@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "40941920599",
+    "project_id": "petpaw-android",
+    "storage_bucket": "petpaw-android.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:40941920599:android:676164c166faeb8f869e12",
+        "android_client_info": {
+          "package_name": "com.petpaw"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAT3xbpinRQoK-TKVfEto3w5c15Tyr07m8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:40941920599:android:9bef6b121541a1b2869e12",
+        "android_client_info": {
+          "package_name": "com.rmit.petpaw"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAT3xbpinRQoK-TKVfEto3w5c15Tyr07m8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
