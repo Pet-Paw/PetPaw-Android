@@ -3,6 +3,7 @@
     <style name="Base.Theme.PetPaw" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
          <item name="colorPrimary">@color/primary</item>
+        <item name="colorOutline">@color/primary</item>
     </style>
 
     <style name="Theme.PetPaw" parent="Base.Theme.PetPaw" />
