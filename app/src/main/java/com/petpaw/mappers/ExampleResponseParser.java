@@ -1,8 +1,5 @@
 package com.petpaw.mappers;
 
-
-
-
 import com.petpaw.clients.ExampleClient;
 import com.petpaw.models.ExampleModel;
 
