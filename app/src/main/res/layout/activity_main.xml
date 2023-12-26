@@ -21,4 +21,10 @@
         android:layout_height="wrap_content"
         android:text="Post detail"/>
 
+    <Button
+        android:id="@+id/createPostBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Create Post"/>
+
 </LinearLayout>

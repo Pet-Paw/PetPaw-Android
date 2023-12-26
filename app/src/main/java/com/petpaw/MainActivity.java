@@ -26,5 +26,15 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        Button createPostBtn = findViewById(R.id.createPostBtn);
+
+        createPostBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, CreatePostActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 }
