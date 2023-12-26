@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "40941920599",
-    "project_id": "petpaw-android",
-    "storage_bucket": "petpaw-android.appspot.com"
+    "project_number": "262951920597",
+    "project_id": "petpaw-1d5a6",
+    "storage_bucket": "petpaw-1d5a6.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:40941920599:android:676164c166faeb8f869e12",
+        "mobilesdk_app_id": "1:262951920597:android:0ba3f57aa272b91504535c",
         "android_client_info": {
           "package_name": "com.petpaw"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyAT3xbpinRQoK-TKVfEto3w5c15Tyr07m8"
+          "current_key": "AIzaSyD8uH6wb6mMn5ifakAKhe-OURUAThXPwsk"
         }
       ],
       "services": {
@@ -26,15 +26,15 @@
     },
     {
       "client_info": {
-        "mobilesdk_app_id": "1:40941920599:android:9bef6b121541a1b2869e12",
+        "mobilesdk_app_id": "1:262951920597:android:639dda62290c920a04535c",
         "android_client_info": {
-          "package_name": "com.rmit.petpaw"
+          "package_name": "com.quang.testing.petpaw"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyAT3xbpinRQoK-TKVfEto3w5c15Tyr07m8"
+          "current_key": "AIzaSyD8uH6wb6mMn5ifakAKhe-OURUAThXPwsk"
         }
       ],
       "services": {
