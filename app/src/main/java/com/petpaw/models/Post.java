@@ -17,8 +17,8 @@ public class Post {
     private List<String> comments;
 
     public Post() {
-//        this.images = new ArrayList<>();
-//        this.comments = new ArrayList<>();
+        this.images = new ArrayList<>();
+        this.comments = new ArrayList<>();
     }
 
     public Post(String title, String content, String author, String petId) {
