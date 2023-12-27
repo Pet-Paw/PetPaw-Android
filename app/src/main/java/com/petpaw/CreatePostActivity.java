@@ -60,7 +60,7 @@ public class CreatePostActivity extends AppCompatActivity {
 
         binding.createPostUploadButton.setOnClickListener(v -> {
             //upload image to firebase storage --------------------------------------------
-//            uploadImage();
+            uploadImage();
 
             //create a new sample post instant and add it to firestore
             // Create a sample Post
@@ -125,7 +125,7 @@ public class CreatePostActivity extends AppCompatActivity {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss", Locale.TAIWAN);
         Date now = new Date();
         String fileName = formatter.format(now);
-        storageReference = FirebaseStorage.getInstance().getReference("images/"+fileName);
+        storageReference = FirebaseStorage.getInstance().getReference("postImages/"+fileName);
 
 
         storageReference.putFile(imageUri)
