@@ -53,7 +53,6 @@ public class CreatePostActivity extends AppCompatActivity {
 
         binding = ActivityCreatePostBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-
         binding.createPostSelectImageButton.setOnClickListener(v -> {
             selectImage();
         });
@@ -66,7 +65,7 @@ public class CreatePostActivity extends AppCompatActivity {
             // Create a sample Post
             Post post = new Post();
             post.setTitle("My Pet");
-            post.setContent("My pet did something cute today!");
+            post.setContent(binding.createPostDescriptionEditText.getText().toString().trim());
             post.setAuthorId("John Doe");
             post.setPetId("pet123");
 
@@ -83,8 +82,6 @@ public class CreatePostActivity extends AppCompatActivity {
                         Log.e("CreatePostActivity", "Error adding document", e);
                     });
         });
-
-
 
 //        DocumentReference docRef;
 //        docRef = db.collection("Posts").document("IzktKwdA0H1mKdswX0r0");
@@ -105,14 +102,11 @@ public class CreatePostActivity extends AppCompatActivity {
 //        });
     }
 
-
     private void selectImage() {
-
         Intent intent = new Intent();
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
         startActivityForResult(intent,100);
-
     }
 
     private void uploadImage() {
@@ -132,8 +126,9 @@ public class CreatePostActivity extends AppCompatActivity {
                 .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                     @Override
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-
                         binding.createPostImageView.setImageURI(null);
+                        binding.createPostImageView.setVisibility(binding.createPostImageView.GONE);
+                        binding.createPostDescriptionEditText.setText("");
                         Toast.makeText(CreatePostActivity.this,"Successfully Uploaded",Toast.LENGTH_SHORT).show();
                         if (progressDialog.isShowing())
                             progressDialog.dismiss();
@@ -141,14 +136,11 @@ public class CreatePostActivity extends AppCompatActivity {
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-
-
                         if (progressDialog.isShowing())
                             progressDialog.dismiss();
                         Toast.makeText(CreatePostActivity.this,"Failed to Upload",Toast.LENGTH_SHORT).show();
                     }
                 });
-
     }
 
     @Override
@@ -156,11 +148,9 @@ public class CreatePostActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == 100 && data != null && data.getData() != null){
-
             imageUri = data.getData();
             binding.createPostImageView.setImageURI(imageUri);
-
-
+            binding.createPostImageView.setVisibility(binding.createPostImageView.VISIBLE);
         }
     }
 
