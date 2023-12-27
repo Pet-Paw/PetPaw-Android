@@ -1,9 +1,6 @@
 package com.petpaw.models;
 
 
-
-import org.w3c.dom.Comment;
-
 import java.util.List;
 
 interface UserInterface {
