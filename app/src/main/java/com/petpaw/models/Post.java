@@ -2,32 +2,33 @@ package com.petpaw.models;
 
 
 
-import org.w3c.dom.Comment;
-
 import java.util.ArrayList;
 import java.util.List;
 
 public class Post {
     private String title;
     private String content;
-    private String author;
+    private String authorId;
     private String petId;
     private int likes;
     private List<String> images;
     private List<String> comments;
+    private List<String> tags;
 
     public Post() {
         this.images = new ArrayList<>();
         this.comments = new ArrayList<>();
+        this.tags = new ArrayList<>();
     }
 
     public Post(String title, String content, String author, String petId) {
         this.title = title;
         this.content = content;
-        this.author = author;
+        this.authorId = author;
         this.petId = petId;
         this.images = new ArrayList<>();
         this.comments = new ArrayList<>();
+        this.tags = new ArrayList<>();
     }
 
     public String getTitle() {
@@ -46,12 +47,12 @@ public class Post {
         this.content = content;
     }
 
-    public String getAuthor() {
-        return author;
+    public String getAuthorId() {
+        return authorId;
     }
 
-    public void setAuthor(String author) {
-        this.author = author;
+    public void setAuthorId(String authorId) {
+        this.authorId = authorId;
     }
 
     public String getPetId() {
@@ -84,6 +85,14 @@ public class Post {
 
     public void setComments(List<String> comments) {
         this.comments = comments;
+    }
+
+    public List<String> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<String> tags) {
+        this.tags = tags;
     }
 
     //    private Post(Builder builder) {
