@@ -12,10 +12,10 @@ import com.petpaw.R;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link ChatOverviewScreenFragment#newInstance} factory method to
+ * Use the {@link MessagesScreenFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ChatOverviewScreenFragment extends Fragment {
+public class MessagesScreenFragment extends Fragment {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -26,7 +26,7 @@ public class ChatOverviewScreenFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    public ChatOverviewScreenFragment() {
+    public MessagesScreenFragment() {
         // Required empty public constructor
     }
 
@@ -39,8 +39,8 @@ public class ChatOverviewScreenFragment extends Fragment {
      * @return A new instance of fragment ChatOverviewScreenFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static ChatOverviewScreenFragment newInstance(String param1, String param2) {
-        ChatOverviewScreenFragment fragment = new ChatOverviewScreenFragment();
+    public static MessagesScreenFragment newInstance(String param1, String param2) {
+        MessagesScreenFragment fragment = new MessagesScreenFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -61,6 +61,6 @@ public class ChatOverviewScreenFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_chat_overview_screen, container, false);
+        return inflater.inflate(R.layout.fragment_messages_screen, container, false);
     }
 }

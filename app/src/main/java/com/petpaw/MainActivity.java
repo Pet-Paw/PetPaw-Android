@@ -59,32 +59,23 @@ public class MainActivity extends AppCompatActivity {
         mBinding.bottomNav.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                switch (item.getItemId()) {
-                    case R.id.menu_bottom_nav_item__home: {
-                        mBinding.bottomNav.setSelectedItemId(R.id.menu_bottom_nav_item__home);
-//                        moveToHomeScreen();
-                        return true;
-                    }
-                    case R.id.menu_bottom_nav_item__search: {
-                        mBinding.bottomNav.setSelectedItemId(R.id.menu_bottom_nav_item__search);
-//                        moveToSearchScreen();
-                        return true;
-                    }
-                    case R.id.menu_bottom_nav_item__notifications: {
-                        mBinding.bottomNav.setSelectedItemId(R.id.menu_bottom_nav_item__notifications);
-//                        moveToNotificationsScreen();
-                        return true;
-                    }
-                    case R.id.menu_bottom_nav_item__notifications: {
-                        mBinding.bottomNav.setSelectedItemId(R.id.menu_bottom_nav_item__messages);
-                        moveToMessagesScreen();
-                        return true;
-                    }
-                    case R.id.menu_bottom_nav_item__profile: {
-                        mBinding.bottomNav.setSelectedItemId(R.id.menu_bottom_nav_item__profile);
-//                        moveToProfileScreen();
-                        return true;
-                    }
+                int itemId = item.getItemId();
+
+                if (itemId == R.id.menu_bottom_nav_item__home) {
+                    mBinding.bottomNav.setSelectedItemId(R.id.menu_bottom_nav_item__home);
+                    return true;
+                } else if (itemId == R.id.menu_bottom_nav_item__search) {
+                    mBinding.bottomNav.setSelectedItemId(R.id.menu_bottom_nav_item__search);
+                    return true;
+                } else if (itemId == R.id.menu_bottom_nav_item__notifications) {
+                    mBinding.bottomNav.setSelectedItemId(R.id.menu_bottom_nav_item__notifications);
+                    return true;
+                } else if (itemId == R.id.menu_bottom_nav_item__messages) {
+                    mBinding.bottomNav.setSelectedItemId(R.id.menu_bottom_nav_item__notifications);
+                    return true;
+                } else if (itemId == R.id.menu_bottom_nav_item__profile) {
+                    mBinding.bottomNav.setSelectedItemId(R.id.menu_bottom_nav_item__profile);
+                    return true;
                 }
 
                 return false;
