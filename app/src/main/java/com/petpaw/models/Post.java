@@ -4,7 +4,10 @@ package com.petpaw.models;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 public class Post {
 //    private String title;
@@ -117,49 +120,18 @@ public class Post {
         this.tags = tags;
     }
 
-    //    private Post(Builder builder) {
-//        this.title = builder.title;
-//        this.content = builder.content;
-//        this.author = builder.author;
-//        this.id = builder.id;
-//        this.images = builder.images;
-//        this.comments = builder.comments;
-//        this.likes = builder.likes;
-//    }
-//
-//    public static class Builder {
-//        private String title;
-//        private String content;
-//        private User author;
-//        private final int id;
-//        private List<String> images;
-//        private List<PostComment> comments;
-//        private int likes;
-//
-//        public Builder(String title, String content, User author, int id) {
-//            this.title = title;
-//            this.content = content;
-//            this.author = author;
-//            this.id = id;
-//        }
-//
-//        public Builder images(List<String> images) {
-//            this.images = images;
-//            return this;
-//        }
-//
-//        public Builder comments(List<PostComment> comments) {
-//            this.comments = comments;
-//            return this;
-//        }
-//
-//        public Builder likes(int likes) {
-//            this.likes = likes;
-//            return this;
-//        }
-//
-//        public Post build() {
-//            return new Post(this);
-//        }
+//    @Override
+//    public Map<String, Object> toDoc(){
+//        Map<String, Object> doc = new HashMap<>();
+//        doc.put("content", this.content);
+//        doc.put("authorId", this.authorId);
+//        doc.put("petId", this.petId);
+//        doc.put("likes", this.likes);
+//        doc.put("dateModified", this.dateModified);
+//        doc.put("isModified", this.isModified);
+//        doc.put("imageURL", this.imageURL);
+//        doc.put("comments", this.comments);
+//        doc.put("tags", this.tags);
+//        return doc;
 //    }
 }
