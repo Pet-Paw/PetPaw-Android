@@ -1,28 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/menu_bottom_nav_item__home"
+        android:icon="@drawable/outline_home_24"
         android:enabled="true"
         android:title="Home"
+        app:showAsAction="always"
         />
     <item
         android:id="@+id/menu_bottom_nav_item__search"
+        android:icon="@drawable/outline_home_24"
         android:enabled="true"
         android:title="Search"
+        app:showAsAction="always"
         />
     <item
         android:id="@+id/menu_bottom_nav_item__notifications"
+        android:icon="@drawable/outline_home_24"
         android:enabled="true"
         android:title="Notifications"
+        app:showAsAction="always"
         />
     <item
         android:id="@+id/menu_bottom_nav_item__messages"
+        android:icon="@drawable/outline_home_24"
         android:enabled="true"
         android:title="Messages"
+        app:showAsAction="always"
         />
     <item
         android:id="@+id/menu_bottom_nav_item__profile"
+        android:icon="@drawable/outline_home_24"
         android:enabled="true"
         android:title="Profile"
+        app:showAsAction="always"
         />
 </menu>
