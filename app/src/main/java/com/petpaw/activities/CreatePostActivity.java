@@ -1,4 +1,4 @@
-package com.petpaw;
+package com.petpaw.activities;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -30,6 +30,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.UploadTask;
+import com.petpaw.R;
 import com.petpaw.databinding.ActivityCreatePostBinding;
 import com.petpaw.databinding.ActivityMainBinding;
 import com.petpaw.models.Post;
