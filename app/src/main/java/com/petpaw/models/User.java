@@ -30,32 +30,17 @@ interface UserInterface {
 }
 public class User implements UserInterface {
     private String name;
-    private final int id;
+    private String id;
     private String bio;
     private String email;
     private String phone;
     private String address;
     private String imageURL;
-    private List<User> friends;
-    private List<User> followers;
-    private List<User> following;
-    private List<Post> posts;
-    private List<Pet> pets;
-
-    private User(Builder builder) {
-        this.name = builder.name;
-        this.id = builder.id;
-        this.bio = builder.bio;
-        this.email = builder.email;
-        this.phone = builder.phone;
-        this.address = builder.address;
-        this.imageURL = builder.imageURL;
-        this.friends = builder.friends;
-        this.followers = builder.followers;
-        this.following = builder.following;
-        this.posts = builder.posts;
-        this.pets = builder.pets;
-    }
+    private List<String> friends;
+    private List<String> followers;
+    private List<String> following;
+    private List<String> posts;
+    private List<String> pets;
 
     @Override
     public void createPost(Post newPost) {
@@ -142,81 +127,111 @@ public class User implements UserInterface {
 
     }
 
-    public static class Builder {
-        private final int id;
-        private String name;
-        private String bio;
-        private String email;
-        private String phone;
-        private String address;
-        private String imageURL;
-        private List<User> friends;
-        private List<User> followers;
-        private List<User> following;
-        private List<Post> posts;
-        private List<Pet> pets;
+    public User() {
 
-        public Builder(int id) {
-            this.id = id;
-        }
+    }
 
-        public Builder name(String name) {
-            this.name = name;
-            return this;
-        }
+    public User(String id, String username, String email, String phoneNumber, String address) {
+        this.id = id;
+        this.name = username;
+        this.email = email;
+        this.phone = phoneNumber;
+        this.address = address;
+    }
 
-        public Builder bio(String bio) {
-            this.bio = bio;
-            return this;
-        }
+    public String getName() {
+        return name;
+    }
 
-        public Builder email(String email) {
-            this.email = email;
-            return this;
-        }
+    public void setName(String name) {
+        this.name = name;
+    }
 
-        public Builder phone(String phone) {
-            this.phone = phone;
-            return this;
-        }
+    public String getId() {
+        return id;
+    }
 
-        public Builder address(String address) {
-            this.address = address;
-            return this;
-        }
+    public void setId(String id) {
+        this.id = id;
+    }
 
-        public Builder imageURL(String imageURL) {
-            this.imageURL = imageURL;
-            return this;
-        }
+    public String getBio() {
+        return bio;
+    }
 
-        public Builder friends(List<User> friends) {
-            this.friends = friends;
-            return this;
-        }
+    public void setBio(String bio) {
+        this.bio = bio;
+    }
 
-        public Builder followers(List<User> followers) {
-            this.followers = followers;
-            return this;
-        }
+    public String getEmail() {
+        return email;
+    }
 
-        public Builder following(List<User> following) {
-            this.following = following;
-            return this;
-        }
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
-        public Builder posts(List<Post> posts) {
-            this.posts = posts;
-            return this;
-        }
+    public String getPhone() {
+        return phone;
+    }
 
-        public Builder pets(List<Pet> pets) {
-            this.pets = pets;
-            return this;
-        }
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
 
-        public User build() {
-            return new User(this);
-        }
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getImageURL() {
+        return imageURL;
+    }
+
+    public void setImageURL(String imageURL) {
+        this.imageURL = imageURL;
+    }
+
+    public List<String> getFriends() {
+        return friends;
+    }
+
+    public void setFriends(List<String> friends) {
+        this.friends = friends;
+    }
+
+    public List<String> getFollowers() {
+        return followers;
+    }
+
+    public void setFollowers(List<String> followers) {
+        this.followers = followers;
+    }
+
+    public List<String> getFollowing() {
+        return following;
+    }
+
+    public void setFollowing(List<String> following) {
+        this.following = following;
+    }
+
+    public List<String> getPosts() {
+        return posts;
+    }
+
+    public void setPosts(List<String> posts) {
+        this.posts = posts;
+    }
+
+    public List<String> getPets() {
+        return pets;
+    }
+
+    public void setPets(List<String> pets) {
+        this.pets = pets;
     }
 }
