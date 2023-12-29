@@ -56,9 +56,9 @@ public class CreatePostActivity extends AppCompatActivity {
     ActivityCreatePostBinding binding;
 
     private Uri imageUri;
-    Uri uploadImageUri;
+//    Uri uploadImageUri;
     private StorageReference storageReference;
-    private StorageReference getImageStorageReference;
+//    private StorageReference getImageStorageReference;
     private DocumentReference postDocRef;
     private boolean isSelectNewImage = false;
 
@@ -79,6 +79,10 @@ public class CreatePostActivity extends AppCompatActivity {
 
 // ------------Check if the intent has a postId, if it does, then it is an edit post -----------------
         if(postId != null) {
+            progressDialog = new ProgressDialog(this);
+            progressDialog.setTitle("Fetching Post Detail....");
+            progressDialog.show();
+
             binding.createPostUploadButton.setVisibility(View.GONE);
             Log.d("CreatePostActivity", "PostId: " + postId);
 
@@ -88,19 +92,19 @@ public class CreatePostActivity extends AppCompatActivity {
             });
 
             FirebaseFirestore db = FirebaseFirestore.getInstance();
-            DocumentReference docRef;
-            docRef = db.collection("Posts").document(postId);
-            docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            DocumentReference postRef;
+            postRef = db.collection("Posts").document(postId);
+            postRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                 @Override
                 public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                     if (task.isSuccessful()) {
                         DocumentSnapshot document = task.getResult();
                         if (document.exists()) {
-                            postDocRef = docRef;
+                            postDocRef = postRef;
 
 //                           ----------- Load image with the URL then the description -----------
                             String imageUrl = document.getString("imageURL");
-                            Log.d("CreatePostActivity", "Image URL Open New: " + imageUrl);
+//                            Log.d("CreatePostActivity", "Image URL Open New: " + imageUrl);
                             Picasso.get()
                                     .load(imageUrl)
                                     .tag(System.currentTimeMillis())
@@ -108,6 +112,8 @@ public class CreatePostActivity extends AppCompatActivity {
                                         @Override
                                         public void onSuccess() {
                                             binding.createPostImageView.setVisibility(View.VISIBLE);
+                                            if (progressDialog.isShowing())
+                                                progressDialog.dismiss();
                                             Log.d("TAG", "Load image successfully");
                                         }
 
@@ -146,7 +152,7 @@ public class CreatePostActivity extends AppCompatActivity {
                                     data.put("dateModified", new Date());
                                     data.put("modified", true);
 
-                                    docRef.update(data)
+                                    postRef.update(data)
                                             .addOnSuccessListener(aVoid -> {
                                                 Log.d("CreatePostActivity", "DocumentSnapshot successfully updated!");
                                                 if(isSelectNewImage) {
@@ -158,12 +164,42 @@ public class CreatePostActivity extends AppCompatActivity {
                                                 Log.e("CreatePostActivity", "Error updating document", e);
                                             });
                                 }
-
                             });
 
+                            storageReference = FirebaseStorage.getInstance().getReference("postImages/"+postId);
+
+                            binding.createPostDeleteButton.setOnClickListener(v -> {
+                                postRef.delete()
+                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
+
+                                                storageReference.delete()
+                                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                            @Override
+                                                            public void onSuccess(Void aVoid) {
+                                                                Log.d("TAG", "Image deleted from storage!");
+                                                            }
+                                                        });
+
+                                                Log.d("TAG", "Document deleted from Firestore!");
+                                                finish();
+
+                                            }
+                                        }).addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception exception) {
+                                                Log.w("TAG", "Failed to delete image and/or document", exception);
+                                            }
+                                        });
+                            });
 
                         } else {
+                            if (progressDialog.isShowing())
+                                progressDialog.dismiss();
+                            Toast.makeText(CreatePostActivity.this, "Post Detail not found", Toast.LENGTH_SHORT).show();
                             Log.d("TAG", "No document found");
+                            finish();
                         }
                     } else {
                         Log.d("TAG", "Get failed with ", task.getException());
@@ -240,7 +276,7 @@ public class CreatePostActivity extends AppCompatActivity {
     private void uploadImage(String postId, boolean isEditImage) {
 
         progressDialog = new ProgressDialog(this);
-        progressDialog.setTitle("Uploading File....");
+        progressDialog.setTitle("Uploading to Database....");
         progressDialog.show();
 
         //Change the time to VN time
@@ -271,7 +307,12 @@ public class CreatePostActivity extends AppCompatActivity {
                                         postDocRef.update(data)
                                                 .addOnSuccessListener(aVoid -> {
                                                     Log.d("CreatePostActivity", "Update image path successfully");
+
                                                     finish();
+//                                                    startActivity(getIntent());
+
+//                                                    recreate();
+
                                                 })      .addOnFailureListener(e->{
                                                     Log.e("CreatePostActivity", "Error updating document", e);
                                                 });
@@ -287,7 +328,6 @@ public class CreatePostActivity extends AppCompatActivity {
                                                     Log.e("CreatePostActivity", "Error updating document", e);
                                                 });
                                     }
-
                                 });
                     }
                 }).addOnFailureListener(new OnFailureListener() {

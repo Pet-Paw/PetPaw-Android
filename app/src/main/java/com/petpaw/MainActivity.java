@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, CreatePostActivity.class);
-                intent.putExtra("postId", "tJrkz9WpKfKwfyGt0tyN");
+                intent.putExtra("postId", "dAFpjNbn9wLFPWt1DhS4");
                 startActivity(intent);
             }
         });
