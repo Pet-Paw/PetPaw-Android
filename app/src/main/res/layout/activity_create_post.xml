@@ -202,7 +202,7 @@
             android:id="@+id/createPostBackButton"
             android:layout_width="100sp"
             android:layout_height="wrap_content"
-            android:backgroundTint="@color/red"
+            android:backgroundTint="@color/darkGray"
             android:text="Back"
             android:textColor="#FFFFFF"
             android:textStyle="bold" />

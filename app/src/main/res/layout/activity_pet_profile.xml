@@ -52,9 +52,9 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:backgroundTint="@color/darkGray"
         android:text="Delete"
         android:textAllCaps="false"
-        android:backgroundTint="@color/red"
         app:cornerRadius="20dp" />
 
     <LinearLayout
