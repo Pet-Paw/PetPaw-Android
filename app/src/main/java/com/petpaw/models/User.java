@@ -1,142 +1,38 @@
 package com.petpaw.models;
 
+import com.google.firebase.Firebase;
+import com.petpaw.interfaces.FirebaseDoc;
 
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
-interface UserInterface {
-
-    /*POST MANAGEMENT*/
-    void createPost(Post newPost);
-    void deletePost(String postId);
-    void editPost(String postId, Post newPost);
-    void commentPost(String postId, PostComment comment);
-    void likePost(String postId);
-    List<Post> searchPosts(FilterBy filterBy);
-
-    /*FRIEND AND SOCIAL MANAGEMENT*/
-    void addFriend(User newFriend);
-    void removeFriend(User friend);
-    List<User> searchFriends(FilterBy filterBy);
-    void follow(User user);
-    void unfollow(User user);
-
-    /*PET PROFILE MANAGEMENT*/
-    void addPet(Pet newPet);
-    void removePet(String petId);
-    void editPet(String petId, Pet pet);
-    List<Pet> searchPets(FilterBy filterBy);
-    void addPetToPost(String postId, Pet pet);
-    void removePetFromPost(String postId, Pet pet);
-}
-public class User implements UserInterface {
+public class User implements FirebaseDoc {
+    public static final String USERS = "users";
+    private String uid;
     private String name;
-    private String id;
-    private String bio;
     private String email;
     private String phone;
     private String address;
     private String imageURL;
-    private List<String> friends;
-    private List<String> followers;
-    private List<String> following;
-    private List<String> posts;
-    private List<String> pets;
-
-    @Override
-    public void createPost(Post newPost) {
-
-    }
-
-    @Override
-    public void deletePost(String postId) {
-
-    }
-
-    @Override
-    public void editPost(String postId, Post newPost) {
-
-    }
-
-    @Override
-    public void commentPost(String postId, PostComment comment) {
-
-    }
-
-    @Override
-    public void likePost(String postId) {
-
-    }
-
-    @Override
-    public List<Post> searchPosts(FilterBy filterBy) {
-        return null;
-    }
-
-    @Override
-    public void addFriend(User newFriend) {
-
-    }
-
-    @Override
-    public void removeFriend(User friend) {
-
-    }
-
-    @Override
-    public List<User> searchFriends(FilterBy filterBy) {
-        return null;
-    }
-
-    @Override
-    public void follow(User user) {
-
-    }
-
-    @Override
-    public void unfollow(User user) {
-
-    }
-
-    @Override
-    public void addPet(Pet newPet) {
-
-    }
-
-    @Override
-    public void removePet(String petId) {
-
-    }
-
-    @Override
-    public void editPet(String petId, Pet pet) {
-
-    }
-
-    @Override
-    public List<Pet> searchPets(FilterBy filterBy) {
-        return null;
-    }
-
-    @Override
-    public void addPetToPost(String postId, Pet pet) {
-
-    }
-
-    @Override
-    public void removePetFromPost(String postId, Pet pet) {
-
-    }
 
     public User() {
-
     }
 
-    public User(String id, String username, String email, String phoneNumber, String address) {
-        this.id = id;
+    public User(String uid, String username, String email, String phoneNumber, String address) {
+        this.uid= uid;
         this.name = username;
         this.email = email;
         this.phone = phoneNumber;
         this.address = address;
+    }
+
+
+    public String getUid() {
+        return uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
     }
 
     public String getName() {
@@ -147,20 +43,12 @@ public class User implements UserInterface {
         this.name = name;
     }
 
-    public String getId() {
-        return id;
+    public String getImageURL() {
+        return imageURL;
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getBio() {
-        return bio;
-    }
-
-    public void setBio(String bio) {
-        this.bio = bio;
+    public void setImageURL(String imageURL) {
+        this.imageURL = imageURL;
     }
 
     public String getEmail() {
@@ -187,51 +75,11 @@ public class User implements UserInterface {
         this.address = address;
     }
 
-    public String getImageURL() {
-        return imageURL;
-    }
-
-    public void setImageURL(String imageURL) {
-        this.imageURL = imageURL;
-    }
-
-    public List<String> getFriends() {
-        return friends;
-    }
-
-    public void setFriends(List<String> friends) {
-        this.friends = friends;
-    }
-
-    public List<String> getFollowers() {
-        return followers;
-    }
-
-    public void setFollowers(List<String> followers) {
-        this.followers = followers;
-    }
-
-    public List<String> getFollowing() {
-        return following;
-    }
-
-    public void setFollowing(List<String> following) {
-        this.following = following;
-    }
-
-    public List<String> getPosts() {
-        return posts;
-    }
-
-    public void setPosts(List<String> posts) {
-        this.posts = posts;
-    }
-
-    public List<String> getPets() {
-        return pets;
-    }
-
-    public void setPets(List<String> pets) {
-        this.pets = pets;
+    @Override
+    public Map<String, Object> toDoc() {
+        Map<String, Object> doc = new HashMap<>();
+        doc.put("name", name);
+        doc.put("imageURL", imageURL);
+        return doc;
     }
 }

@@ -17,31 +17,31 @@
         <activity
             android:name=".activities.SignUpActivity"
             android:exported="false" />
+
         <activity
             android:name=".activities.SignInActivity"
             android:exported="false" />
+
         <activity
             android:name=".activities.StartActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".activities.MainActivity"
+            android:exported="false">
+        </activity>
 
         <activity
             android:name=".PostDetailActivity"
             android:exported="false" />
         <activity
-            android:name=".MainActivity"
-            android:exported="false">
-
-        </activity>
-        <activity
             android:name=".activities.CreatePostActivity"
-            android:exported="true"
+            android:exported="false"
             android:windowSoftInputMode="adjustPan" />
 
         <meta-data
