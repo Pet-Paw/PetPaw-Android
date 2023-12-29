@@ -9,12 +9,12 @@ import java.util.Map;
 public class User implements FirebaseDoc {
     private String uid;
     private String name;
-    private String imageUrl;
+    private String imageURL;
 
     public User(String uid, String name, String imageUrl) {
         this.uid = uid;
         this.name = name;
-        this.imageUrl = imageUrl;
+        this.imageURL = imageUrl;
     }
 
     public String getUid() {
@@ -33,19 +33,19 @@ public class User implements FirebaseDoc {
         this.name = name;
     }
 
-    public String getImageUrl() {
-        return imageUrl;
+    public String getImageURL() {
+        return imageURL;
     }
 
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
+    public void setImageURL(String imageURL) {
+        this.imageURL = imageURL;
     }
 
     @Override
     public Map<String, Object> toDoc() {
         Map<String, Object> doc = new HashMap<>();
         doc.put("name", name);
-        doc.put("imageUrl", imageUrl);
+        doc.put("imageURL", imageURL);
         return doc;
     }
 }

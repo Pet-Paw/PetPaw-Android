@@ -61,7 +61,6 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
             // TODO: load user avatar and username
 //            Picasso.get().load()
         }
-
     }
 
     @Override

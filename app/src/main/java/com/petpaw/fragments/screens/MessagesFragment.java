@@ -65,8 +65,8 @@ public class MessagesFragment extends Fragment {
     }
 
     private void getMessagesFromDb() {
-        mDb.collection(Message.MESSAGES)
-                .whereEqualTo("receiverId", mUser.getUid())
+//        mDb.collection(Message.MESSAGES)
+//                .whereEqualTo("receiverId", mUser.getUid())
 
     }
 }

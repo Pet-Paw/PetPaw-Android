@@ -4,23 +4,29 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/navigation_bottom_nav"
     app:startDestination="@id/homeFragment">
-
     <fragment
         android:id="@+id/homeFragment"
         android:name="com.petpaw.fragments.screens.HomeFragment"
         android:label="fragment_home"
-        tools:layout="@layout/fragment_home" >
-        <action
-            android:id="@+id/action_homeFragment_to_messagesFragment"
-            app:destination="@id/messagesFragment" />
-    </fragment>
+        tools:layout="@layout/fragment_home" />
     <fragment
         android:id="@+id/messagesFragment"
         android:name="com.petpaw.fragments.screens.MessagesFragment"
         android:label="fragment_messages"
-        tools:layout="@layout/fragment_messages" >
-        <action
-            android:id="@+id/action_messagesFragment_to_homeFragment"
-            app:destination="@id/homeFragment" />
-    </fragment>
+        tools:layout="@layout/fragment_messages" />
+    <fragment
+        android:id="@+id/notificationsFragment"
+        android:name="com.petpaw.fragments.screens.NotificationsFragment"
+        android:label="fragment_notifications"
+        tools:layout="@layout/fragment_notifications" />
+    <fragment
+        android:id="@+id/searchFragment"
+        android:name="com.petpaw.fragments.screens.SearchFragment"
+        android:label="fragment_search"
+        tools:layout="@layout/fragment_search" />
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.petpaw.fragments.screens.ProfileFragment"
+        android:label="fragment_profile"
+        tools:layout="@layout/fragment_profile" />
 </navigation>
