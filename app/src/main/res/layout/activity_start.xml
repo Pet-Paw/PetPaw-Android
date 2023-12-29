@@ -50,6 +50,7 @@
     <Button
         android:layout_width="300dp"
         android:layout_gravity="center"
+        android:id="@+id/startBtn"
 
         android:layout_height="64dp"
         android:text="Get Started"

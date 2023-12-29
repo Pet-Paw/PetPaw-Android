@@ -24,6 +24,7 @@
 
         <EditText
             style="@style/Widget.Material3.TextInputEditText.OutlinedBox"
+            android:id="@+id/username"
             android:layout_width="324dp"
             android:layout_height="55dp"
             android:layout_gravity="center"
@@ -36,10 +37,12 @@
 
         <EditText
             style="@style/Widget.Material3.TextInputEditText.OutlinedBox"
+            android:id="@+id/emailOrPhone"
             android:layout_width="324dp"
             android:layout_height="55dp"
             android:layout_gravity="center"
             android:layout_marginTop="15dp"
+
             android:background="@drawable/edit_text_border"
             android:drawableBottom="@color/black"
             android:hint="Email/Phone Number"
@@ -49,31 +52,32 @@
 
         <EditText
             style="@style/Widget.Material3.TextInputEditText.OutlinedBox"
+            android:id="@+id/address"
             android:layout_width="324dp"
             android:layout_height="55dp"
             android:layout_gravity="center"
             android:layout_marginTop="15dp"
             android:background="@drawable/edit_text_border"
             android:drawableBottom="@color/black"
-            android:hint="Email Address"
+            android:hint="Address"
             android:inputType="textEmailAddress"
             android:textSize="20dp" />
 
         <EditText
             style="@style/Widget.Material3.TextInputEditText.OutlinedBox"
+            android:id="@+id/password"
             android:layout_width="324dp"
             android:layout_height="55dp"
             android:layout_gravity="center"
             android:layout_marginTop="15dp"
             android:background="@drawable/edit_text_border"
             android:hint="Enter Your Password"
-            android:inputType="textEmailAddress"
+            android:inputType="textPassword"
             android:textSize="20dp" />
 
 
-
-
         <Button
+            android:id="@+id/btnSignUp"
             android:layout_width="324dp"
             android:layout_height="64dp"
             android:layout_gravity="center"
@@ -106,6 +110,7 @@
             android:textSize="15sp" />
 
         <TextView
+            android:id="@+id/directToLogin"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="@font/poppins_medium"
