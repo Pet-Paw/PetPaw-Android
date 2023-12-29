@@ -32,6 +32,7 @@
                         android:layout_height="wrap_content"
                         app:cardCornerRadius="30dp">
                         <ImageView
+                            android:id="@+id/postCardViewProfilePic"
                             android:layout_width="48dp"
                             android:layout_height="48dp"
                             android:src="@drawable/profile_pic_placeholder"
@@ -42,23 +43,31 @@
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
                         android:gravity="center_vertical"
-                        android:layout_marginLeft="10dp">
+                        android:layout_marginLeft="10dp"
+                        android:layout_gravity="center">
+
                         <TextView
+                            android:id="@+id/postCardViewUserNameTextView"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="Le Duy Quang"/>
+                            android:layout_height="match_parent"
+                            android:text="Le Duy Quang"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+<!--                        <TextView-->
+<!--                            android:layout_width="match_parent"-->
+<!--                            android:layout_height="wrap_content"-->
+<!--                            android:text="Go Vap, Ho Chi Minh City"/>-->
                         <TextView
+                            android:id="@+id/postCardViewDate"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="Go Vap, Ho Chi Minh City"/>
+                            android:layout_height="match_parent"
+                            android:text="Jan 1st 2024"
+                            android:textAlignment="textStart" />
                     </LinearLayout>
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:text="2 Hr Ago"
-                        android:textAlignment="textEnd"/>
+
                 </LinearLayout>
                 <ImageView
+                    android:id="@+id/postCardImageView"
                     android:layout_width="match_parent"
                     android:layout_height="200dp"
                     android:src="@drawable/cat_placeholder"
@@ -75,6 +84,7 @@
                         android:src="@drawable/outline_thumb_up_24_unliked"
                         android:layout_marginRight="5dp"/>
                     <TextView
+                        android:id="@+id/postCardViewLikeCountTextView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="0" />
@@ -85,6 +95,7 @@
                         android:layout_marginRight="5dp"
                         android:layout_marginLeft="20dp"/>
                     <TextView
+                        android:id="@+id/postCardViewCommentCountTextView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="0" />
