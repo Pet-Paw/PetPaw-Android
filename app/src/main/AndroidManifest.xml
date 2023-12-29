@@ -13,6 +13,15 @@
         android:theme="@style/Theme.PetPaw"
         tools:targetApi="31">
         <activity
+            android:name=".PetProfileActivity"
+            android:exported="false" />
+        <activity
+            android:name=".EditProfileActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ProfileActivity"
+            android:exported="false" />
+        <activity
             android:name=".PostDetailActivity"
             android:exported="false" />
         <activity
@@ -27,8 +36,7 @@
         <activity
             android:name=".CreatePostActivity"
             android:exported="true"
-            android:windowSoftInputMode="adjustPan"/>
-
+            android:windowSoftInputMode="adjustPan" />
     </application>
 
 </manifest>
