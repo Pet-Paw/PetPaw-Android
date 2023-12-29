@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class User implements FirebaseDoc {
+    public static final String USERS = "users";
     private String uid;
     private String name;
     private String imageURL;

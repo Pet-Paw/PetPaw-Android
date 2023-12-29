@@ -2,25 +2,19 @@ package com.petpaw.models;
 
 import com.petpaw.interfaces.FirebaseDoc;
 
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 public class Message implements FirebaseDoc {
-    public static final String MESSAGES = "Messages";
+    public static final String MESSAGES = "MESSAGES";
     private String uid;
     private String senderId;
-    private String receiverId;
     private String content;
-    private Date timeStamp;
+    private Date sentAt;
 
-    public Message(String uid, String senderId, String receiverId, String content, Date timeStamp) {
-        this.uid = uid;
-        this.senderId = senderId;
-        this.receiverId = receiverId;
-        this.content = content;
-        this.timeStamp = timeStamp;
-    }
+    public Message() {}
 
     public String getUid() {
         return uid;
@@ -38,14 +32,6 @@ public class Message implements FirebaseDoc {
         this.senderId = senderId;
     }
 
-    public String getReceiverId() {
-        return receiverId;
-    }
-
-    public void setReceiverId(String receiverId) {
-        this.receiverId = receiverId;
-    }
-
     public String getContent() {
         return content;
     }
@@ -54,21 +40,22 @@ public class Message implements FirebaseDoc {
         this.content = content;
     }
 
-    public Date getTimeStamp() {
-        return timeStamp;
+    public Date getSentAt() {
+        return sentAt;
     }
 
-    public void setTimeStamp(Date timeStamp) {
-        this.timeStamp = timeStamp;
+    public void setSentAt(Date sentAt) {
+        this.sentAt = sentAt;
     }
 
     @Override
     public Map<String, Object> toDoc() {
         Map<String, Object> doc = new HashMap<>();
-        doc.put("senderId", senderId);
-        doc.put("receiverId", receiverId);
         doc.put("content", content);
-        doc.put("timeStamp", timeStamp);
+        doc.put("sentAt", sentAt);
+        doc.put("senderId", senderId);
         return doc;
     }
+
+
 }
