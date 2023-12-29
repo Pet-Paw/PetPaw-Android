@@ -47,11 +47,20 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        Button editPostBtn = findViewById(R.id.editPostBtn);
+        editPostBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, CreatePostActivity.class);
+                intent.putExtra("postId", "tJrkz9WpKfKwfyGt0tyN");
+                startActivity(intent);
+            }
+        });
     }
 
     private void setupUI() {
         setupBottomNav();
-
     }
 
     @SuppressLint("NonConstantResourceId")

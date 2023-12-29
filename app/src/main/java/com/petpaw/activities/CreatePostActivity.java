@@ -41,6 +41,7 @@ import android.widget.Toast;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.petpaw.databinding.ActivityCreatePostBinding;
+import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -59,6 +60,8 @@ public class CreatePostActivity extends AppCompatActivity {
     private StorageReference storageReference;
     private StorageReference getImageStorageReference;
     private DocumentReference postDocRef;
+    private boolean isSelectNewImage = false;
+
     ProgressDialog progressDialog;
 
 //    *** The imageId is also the post id ***
@@ -74,14 +77,15 @@ public class CreatePostActivity extends AppCompatActivity {
         binding = ActivityCreatePostBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        binding.createPostSelectImageButton.setOnClickListener(v -> {
-            selectImage();
-        });
-
-// ------------Check if the intent has a postId, if it does, then it is an edit post -------------------
+// ------------Check if the intent has a postId, if it does, then it is an edit post -----------------
         if(postId != null) {
             binding.createPostUploadButton.setVisibility(View.GONE);
             Log.d("CreatePostActivity", "PostId: " + postId);
+
+            binding.createPostSelectImageButton.setOnClickListener(v -> {
+                selectImage();
+                isSelectNewImage = true;
+            });
 
             FirebaseFirestore db = FirebaseFirestore.getInstance();
             DocumentReference docRef;
@@ -92,10 +96,74 @@ public class CreatePostActivity extends AppCompatActivity {
                     if (task.isSuccessful()) {
                         DocumentSnapshot document = task.getResult();
                         if (document.exists()) {
-                            Log.d("TAG", "Document data: " + document.getData());
+                            postDocRef = docRef;
+
+//                           ----------- Load image with the URL then the description -----------
+                            String imageUrl = document.getString("imageURL");
+                            Log.d("CreatePostActivity", "Image URL Open New: " + imageUrl);
+                            Picasso.get()
+                                    .load(imageUrl)
+                                    .tag(System.currentTimeMillis())
+                                    .into(binding.createPostImageView, new com.squareup.picasso.Callback() {
+                                        @Override
+                                        public void onSuccess() {
+                                            binding.createPostImageView.setVisibility(View.VISIBLE);
+                                            Log.d("TAG", "Load image successfully");
+                                        }
+
+                                        @Override
+                                        public void onError(Exception e) {
+                                            Log.e("TAG", "Load image failed");
+                                        }
+                                    });
+
+                            binding.createPostDescriptionEditText.setText(document.getString("content"));
+
+//                            ------- Check valid input --------
+                            binding.createPostSaveButton.setOnClickListener(v -> {
+                                boolean isValid = true;
+                                List<String> tags = new ArrayList<>();
+
+                                String description = binding.createPostDescriptionEditText.getText().toString();
+
+                                if(!description.isEmpty()){
+                                    String[] parts = description.split("#");
+                                    for(int i=1; i<parts.length; i++) {
+                                        String part = parts[i];
+                                        if(!part.isEmpty() && part.charAt(0) != '#') {
+                                            tags.add(part);
+                                        }
+                                    }
+                                    Log.d("CreatePostActivity", "Tags: " + tags.toString());
+                                }
+
+//                            -------- update if valid input --------
+
+                                if(isValid) {
+                                    Map<String, Object> data = new HashMap<>();
+                                    data.put("content", description);
+                                    data.put("tags", tags);
+                                    data.put("dateModified", new Date());
+                                    data.put("modified", true);
+
+                                    docRef.update(data)
+                                            .addOnSuccessListener(aVoid -> {
+                                                Log.d("CreatePostActivity", "DocumentSnapshot successfully updated!");
+                                                if(isSelectNewImage) {
+                                                    uploadImage(postId,true);
+                                                } else {
+                                                    finish();
+                                                }
+                                            })      .addOnFailureListener(e->{
+                                                Log.e("CreatePostActivity", "Error updating document", e);
+                                            });
+                                }
+
+                            });
+
 
                         } else {
-                            Log.d("TAG", "No such document");
+                            Log.d("TAG", "No document found");
                         }
                     } else {
                         Log.d("TAG", "Get failed with ", task.getException());
@@ -103,34 +171,12 @@ public class CreatePostActivity extends AppCompatActivity {
                 }
             });
 
-            //get the image from storage and set it to the image view
-            getImageStorageReference = FirebaseStorage.getInstance().getReference().child("postImages/"+postId);
-            Log.d("CreatePostActivity", "Image Storage Reference: " + getImageStorageReference.toString());
+        }
+        else { //----------if it does not have a postId, then it is a new post --------------
+            binding.createPostSelectImageButton.setOnClickListener(v -> {
+                selectImage();
+            });
 
-            try {
-                final File localFile = File.createTempFile(postId, "jpg");
-                Log.d("CreatePostActivity", "Local file created");
-                getImageStorageReference.getFile(localFile)
-                        .addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
-                            @Override
-                            public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                                Bitmap bitmap = BitmapFactory.decodeFile(localFile.getAbsolutePath());
-                                binding.createPostImageView.setImageBitmap(bitmap);
-                            }
-                        }).addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Log.e("CreatePostActivity", "Error getting image from storage", e);
-                            }
-                        }
-                );
-            }catch (Exception e){
-                Log.e("CreatePostActivity", "Error creating temp file", e);
-            }
-
-
-
-        }else { //if it does not have a postId, then it is a new post ------------------------------
             Log.d("CreatePostActivity", "PostId is null");
             binding.createPostButtonLinearLayout.setVisibility(View.GONE);
             binding.createPostUploadButton.setOnClickListener(v -> {
@@ -139,23 +185,26 @@ public class CreatePostActivity extends AppCompatActivity {
 
                 String description = binding.createPostDescriptionEditText.getText().toString();
 
-                String[] parts = description.split("#");
-                for(int i=1; i<parts.length; i++) {
-                    String part = parts[i];
-                    if(!part.isEmpty() && part.charAt(0) != '#') {
-                        tags.add(part);
+                if(!description.isEmpty()){
+                    String[] parts = description.split("#");
+                    for(int i=1; i<parts.length; i++) {
+                        String part = parts[i];
+                        if(!part.isEmpty() && part.charAt(0) != '#') {
+                            tags.add(part);
+                        }
                     }
+                    Log.d("CreatePostActivity", "Tags: " + tags.toString());
                 }
 
-                Log.d("CreatePostActivity", "Tags: " + tags.toString());
 
                 if(isValid){
-//                    ****Still haven't had the add petId ****
                     Post post = new Post();
                     post.setDateModified(new Date());
                     post.setContent(description);
                     post.setAuthorId("John Doe");
+//                    **** Still haven't had correct petId ****
                     post.setPetId("pet123");
+                    post.setTags(tags);
 
                     // Test connection to firebase ----------------------------------------
                     FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -164,14 +213,12 @@ public class CreatePostActivity extends AppCompatActivity {
                             .add(post)
                             .addOnSuccessListener(documentReference -> {
                                 postDocRef = documentReference;
-                                uploadImage(documentReference.getId());
-                                //#at this part, tag and the imageURL to the post
-
+                                uploadImage(documentReference.getId(), false);
 
                                 Toast.makeText(this, "Post Successfully Created", Toast.LENGTH_SHORT).show();
                                 Log.d("CreatePostActivity", "DocumentSnapshot written with ID: " + documentReference.getId());
 
-//                        ******** Remember to add the post id to the user data also ********
+//                        ******** Need to update relevant class Later on ********
 
                             })
                             .addOnFailureListener(e -> {
@@ -190,7 +237,7 @@ public class CreatePostActivity extends AppCompatActivity {
         startActivityForResult(intent,100);
     }
 
-    private void uploadImage(String postId) {
+    private void uploadImage(String postId, boolean isEditImage) {
 
         progressDialog = new ProgressDialog(this);
         progressDialog.setTitle("Uploading File....");
@@ -216,18 +263,31 @@ public class CreatePostActivity extends AppCompatActivity {
                         // Get download URL after upload completes
                         taskSnapshot.getStorage().getDownloadUrl()
                                 .addOnSuccessListener(uri -> {
-                                    uploadImageUri = uri;
-                                    Log.d("CreatePostActivity", "Image URL: " + uploadImageUri);
-                                    Map<String, Object> data = new HashMap<>();
-                                    data.put("imageURL", uploadImageUri.toString());
+                                    Log.d("CreatePostActivity", "Image URL: " + uri);
 
-                                    postDocRef.update(data)
-                                            .addOnSuccessListener(aVoid -> {
-                                                Log.d("CreatePostActivity", "DocumentSnapshot successfully updated!");
+                                    if(isEditImage){
+                                        Map<String, Object> data = new HashMap<>();
+                                        data.put("imageURL", uri.toString());
+                                        postDocRef.update(data)
+                                                .addOnSuccessListener(aVoid -> {
+                                                    Log.d("CreatePostActivity", "Update image path successfully");
+                                                    finish();
+                                                })      .addOnFailureListener(e->{
+                                                    Log.e("CreatePostActivity", "Error updating document", e);
+                                                });
+                                        finish();
+                                    }else{
+                                        Map<String, Object> data = new HashMap<>();
+                                        data.put("imageURL", uri.toString());
+                                        postDocRef.update(data)
+                                                .addOnSuccessListener(aVoid -> {
+                                                    Log.d("CreatePostActivity", "DocumentSnapshot successfully updated!");
                                                 finish();
-                                            })      .addOnFailureListener(e->{
-                                                Log.e("CreatePostActivity", "Error updating document", e);
-                                            });
+                                                })      .addOnFailureListener(e->{
+                                                    Log.e("CreatePostActivity", "Error updating document", e);
+                                                });
+                                    }
+
                                 });
                     }
                 }).addOnFailureListener(new OnFailureListener() {
