@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:ignore="MissingPrefix">
+
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="match_parent"
+
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        tools:context=".activities.StartActivity">
+
+        <ImageView
+            android:id="@+id/logo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:layout_marginTop="20dp"
+            android:src="@drawable/signup_banner" />
+
+        <EditText
+            style="@style/Widget.Material3.TextInputEditText.OutlinedBox"
+            android:id="@+id/username"
+            android:layout_width="324dp"
+            android:layout_height="55dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="50dp"
+            android:background="@drawable/edit_text_border"
+            android:drawableBottom="@color/black"
+            android:hint="Username"
+            android:inputType="textEmailAddress"
+            android:textSize="20dp" />
+
+        <EditText
+            style="@style/Widget.Material3.TextInputEditText.OutlinedBox"
+            android:id="@+id/emailOrPhone"
+            android:layout_width="324dp"
+            android:layout_height="55dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="15dp"
+
+            android:background="@drawable/edit_text_border"
+            android:drawableBottom="@color/black"
+            android:hint="Email/Phone Number"
+            android:inputType="textEmailAddress"
+            android:textSize="20dp" />
+
+
+        <EditText
+            style="@style/Widget.Material3.TextInputEditText.OutlinedBox"
+            android:id="@+id/address"
+            android:layout_width="324dp"
+            android:layout_height="55dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="15dp"
+            android:background="@drawable/edit_text_border"
+            android:drawableBottom="@color/black"
+            android:hint="Address"
+            android:inputType="textEmailAddress"
+            android:textSize="20dp" />
+
+        <EditText
+            style="@style/Widget.Material3.TextInputEditText.OutlinedBox"
+            android:id="@+id/password"
+            android:layout_width="324dp"
+            android:layout_height="55dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="15dp"
+            android:background="@drawable/edit_text_border"
+            android:hint="Enter Your Password"
+            android:inputType="textPassword"
+            android:textSize="20dp" />
+
+
+        <Button
+            android:id="@+id/btnSignUp"
+            android:layout_width="324dp"
+            android:layout_height="64dp"
+            android:layout_gravity="center"
+
+            android:layout_marginTop="64dp"
+            android:text="Sign up" />
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="407dp"
+        android:layout_height="114dp"
+        android:orientation="horizontal"
+        android:gravity="center"
+
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/poppins_medium"
+
+            android:lineHeight="20sp"
+            android:text="Have an account? Let’s "
+            android:textColor="#010101"
+            android:textFontWeight="500"
+            android:textSize="15sp" />
+
+        <TextView
+            android:id="@+id/directToLogin"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/poppins_medium"
+            android:textColor="@color/primary"
+            android:lineHeight="20sp"
+            android:text="Log In"
+            android:autoLink="all"
+            android:textFontWeight="500"
+            android:textSize="15sp" />
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

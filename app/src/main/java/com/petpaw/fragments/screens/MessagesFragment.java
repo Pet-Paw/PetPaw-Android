@@ -92,21 +92,21 @@ public class MessagesFragment extends Fragment {
     }
 
     private void setupFirebaseUser() {
-        mAuth.signInWithEmailAndPassword("u01@qq.com", "Binh1234")
-                .addOnCompleteListener(requireActivity(), new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (!task.isSuccessful()) {
-                            return;
-                        }
-
-                        mFirebaseUser = mAuth.getCurrentUser();
-                        assert mFirebaseUser != null;
-
-                        setupRvConversationList();
-                        getConversationsFromDb();
-                    }
-                });
+//        mAuth.signInWithEmailAndPassword("u01@qq.com", "Binh1234")
+//                .addOnCompleteListener(requireActivity(), new OnCompleteListener<AuthResult>() {
+//                    @Override
+//                    public void onComplete(@NonNull Task<AuthResult> task) {
+//                        if (!task.isSuccessful()) {
+//                            return;
+//                        }
+//
+//                        mFirebaseUser = mAuth.getCurrentUser();
+//                        assert mFirebaseUser != null;
+//
+//                        setupRvConversationList();
+//                        getConversationsFromDb();
+//                    }
+//                });
     }
 
     private void getConversationsFromDb() {

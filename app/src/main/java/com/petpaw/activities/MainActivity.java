@@ -16,7 +16,6 @@ import android.view.View;
 import android.widget.Button;
 
 import com.google.android.material.navigation.NavigationBarView;
-import com.petpaw.CreatePostActivity;
 import com.petpaw.PostDetailActivity;
 import com.petpaw.R;
 import com.petpaw.databinding.ActivityMainBinding;

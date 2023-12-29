@@ -10,13 +10,22 @@ public class User implements FirebaseDoc {
     public static final String USERS = "users";
     private String uid;
     private String name;
+    private String email;
+    private String phone;
+    private String address;
     private String imageURL;
 
-    public User(String uid, String name, String imageUrl) {
-        this.uid = uid;
-        this.name = name;
-        this.imageURL = imageUrl;
+    public User() {
     }
+
+    public User(String uid, String username, String email, String phoneNumber, String address) {
+        this.uid= uid;
+        this.name = username;
+        this.email = email;
+        this.phone = phoneNumber;
+        this.address = address;
+    }
+
 
     public String getUid() {
         return uid;
@@ -40,6 +49,30 @@ public class User implements FirebaseDoc {
 
     public void setImageURL(String imageURL) {
         this.imageURL = imageURL;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 
     @Override

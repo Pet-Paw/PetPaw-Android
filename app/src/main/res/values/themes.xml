@@ -2,7 +2,7 @@
     <!-- Base application theme. -->
     <style name="Base.Theme.PetPaw" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="colorPrimary">@color/primary</item>
-<!--        <item name="colorSurface">@color/surface</item>-->
+        <!--        <item name="colorSurface">@color/surface</item>-->
         <item name="bottomNavigationStyle">@style/Widget.App.BottomNavigationView</item>
     </style>
 
@@ -19,5 +19,11 @@
 
     <style name="Widget.App.BottomNavigationView.ActiveIndicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
         <item name="android:color">@color/secondary_container</item>
+    </style>
+
+    <style name="Circular">
+        <item name="cornerSize">50%</item>
+        <item name="borderRound">2dp</item>
+        <item name="color">@color/black</item>
     </style>
 </resources>
