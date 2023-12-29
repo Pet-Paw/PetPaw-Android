@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,6 +26,7 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.petpaw.adapters.ConversationListAdapter;
 import com.petpaw.databinding.FragmentMessagesBinding;
+import com.petpaw.interfaces.OnConversationClickListener;
 import com.petpaw.models.Conversation;
 import com.petpaw.models.Message;
 import com.petpaw.models.User;
@@ -50,6 +52,8 @@ public class MessagesFragment extends Fragment {
 
     private List<String> mUserIdList;
 
+    private ConversationListAdapter mConversationListAdapter;
+
     public MessagesFragment() {
         // Required empty public constructor
     }
@@ -72,7 +76,6 @@ public class MessagesFragment extends Fragment {
 
         mAuth = FirebaseAuth.getInstance();
         mDb = FirebaseFirestore.getInstance();
-
 
     }
 
@@ -100,6 +103,7 @@ public class MessagesFragment extends Fragment {
                         mFirebaseUser = mAuth.getCurrentUser();
                         assert mFirebaseUser != null;
 
+                        setupRvConversationList();
                         getConversationsFromDb();
                     }
                 });
@@ -113,6 +117,7 @@ public class MessagesFragment extends Fragment {
                     @Override
                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                         mNumConversations = queryDocumentSnapshots.size();
+                        Log.d("messages.java", "mNumConversations = " + mNumConversations);
                         mConversationList = new ArrayList<>();
 
                         mUserIdList = new ArrayList<>();
@@ -146,6 +151,7 @@ public class MessagesFragment extends Fragment {
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                        Log.d("messages.java", "get last msg ");
                         for (DocumentSnapshot doc: queryDocumentSnapshots) {
                             Message message = doc.toObject(Message.class);
                             assert message != null;
@@ -156,11 +162,12 @@ public class MessagesFragment extends Fragment {
                             mConversationList.add(conversation);
                         }
 
-                        if (mConversationList.size() < mNumConversations) {
-                            return;
-                        }
+                        Log.d("messages.java", "Conversation list sz: " + mConversationList.size());
 
-                        setupRvConversationList();
+                        if (mConversationList.size() == mNumConversations) {
+                            Log.d("messages.java", "setup conversation list");
+                            mConversationListAdapter.setConversationList(mConversationList);
+                        }
                     }
                 });
     }
@@ -176,8 +183,11 @@ public class MessagesFragment extends Fragment {
 
                         for (DocumentSnapshot doc: queryDocumentSnapshots) {
                             User user = doc.toObject(User.class);
-                            userMap.
+                            user.setUid(doc.getId());
+                            userMap.put(doc.getId(), user);
                         }
+
+                        mConversationListAdapter.setUserMap(userMap);
                     }
                 });
     }
@@ -186,8 +196,15 @@ public class MessagesFragment extends Fragment {
         mBinding.rvConversationList.setLayoutManager(
                 new LinearLayoutManager(requireActivity(), LinearLayoutManager.VERTICAL, false)
         );
-        ConversationListAdapter adapter = new ConversationListAdapter(mFirebaseUser, mConversationList);
-        mBinding.rvConversationList.setAdapter(adapter);
+        mConversationListAdapter = new ConversationListAdapter(mFirebaseUser);
+        mBinding.rvConversationList.setAdapter(mConversationListAdapter);
+
+        mConversationListAdapter.setOnClickListener(new OnConversationClickListener() {
+            @Override
+            public void onClick(Conversation conversation) {
+
+            }
+        });
     }
 
 }
