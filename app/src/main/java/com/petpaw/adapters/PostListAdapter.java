@@ -160,3 +160,20 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.PostVi
         }
     }
 }
+
+class PostViewHolder extends RecyclerView.ViewHolder {
+
+    ImageView postCardViewProfilePic, postCardImageView;
+    TextView postCardViewUserNameTextView, postCardViewDate, postCardViewLikeCountTextView, postCardViewCommentCountTextView;
+
+    public PostViewHolder(@NonNull View itemView) {
+        super(itemView);
+        postCardViewProfilePic = itemView.findViewById(R.id.postCardViewProfilePic);
+        postCardImageView = itemView.findViewById(R.id.postCardImageView);
+        postCardViewUserNameTextView = itemView.findViewById(R.id.postCardViewUserNameTextView);
+        postCardViewDate = itemView.findViewById(R.id.postCardViewDate);
+        postCardViewLikeCountTextView = itemView.findViewById(R.id.postCardViewLikeCountTextView);
+        postCardViewCommentCountTextView = itemView.findViewById(R.id.postCardViewCommentCountTextView);
+
+    }
+}
