@@ -25,6 +25,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -69,6 +70,10 @@ public class CreatePostActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_post);
+
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        String currentUserId = auth.getCurrentUser().getUid();
+        Log.d("CreatePostActivity", "Current User Id: " + currentUserId);
 
         Intent intent = getIntent();
         String postId = intent.getStringExtra("postId");
@@ -208,7 +213,7 @@ public class CreatePostActivity extends AppCompatActivity {
             });
 
         }
-        else { //----------if it does not have a postId, then it is a new post --------------
+        else { //----------if it does not have a postId, then it is creating a new post --------------
             binding.createPostSelectImageButton.setOnClickListener(v -> {
                 selectImage();
             });
@@ -232,38 +237,46 @@ public class CreatePostActivity extends AppCompatActivity {
                     Log.d("CreatePostActivity", "Tags: " + tags.toString());
                 }
 
-
                 if(isValid){
                     Post post = new Post();
                     post.setDateModified(new Date());
                     post.setContent(description);
-                    post.setAuthorId("John Doe");
+                    post.setAuthorId(currentUserId);
 //                    **** Still haven't had correct petId ****
                     post.setPetId("pet123");
                     post.setTags(tags);
 
-                    // Test connection to firebase ----------------------------------------
                     FirebaseFirestore db = FirebaseFirestore.getInstance();
                     Log.d("CreatePostActivity", "Adding post to Firestore");
                     db.collection("Posts")
                             .add(post)
                             .addOnSuccessListener(documentReference -> {
+                                String id = documentReference.getId();
+                                DocumentReference postRef = db.collection("Posts").document(id);
+                                postRef.update("postId", id)
+                                        .addOnSuccessListener(aVoid -> {
+                                            Log.d("CreatePostActivity", "DocumentSnapshot successfully updated!");
+                                        })      .addOnFailureListener(e->{
+                                    Log.e("CreatePostActivity", "Error updating document", e);
+                                });
+
                                 postDocRef = documentReference;
-                                uploadImage(documentReference.getId(), false);
+                                uploadImage(id, false);
 
                                 Toast.makeText(this, "Post Successfully Created", Toast.LENGTH_SHORT).show();
-                                Log.d("CreatePostActivity", "DocumentSnapshot written with ID: " + documentReference.getId());
 
 //                        ******** Need to update relevant class Later on ********
-
                             })
                             .addOnFailureListener(e -> {
                                 Toast.makeText(this, "Error creating post", Toast.LENGTH_SHORT).show();
                             });
                 }
-
             });
         }
+
+        binding.createPostBackButton.setOnClickListener(v -> {
+            finish();
+        });
     }
 
     private void selectImage() {
