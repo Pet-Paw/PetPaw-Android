@@ -1,20 +1,27 @@
 package com.petpaw.models;
 
-import java.util.List;
+import com.petpaw.interfaces.FirebaseDoc;
 
-public class PostComment {
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public class Comment implements FirebaseDoc {
+    private String commentId;
     private String content;
     private String author;
-    private int likes;
+    private List<String> likes;
 
-    public PostComment() {
+    public Comment() {
     }
 
-    public PostComment(String content, String author, int likes) {
+    public Comment(String commentId, String content, String author, List<String> likes) {
+        this.commentId = commentId;
         this.content = content;
         this.author = author;
         this.likes = likes;
     }
+
 
     public String getContent() {
         return content;
@@ -24,7 +31,7 @@ public class PostComment {
         return author;
     }
 
-    public int getLikes() {
+    public List<String> getLikes() {
         return likes;
     }
 
@@ -36,11 +43,28 @@ public class PostComment {
         this.author = author;
     }
 
-    public void setLikes(int likes) {
+    public void setLikes(List<String> likes) {
         this.likes = likes;
     }
 
-//    private final int id;
+    public String getCommentId() {
+        return commentId;
+    }
+
+    public void setCommentId(String commentId) {
+        this.commentId = commentId;
+    }
+
+    @Override
+    public Map<String, Object> toDoc() {
+        Map<String, Object> doc = new HashMap<>();
+        doc.put("content", content);
+        doc.put("author", author);
+        doc.put("likes", likes);
+        return doc;
+    }
+
+    //    private final int id;
 //    private List<Pet> pets;
 
 //    private PostComment(Builder builder) {

@@ -37,9 +37,6 @@
         </activity>
 
         <activity
-            android:name=".PostDetailActivity"
-            android:exported="false" />
-        <activity
             android:name=".activities.CreatePostActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustPan" />
