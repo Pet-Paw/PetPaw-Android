@@ -6,6 +6,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,17 +16,25 @@ import android.view.ViewGroup;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.petpaw.R;
+import com.petpaw.adapters.CommentListAdapter;
+import com.petpaw.adapters.PostListAdapter;
 import com.petpaw.databinding.FragmentPostDetailBinding;
 import com.petpaw.models.Post;
 import com.petpaw.models.Comment;
 import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -84,6 +93,10 @@ public class PostDetailFragment extends Fragment {
                         DocumentSnapshot doc = task.getResult();
                         post = doc.toObject(Post.class);
                         List<String> likes = post.getLikes();
+                        List<String> comments = post.getComments();
+                        if (!comments.isEmpty()){
+                            getComments(comments);
+                        }
                         mBinding.postCardView.postCardViewUserNameTextView.setText(post.getAuthorId());
 
                         //        ------- Formate Date ------------
@@ -150,7 +163,7 @@ public class PostDetailFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 if (mBinding.createPostCommentEditText.getText().toString().length() != 0){
-                    Comment cmt = new Comment(mBinding.createPostCommentEditText.getText().toString(), mAuth.getUid(), null, null);
+                    Comment cmt = new Comment(null, mAuth.getUid(), mAuth.getCurrentUser().getUid(), null);
                     db.collection("Comments")
                             .add(cmt.toDoc())
                             .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
@@ -158,28 +171,54 @@ public class PostDetailFragment extends Fragment {
                                 public void onComplete(@NonNull Task<DocumentReference> task) {
                                     if (task.isSuccessful()){
                                         DocumentReference doc = task.getResult();
-                                        db.collection("Comments").document(doc.getId())
+                                        db.collection("Comments")
+                                                        .document(doc.getId())
                                                         .update("commentId", doc.getId())
-                                                                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                                    @Override
-                                                                    public void onComplete(@NonNull Task<Void> task) {
-                                                                        db.collection("Posts").document(testPostId)
-                                                                                .update("comments", FieldValue.arrayUnion(doc.getId()))
-                                                                                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                                                    @Override
-                                                                                    public void onComplete(@NonNull Task<Void> task) {
-                                                                                        Log.d("TAG", "Comment posted successfully ");
-                                                                                    }
-                                                                                });
-                                                                    }
-                                                                });
-                                    }
+                                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                            @Override
+                                                            public void onComplete(@NonNull Task<Void> task) {
+                                                                db.collection("Posts").document(testPostId)
+                                                                        .update("comments", FieldValue.arrayUnion(doc.getId()))
+                                                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                            @Override
+                                                                            public void onComplete(@NonNull Task<Void> task) {
+                                                                                Log.d("TAG", "Comment posted successfully ");
+                                                                            }
+                                                                        });
+                                                            }
+                                                        });
+
+                                        }
                                 }
                             });
 
                 }
             }
         });
+
+
         return mBinding.getRoot();
+    }
+
+    public void getComments(List<String> commentIDList){
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        List<Comment> commentList = new ArrayList<>();
+         // Get a reference to the Posts collection
+        db.collection("Comments")
+                .whereIn(FieldPath.documentId(), commentIDList)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if(task.isSuccessful()){
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                commentList.add(document.toObject(Comment.class));
+                            }
+                            mBinding.postDetailCommentRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+                            mBinding.postDetailCommentRecyclerView.setAdapter(new CommentListAdapter(requireContext(), commentList));
+                        }
+                    }
+                });
+
     }
 }

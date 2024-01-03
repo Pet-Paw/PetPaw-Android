@@ -58,6 +58,7 @@ public class Comment implements FirebaseDoc {
     @Override
     public Map<String, Object> toDoc() {
         Map<String, Object> doc = new HashMap<>();
+        doc.put("commentId", commentId);
         doc.put("content", content);
         doc.put("author", author);
         doc.put("likes", likes);
