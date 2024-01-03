@@ -14,18 +14,34 @@ public class Post {
     private String content;
     private String authorId;
     private String petId;
-    private int likes;
+//    private int likes;
     private Date dateModified;
     private boolean isModified;
     private String imageURL;
+    private List<String> likes;
+
     private List<String> comments;
     private List<String> tags;
+    private String postId;
 
     public Post() {
         this.dateModified = new Date();
         this.isModified = false;
+        this.likes = new ArrayList<>();
         this.comments = new ArrayList<>();
         this.tags = new ArrayList<>();
+        this.postId = "";
+    }
+
+    public Post(String authorId, Date dateModified, String content,  boolean isModified, String imageURL, List<String> likes, List<String> comments, String postId){
+        this.authorId = authorId;
+        this.dateModified = dateModified;
+        this.isModified = isModified;
+        this.content = content;
+        this.imageURL = imageURL;
+        this.likes = likes;
+        this.comments = comments;
+        this.postId = postId;
     }
 
     public Post(String content, String author, String petId) {
@@ -38,6 +54,14 @@ public class Post {
         this.isModified = false;
         this.comments = new ArrayList<>();
         this.tags = new ArrayList<>();
+    }
+
+    public String getPostId() {
+        return postId;
+    }
+
+    public void setPostId(String postId) {
+        this.postId = postId;
     }
 
     public String getContent() {
@@ -88,21 +112,13 @@ public class Post {
         this.petId = petId;
     }
 
-    public int getLikes() {
+    public List<String> getLikes() {
         return likes;
     }
 
-    public void setLikes(int likes) {
+    public void setLikes(List<String> likes) {
         this.likes = likes;
     }
-
-//    public List<String> getImages() {
-//        return images;
-//    }
-
-//    public void setImages(List<String> images) {
-//        this.images = images;
-//    }
 
     public List<String> getComments() {
         return comments;
