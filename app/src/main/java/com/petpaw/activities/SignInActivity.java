@@ -10,8 +10,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.petpaw.MainActivity;
-import com.petpaw.R;
 import com.petpaw.databinding.ActivitySignInBinding;
 
 public class SignInActivity extends AppCompatActivity {

@@ -2,40 +2,66 @@ package com.petpaw.models;
 
 
 
-import org.w3c.dom.Comment;
-
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 public class Post {
-    private String title;
+//    private String title;
     private String content;
-    private String author;
+    private String authorId;
     private String petId;
-    private int likes;
-    private List<String> images;
+//    private int likes;
+    private Date dateModified;
+    private boolean isModified;
+    private String imageURL;
+    private List<String> likes;
+
     private List<String> comments;
+    private List<String> tags;
+    private String postId;
 
     public Post() {
-        this.images = new ArrayList<>();
+        this.dateModified = new Date();
+        this.isModified = false;
+        this.likes = new ArrayList<>();
         this.comments = new ArrayList<>();
+        this.tags = new ArrayList<>();
+        this.postId = "";
     }
 
-    public Post(String title, String content, String author, String petId) {
-        this.title = title;
+    public Post(String authorId, Date dateModified, String content,  boolean isModified, String imageURL, List<String> likes, List<String> comments, String postId){
+        this.authorId = authorId;
+        this.dateModified = dateModified;
+        this.isModified = isModified;
         this.content = content;
-        this.author = author;
+        this.imageURL = imageURL;
+        this.likes = likes;
+        this.comments = comments;
+        this.postId = postId;
+    }
+
+    public Post(String content, String author, String petId) {
+        this.content = content;
+        this.authorId = author;
         this.petId = petId;
-        this.images = new ArrayList<>();
+
+//        default value -------------------------
+        this.dateModified = new Date();
+        this.isModified = false;
         this.comments = new ArrayList<>();
+        this.tags = new ArrayList<>();
     }
 
-    public String getTitle() {
-        return title;
+    public String getPostId() {
+        return postId;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public void setPostId(String postId) {
+        this.postId = postId;
     }
 
     public String getContent() {
@@ -46,12 +72,36 @@ public class Post {
         this.content = content;
     }
 
-    public String getAuthor() {
-        return author;
+    public Date getDateModified() {
+        return dateModified;
     }
 
-    public void setAuthor(String author) {
-        this.author = author;
+    public void setDateModified(Date dateModified) {
+        this.dateModified = dateModified;
+    }
+
+    public boolean isModified() {
+        return isModified;
+    }
+
+    public void setModified(boolean modified) {
+        isModified = modified;
+    }
+
+    public String getImageURL() {
+        return imageURL;
+    }
+
+    public void setImageURL(String imageURL) {
+        this.imageURL = imageURL;
+    }
+
+    public String getAuthorId() {
+        return authorId;
+    }
+
+    public void setAuthorId(String authorId) {
+        this.authorId = authorId;
     }
 
     public String getPetId() {
@@ -62,20 +112,12 @@ public class Post {
         this.petId = petId;
     }
 
-    public int getLikes() {
+    public List<String> getLikes() {
         return likes;
     }
 
-    public void setLikes(int likes) {
+    public void setLikes(List<String> likes) {
         this.likes = likes;
-    }
-
-    public List<String> getImages() {
-        return images;
-    }
-
-    public void setImages(List<String> images) {
-        this.images = images;
     }
 
     public List<String> getComments() {
@@ -86,49 +128,26 @@ public class Post {
         this.comments = comments;
     }
 
-    //    private Post(Builder builder) {
-//        this.title = builder.title;
-//        this.content = builder.content;
-//        this.author = builder.author;
-//        this.id = builder.id;
-//        this.images = builder.images;
-//        this.comments = builder.comments;
-//        this.likes = builder.likes;
-//    }
-//
-//    public static class Builder {
-//        private String title;
-//        private String content;
-//        private User author;
-//        private final int id;
-//        private List<String> images;
-//        private List<PostComment> comments;
-//        private int likes;
-//
-//        public Builder(String title, String content, User author, int id) {
-//            this.title = title;
-//            this.content = content;
-//            this.author = author;
-//            this.id = id;
-//        }
-//
-//        public Builder images(List<String> images) {
-//            this.images = images;
-//            return this;
-//        }
-//
-//        public Builder comments(List<PostComment> comments) {
-//            this.comments = comments;
-//            return this;
-//        }
-//
-//        public Builder likes(int likes) {
-//            this.likes = likes;
-//            return this;
-//        }
-//
-//        public Post build() {
-//            return new Post(this);
-//        }
+    public List<String> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<String> tags) {
+        this.tags = tags;
+    }
+
+//    @Override
+//    public Map<String, Object> toDoc(){
+//        Map<String, Object> doc = new HashMap<>();
+//        doc.put("content", this.content);
+//        doc.put("authorId", this.authorId);
+//        doc.put("petId", this.petId);
+//        doc.put("likes", this.likes);
+//        doc.put("dateModified", this.dateModified);
+//        doc.put("isModified", this.isModified);
+//        doc.put("imageURL", this.imageURL);
+//        doc.put("comments", this.comments);
+//        doc.put("tags", this.tags);
+//        return doc;
 //    }
 }
