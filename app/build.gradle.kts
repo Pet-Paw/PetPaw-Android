@@ -46,6 +46,8 @@ dependencies {
     implementation("androidx.navigation:navigation-ui:2.7.6")
     implementation("androidx.recyclerview:recyclerview:1.3.2")
     implementation("com.google.android.gms:play-services-tasks:18.0.2")
+    implementation("androidx.navigation:navigation-runtime:2.7.6")
+    implementation("com.google.firebase:firebase-database:20.3.0")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
