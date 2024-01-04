@@ -66,4 +66,7 @@ dependencies {
     // PinView
     implementation("io.github.chaosleung:pinview:1.4.4")
 
+    // Avatar ImageView
+    implementation("de.hdodenhof:circleimageview:3.1.0")
+
 }

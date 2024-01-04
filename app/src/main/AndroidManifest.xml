@@ -26,10 +26,6 @@
             android:exported="false" />
 
         <activity
-            android:name=".activities.ProfileActivity"
-            android:exported="false" />
-
-        <activity
             android:name=".activities.UserFollowingActivity"
             android:exported="false" >
 <!--            <intent-filter>-->
