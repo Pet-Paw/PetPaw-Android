@@ -3,14 +3,17 @@ package com.petpaw.activities;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.chaos.view.PinView;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseException;
@@ -22,6 +25,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthOptions;
 import com.google.firebase.auth.PhoneAuthProvider;
+import com.petpaw.R;
 import com.petpaw.database.UserCollection;
 import com.petpaw.databinding.ActivitySignUpBinding;
 import com.petpaw.models.User;
@@ -41,6 +45,10 @@ public class SignUpActivity extends AppCompatActivity {
 
     private UserCollection userCollection = UserCollection.newInstance();
 
+    private String phoneInSignUpByPhone;
+
+    private String usernameInSignUpByPhone;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,13 +59,6 @@ public class SignUpActivity extends AppCompatActivity {
             @Override
             public void onVerificationCompleted(@NonNull PhoneAuthCredential phoneAuthCredential) {
                 Log.d(TAG, "onVerificationCompleted:" + phoneAuthCredential);
-                final String code = phoneAuthCredential.getSmsCode();
-                if (code != null) {
-                    Log.d(TAG, "onVerificationCompleted: code: " + code);
-                    verifyCode(code);
-                }
-//                    signInWithPhoneAuthCredential(phoneAuthCredential);
-
             }
 
             @Override
@@ -84,17 +85,38 @@ public class SignUpActivity extends AppCompatActivity {
                 mVerificationId = verificationId;
                 mResendToken = token;
 
-                // test verify code
-                verifyCode("123456");
+                // open dialog to input otp
+                Dialog dialog = new Dialog(SignUpActivity.this);
+                dialog.setContentView(R.layout.otp_form);
+                dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
+                dialog.show();
+
+                PinView pinView = dialog.findViewById(R.id.pinview);
+                Button btn_submit_otp = dialog.findViewById(R.id.btnConfirmOtp);
+
+                btn_submit_otp.setOnClickListener(v -> {
+                    String otp = pinView.getText().toString();
+                    if (otp.isEmpty()) {
+                        Toast.makeText(SignUpActivity.this, "Please enter OTP", Toast.LENGTH_SHORT).show();
+                    } else {
+                        dialog.dismiss();
+                        verifyCode(otp);
+                    }
+                });
+//
+//
+//                // test verify code
+//                verifyCode("123456");
             }
         };
 
         EditText username = signUpBinding.username;
-        EditText emailOrPhone = signUpBinding.emailOrPhone;
         EditText password = signUpBinding.password;
         EditText address = signUpBinding.address;
         Button signUpBtn = signUpBinding.btnSignUp;
         TextView directToLogin = signUpBinding.directToLogin;
+        EditText emailOrPhone = signUpBinding.emailOrPhone;
 
         auth = FirebaseAuth.getInstance();
         signUpBtn.setOnClickListener(v -> {
@@ -139,7 +161,10 @@ public class SignUpActivity extends AppCompatActivity {
                 }
             });
         } else {
+            phoneInSignUpByPhone = emailOrPhone;
+            usernameInSignUpByPhone = username;
             startPhoneNumberVerification(emailOrPhone);
+
         }
     }
 
@@ -154,7 +179,18 @@ public class SignUpActivity extends AppCompatActivity {
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()) {
                     Log.d(TAG, "signInWithCredential:success");
-                    FirebaseUser user = task.getResult().getUser();
+                    Toast.makeText(SignUpActivity.this, "Signup successfully", Toast.LENGTH_SHORT).show();
+
+                    // Create user in fireStore
+                    FirebaseUser firebaseUser = auth.getCurrentUser();
+                    String userId = firebaseUser.getUid();
+                    User newUser = new User(userId, usernameInSignUpByPhone, "", phoneInSignUpByPhone,  "");
+                    userCollection.createUser(newUser);
+
+
+                    Intent intent = new Intent(SignUpActivity.this, SignInActivity.class);
+                    startActivity(intent);
+                    finish();
 
                 } else {
                     Log.w(TAG, "signInWithCredential:failure", task.getException());
