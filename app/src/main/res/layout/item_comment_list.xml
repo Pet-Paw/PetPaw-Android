@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical">
+
+    <ImageView
+        android:id="@+id/commentUserProfilePicImageView"
+        android:layout_width="0dp"
+        android:layout_height="64dp"
+        android:layout_weight=".15"
+        />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight=".65"
+        android:orientation="vertical">
+        <TextView
+            android:id="@+id/commentUsernameTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <TextView
+            android:id="@+id/commentContentTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Commentaaaaaaaaaaa"
+            android:gravity="center_vertical"/>
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/commentLikeBtn"
+        android:layout_width="0dp"
+        android:layout_height="32dp"
+        android:layout_weight=".1"
+        android:src="@drawable/outline_thumb_up_24_unliked"/>
+
+    <TextView
+        android:id="@+id/commentLikeCountTextView"
+        android:layout_width="0dp"
+        android:layout_height="32dp"
+        android:text="000"
+        android:layout_weight=".1"/>
+
+</LinearLayout>
