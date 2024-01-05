@@ -33,12 +33,13 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         app:cardCornerRadius="30dp">
-                        <ImageView
+                        <de.hdodenhof.circleimageview.CircleImageView
                             android:id="@+id/postCardViewProfilePic"
                             android:layout_width="48dp"
                             android:layout_height="48dp"
-                            android:src="@drawable/profile_pic_placeholder"
-                            android:scaleType="centerCrop"/>
+                            android:src="@drawable/default_avatar"
+                            app:civ_border_width="1dp"
+                            app:civ_border_color="@color/primary"/>
                     </androidx.cardview.widget.CardView>
                     <LinearLayout
                         android:layout_width="wrap_content"

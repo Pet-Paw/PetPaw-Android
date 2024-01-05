@@ -5,8 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="center_horizontal"
-    android:orientation="vertical"
-    tools:context=".activities.ProfileActivity">
+    android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -34,12 +33,13 @@
 
     </LinearLayout>
 
-    <com.google.android.material.imageview.ShapeableImageView
-        android:id="@+id/profilePic"
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/petProfilePic"
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:src="@drawable/cat_placeholder"
-        app:shapeAppearanceOverlay="@style/Circular" />
+        app:civ_border_width="1dp"
+        app:civ_border_color="@color/primary"/>
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
