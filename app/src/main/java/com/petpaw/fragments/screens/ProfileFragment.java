@@ -35,6 +35,8 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.petpaw.R;
 import com.petpaw.activities.EditProfileActivity;
 import com.petpaw.adapters.PostListAdapter;
+import com.petpaw.databinding.FragmentMessagesBinding;
+import com.petpaw.databinding.FragmentProfileBinding;
 import com.petpaw.models.Post;
 import com.petpaw.models.User;
 import com.squareup.picasso.Picasso;
@@ -56,14 +58,11 @@ public class ProfileFragment extends Fragment {
     private static final int EDIT_PROFILE_REQUEST_CODE = 100;
 
     // TODO: Rename and change types of parameters
+    private FragmentProfileBinding binding;
     private String mParam1;
     private String mParam2;
     private User user;
     private String uid;
-    private ImageView avatar;
-    private TextView name, location, postNum, followerNum, followingNum, displayPosts, displayPets;
-    private Button editBtn, addPetBtn;
-    private RecyclerView postsRecyclerView, petsRecyclerView;
     private List<Post> userPostList = new ArrayList<>();
     private List<User> userFollowingList = new ArrayList<>();
     private List<User> userFollowerList = new ArrayList<>();
@@ -102,55 +101,48 @@ public class ProfileFragment extends Fragment {
         if (currentUser != null) {
             uid = currentUser.getUid();
         }
+        /*
+
         displayUserInfo();
         getUserPosts();
         getUserFollowers();
         getUserFollowings();
+
+         */
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.fragment_profile, container, false);
-        avatar = view.findViewById(R.id.profileAvatarImage);
-        name = view.findViewById(R.id.profileName);
-        location = view.findViewById(R.id.profileLocation);
-        postNum = view.findViewById(R.id.profilePostNum);
-        followerNum = view.findViewById(R.id.profileFollowerNum);
-        followingNum = view.findViewById(R.id.profileFollowingNum);
-        displayPosts = view.findViewById(R.id.profileDisplayPostsText);
-        displayPets = view.findViewById(R.id.profileDisplayPetsText);
-        editBtn = view.findViewById(R.id.profileEditBtn);
-        addPetBtn = view.findViewById(R.id.profileAddPetBtn);
-        postsRecyclerView = view.findViewById(R.id.profilePostsRecyclerView);
-        petsRecyclerView = view.findViewById(R.id.profilePetsRecyclerView);
+        //View view = inflater.inflate(R.layout.fragment_profile, container, false);
+        binding = FragmentProfileBinding.inflate(inflater, container, false);
 
-        displayPosts.setOnClickListener(new View.OnClickListener() {
+        binding.displayPosts.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                displayPosts.setClickable(false);
-                displayPosts.setTypeface(null, Typeface.BOLD);
-                displayPets.setClickable(true);
-                displayPets.setTypeface(null, Typeface.NORMAL);
-                postsRecyclerView.setVisibility(View.VISIBLE);
-                petsRecyclerView.setVisibility(View.GONE);
+                binding.displayPosts.setClickable(false);
+                binding.displayPosts.setTypeface(null, Typeface.BOLD);
+                binding.displayPets.setClickable(true);
+                binding.displayPets.setTypeface(null, Typeface.NORMAL);
+                binding.postsRecyclerView.setVisibility(View.VISIBLE);
+                binding.petsRecyclerView.setVisibility(View.GONE);
             }
         });
 
-        displayPets.setOnClickListener(new View.OnClickListener() {
+        binding.displayPets.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                displayPets.setClickable(false);
-                displayPets.setTypeface(null, Typeface.BOLD);
-                displayPosts.setClickable(true);
-                displayPosts.setTypeface(null, Typeface.NORMAL);
-                petsRecyclerView.setVisibility(View.VISIBLE);
-                postsRecyclerView.setVisibility(View.GONE);
+                binding.displayPets.setClickable(false);
+                binding.displayPets.setTypeface(null, Typeface.BOLD);
+                binding.displayPosts.setClickable(true);
+                binding.displayPosts.setTypeface(null, Typeface.NORMAL);
+                binding.petsRecyclerView.setVisibility(View.VISIBLE);
+                binding.postsRecyclerView.setVisibility(View.GONE);
             }
         });
 
-        editBtn.setOnClickListener(new View.OnClickListener() {
+        binding.editBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(requireContext(), EditProfileActivity.class);
@@ -163,7 +155,7 @@ public class ProfileFragment extends Fragment {
             }
         });
 
-        return view;
+        return binding.getRoot();
     }
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -186,6 +178,9 @@ public class ProfileFragment extends Fragment {
         Log.d("TAG", "onResume: ");
         super.onResume();
         displayUserInfo();
+        getUserPosts();
+        getUserFollowers();
+        getUserFollowings();
     }
 
     private void displayUserInfo() {
@@ -198,14 +193,32 @@ public class ProfileFragment extends Fragment {
                 if (task.isSuccessful()) {
                     for (QueryDocumentSnapshot documentSnapshot : task.getResult()) {
                         user = documentSnapshot.toObject(User.class);
+                        Log.d("TAG", "User: " + user.getName());
                         if (user != null) {
-                            if (user.getImageURL() != null && !user.getImageURL().isEmpty()) {
-                                Picasso.get().load(user.getImageURL()).into(avatar);
+                            Log.d("TAG", "user.getImageURL() != null: " + user.getImageURL());
+                            Log.d("TAG", "!(user.getImageURL().isEmpty()): " + !(user.getImageURL().isEmpty()));
+                            if (user.getImageURL() != null && !(user.getImageURL().isEmpty())) {
+                                Log.d("TAG", "getImage() true ");
+                                //Picasso.get().load(user.getImageURL()).tag(System.currentTimeMillis()).into(binding.avatar);
+                                binding.profileAvatar.setImageDrawable(null);
+                                Picasso.get()
+                                        .load(user.getImageURL())
+                                        .tag(System.currentTimeMillis())
+                                        .into(binding.profileAvatar, new com.squareup.picasso.Callback() {
+                                            @Override
+                                            public void onSuccess() {
+                                                Log.d("TAG", "Load image successfully");
+                                            }
+                                            @Override
+                                            public void onError(Exception e) {
+                                                Log.e("TAG", "Load image failed");
+                                            }
+                                        });
                             } else {
-                                avatar.setImageResource(R.drawable.default_avatar);
+                                binding.profileAvatar.setImageResource(R.drawable.default_avatar);
                             }
-                            name.setText(user.getName());
-                            location.setText(user.getAddress());
+                            binding.name.setText(user.getName());
+                            binding.location.setText(user.getAddress());
                             break;
                         }
                     }
@@ -235,9 +248,9 @@ public class ProfileFragment extends Fragment {
                         Log.d("ProfileFragment", "No posts found for the user.");
                     }
 
-                    postNum.setText(userPostList.size() + "");
-                    postsRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-                    postsRecyclerView.setAdapter(new PostListAdapter(requireContext(), userPostList));
+                    binding.postNum.setText(userPostList.size() + "");
+                    binding.postsRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+                    binding.postsRecyclerView.setAdapter(new PostListAdapter(requireContext(), userPostList));
                 } else {
                     Log.e("ProfileFragment", "Error getting user posts: ", task.getException());
                 }
@@ -257,7 +270,7 @@ public class ProfileFragment extends Fragment {
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         followerCount++;
                     }
-                    followerNum.setText(followerCount + "");
+                    binding.followerNum.setText(followerCount + "");
 
                 } else {
                     Log.e("ProfileFragment", "Error getting user followers: ", task.getException());
@@ -278,7 +291,7 @@ public class ProfileFragment extends Fragment {
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         followingCount++;
                     }
-                    followingNum.setText(followingCount + "");
+                    binding.followingNum.setText(followingCount + "");
 
                 } else {
                     Log.e("ProfileFragment", "Error getting user followers: ", task.getException());
