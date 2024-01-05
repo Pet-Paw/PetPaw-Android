@@ -101,14 +101,6 @@ public class ProfileFragment extends Fragment {
         if (currentUser != null) {
             uid = currentUser.getUid();
         }
-        /*
-
-        displayUserInfo();
-        getUserPosts();
-        getUserFollowers();
-        getUserFollowings();
-
-         */
     }
 
     @Override
@@ -175,12 +167,13 @@ public class ProfileFragment extends Fragment {
 
     @Override
     public void onResume() {
-        Log.d("TAG", "onResume: ");
         super.onResume();
+        Log.d("ProfileFragment", "onResume");
         displayUserInfo();
         getUserPosts();
         getUserFollowers();
         getUserFollowings();
+
     }
 
     private void displayUserInfo() {
@@ -191,37 +184,33 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
+                    Log.d("ProfileFragment", "task.getResult().size() = " + task.getResult().size());
+
                     for (QueryDocumentSnapshot documentSnapshot : task.getResult()) {
                         user = documentSnapshot.toObject(User.class);
-                        Log.d("TAG", "User: " + user.getName());
-                        if (user != null) {
-                            Log.d("TAG", "user.getImageURL() != null: " + user.getImageURL());
-                            Log.d("TAG", "!(user.getImageURL().isEmpty()): " + !(user.getImageURL().isEmpty()));
-                            if (user.getImageURL() != null && !(user.getImageURL().isEmpty())) {
-                                Log.d("TAG", "getImage() true ");
-                                //Picasso.get().load(user.getImageURL()).tag(System.currentTimeMillis()).into(binding.avatar);
-                                binding.profileAvatar.setImageDrawable(null);
-                                Picasso.get()
-                                        .load(user.getImageURL())
-                                        .tag(System.currentTimeMillis())
-                                        .into(binding.profileAvatar, new com.squareup.picasso.Callback() {
-                                            @Override
-                                            public void onSuccess() {
-                                                Log.d("TAG", "Load image successfully");
-                                            }
-                                            @Override
-                                            public void onError(Exception e) {
-                                                Log.e("TAG", "Load image failed");
-                                            }
-                                        });
-                            } else {
-                                binding.profileAvatar.setImageResource(R.drawable.default_avatar);
-                            }
-                            binding.name.setText(user.getName());
-                            binding.location.setText(user.getAddress());
-                            break;
+                        Log.d("ProfileFragment", "image URL: " + user.getImageURL());
+                        if (user.getImageURL() != null && !(user.getImageURL().isEmpty())) {
+                            Picasso.get()
+                                    .load(user.getImageURL())
+                                    .tag(System.currentTimeMillis())
+                                    .into(binding.profileAvatar, new com.squareup.picasso.Callback() {
+                                        @Override
+                                        public void onSuccess() {
+                                            Log.d("TAG", "Load avatar successfully at " + System.currentTimeMillis());
+                                        }
+                                        @Override
+                                        public void onError(Exception e) {
+                                            Log.e("TAG", "Load image failed");
+                                        }
+                                    });
+                        } else {
+                            binding.profileAvatar.setImageResource(R.drawable.default_avatar);
                         }
+                        binding.name.setText(user.getName());
+                        binding.location.setText(user.getAddress());
+                        break;
                     }
+
                 } else {
                     Log.e("ProfileFragment", "Error getting user data: ", task.getException());
                 }

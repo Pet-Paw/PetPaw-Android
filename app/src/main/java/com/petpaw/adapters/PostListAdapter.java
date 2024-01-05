@@ -118,7 +118,7 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.PostVi
                 .into(holder.postCardImageView, new com.squareup.picasso.Callback() {
                     @Override
                     public void onSuccess() {
-                        Log.d("TAG", "Load image successfully");
+                        Log.d("TAG", "Load image successfully at " + System.currentTimeMillis());
                     }
                     @Override
                     public void onError(Exception e) {
