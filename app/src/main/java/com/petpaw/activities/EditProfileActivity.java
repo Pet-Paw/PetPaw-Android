@@ -74,7 +74,7 @@ public class EditProfileActivity extends AppCompatActivity {
         binding.saveBtn.setOnClickListener(v-> {
             saveUserInfo();
             setResult(Activity.RESULT_OK);
-            finish();
+            //finish();
         });
 
         binding.backBtn.setOnClickListener(v -> {
@@ -100,7 +100,11 @@ public class EditProfileActivity extends AppCompatActivity {
                 avatarRef.putFile(avatarImageUri)
                         .addOnSuccessListener(taskSnapshot -> avatarRef.getDownloadUrl().addOnSuccessListener(uri -> {
                     String avatarUrl = uri.toString();
-                    db.collection("users").document(uid).update("imageURL", avatarUrl);
+                    db.collection("users").document(uid).update("imageURL", avatarUrl)
+                            .addOnSuccessListener(aVoid -> {
+                                setResult(Activity.RESULT_OK);
+                                finish();
+                            });
                 }));
             }
         }
