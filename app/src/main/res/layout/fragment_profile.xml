@@ -184,8 +184,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
-            android:layout_marginLeft="30dp"
-            android:layout_marginRight="30dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
             android:gravity="center_horizontal"
             android:orientation="horizontal">
             <TextView
@@ -213,13 +213,14 @@
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginLeft="30dp"
-            android:layout_marginRight="30dp">
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp">
 
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingTop="20dp">
+                android:layout_marginTop="20dp"
+                >
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/postsRecyclerView"
                     android:layout_width="match_parent"
