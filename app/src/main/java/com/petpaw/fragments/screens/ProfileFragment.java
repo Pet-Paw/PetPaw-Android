@@ -8,6 +8,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -34,14 +35,17 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.petpaw.R;
 import com.petpaw.activities.EditProfileActivity;
+import com.petpaw.adapters.PetListAdapter;
 import com.petpaw.adapters.PostListAdapter;
 import com.petpaw.databinding.FragmentMessagesBinding;
 import com.petpaw.databinding.FragmentProfileBinding;
+import com.petpaw.models.Pet;
 import com.petpaw.models.Post;
 import com.petpaw.models.User;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -64,6 +68,7 @@ public class ProfileFragment extends Fragment {
     private User user;
     private String uid;
     private List<Post> userPostList = new ArrayList<>();
+    private List<Pet> userPetList = new ArrayList<>();
     private List<User> userFollowingList = new ArrayList<>();
     private List<User> userFollowerList = new ArrayList<>();
 
@@ -109,7 +114,6 @@ public class ProfileFragment extends Fragment {
 
         //View view = inflater.inflate(R.layout.fragment_profile, container, false);
         binding = FragmentProfileBinding.inflate(inflater, container, false);
-
         binding.displayPosts.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -143,12 +147,14 @@ public class ProfileFragment extends Fragment {
                 intent.putExtra("email", user.getEmail());
                 intent.putExtra("address", user.getAddress());
                 intent.putExtra("phone", user.getPhone());
-                startActivityForResult(intent, EDIT_PROFILE_REQUEST_CODE);
+                startActivity(intent);
+                //startActivityForResult(intent, EDIT_PROFILE_REQUEST_CODE);
             }
         });
 
         return binding.getRoot();
     }
+    /*
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -163,6 +169,7 @@ public class ProfileFragment extends Fragment {
             }
         }
     }
+     */
 
 
     @Override
@@ -245,6 +252,19 @@ public class ProfileFragment extends Fragment {
                 }
             }
         });
+    }
+
+    private void getUserPets() {
+        /*
+        Pet pet = new Pet.Builder("Daisy", 1) // Replace "Buddy" and 1 with actual name and id
+                .bio("Friendly and playful cat")
+                .images(Arrays.asList("image1.jpg", "image2.jpg")) // Replace with actual image names
+                .build();
+        userPetList.add(pet);
+        binding.petsRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+        binding.petsRecyclerView.setAdapter(new PetListAdapter(requireContext(), userPetList));
+         */
+
     }
 
     private void getUserFollowers() {

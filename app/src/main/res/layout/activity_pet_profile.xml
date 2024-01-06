@@ -16,11 +16,13 @@
         android:padding="10dp">
 
         <ImageView
+            android:id="@+id/backBtn"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:src="@drawable/baseline_arrow_back_ios_24" />
 
         <TextView
+            android:id="@+id/title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginEnd="20dp"
@@ -28,31 +30,39 @@
             android:text="Pet Profile"
             android:textAlignment="center"
             android:textColor="@color/black"
-            android:textStyle="bold"
-            android:textSize="22dp" />
+            android:textSize="22dp"
+            android:textStyle="bold" />
 
     </LinearLayout>
 
     <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/petProfilePic"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
+        android:id="@+id/petAvatar"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
         android:src="@drawable/cat_placeholder"
-        app:civ_border_width="1dp"
-        app:civ_border_color="@color/primary"/>
+        app:civ_border_color="@color/primary"
+        app:civ_border_width="1dp" />
+
     <TextView
+        android:id="@+id/petName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="5dp"
+        android:layout_centerInParent="true"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="10dp"
+        android:baselineAligned="false"
         android:text="Daisy"
         android:textColor="@color/black"
-        android:textStyle="bold"
-        android:textSize="24dp" />
+        android:textSize="24dp"
+        android:textStyle="bold" />
 
     <Button
+        android:id="@+id/deleteBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:backgroundTint="@color/darkGray"
+        android:backgroundTint="@color/red"
         android:text="Delete"
         android:textAllCaps="false"
         app:cornerRadius="20dp" />
@@ -60,30 +70,36 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
         android:layout_marginLeft="30dp"
+        android:layout_marginTop="15dp"
         android:layout_marginRight="30dp"
         android:gravity="center_horizontal"
         android:orientation="horizontal">
+
         <TextView
+            android:id="@+id/displayImages"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:textAlignment="center"
-            android:textColor="@color/black"
+            android:clickable="true"
             android:text="Image"
-            android:clickable="true"
-            android:textSize="20dp"/>
+            android:textAlignment="center"
+            android:textColor="@color/black"
+            android:textSize="20dp" />
+
         <TextView
+            android:id="@+id/displayInfo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textAlignment="center"
             android:layout_weight="1"
-            android:textColor="@color/black"
-            android:text="Information"
             android:clickable="true"
+            android:text="Information"
+            android:textStyle="bold"
+            android:textAlignment="center"
+            android:textColor="@color/black"
             android:textSize="20dp" />
     </LinearLayout>
+
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -94,106 +110,126 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingTop="20dp">
+
             <GridView
+                android:id="@+id/petImagesGridView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:horizontalSpacing="10dp"
                 android:numColumns="2"
                 android:verticalSpacing="10dp"
-                android:horizontalSpacing="10dp"
-                android:visibility="gone"/>
+                android:visibility="gone" />
+
             <LinearLayout
+                android:id="@+id/petInfoLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:gravity="center_horizontal"
+                android:layout_marginLeft="20dp"
                 android:layout_marginRight="10dp"
-                android:layout_marginLeft="10dp">
+                android:gravity="center_horizontal"
+                android:orientation="vertical">
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="10dp"
-                    android:gravity="center_horizontal"
+                    android:layout_marginBottom="20dp"
+                    android:gravity="center_vertical"
                     android:orientation="horizontal">
+
                     <TextView
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Age"
                         android:textColor="@color/black"
-                        android:layout_weight="1"
-                        android:textSize="18dp"/>
+                        android:textSize="18dp" />
+
                     <TextView
+                        android:id="@+id/petAge"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:textAlignment="textEnd"
+                        android:layout_centerHorizontal="true"
+                        android:layout_centerVertical="true"
                         android:text="9"
-                        android:textStyle="bold"
+                        android:textAlignment="textEnd"
                         android:textColor="@color/black"
-                        android:layout_weight="1"
-                        android:textSize="18dp"/>
+                        android:textSize="18dp"
+                        android:textStyle="bold" />
+
                 </LinearLayout>
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="10dp"
-                    android:gravity="center_horizontal"
+                    android:layout_marginBottom="20dp"
+                    android:gravity="center_vertical"
                     android:orientation="horizontal">
+
                     <TextView
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Breed"
                         android:textColor="@color/black"
-                        android:layout_weight="1"
-                        android:textSize="18dp"/>
+                        android:textSize="18dp" />
+
                     <TextView
+                        android:id="@+id/petBreed"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:textAlignment="textEnd"
-                        android:text="Domestic Shorthair"
-                        android:textStyle="bold"
-                        android:textColor="@color/black"
+                        android:layout_centerInParent="true"
                         android:layout_weight="1"
-                        android:textSize="18dp"/>
+                        android:text="Domestic Shorthair"
+                        android:textAlignment="textEnd"
+                        android:textColor="@color/black"
+                        android:textSize="18dp"
+                        android:textStyle="bold" />
+
                 </LinearLayout>
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="5dp"
-                    android:gravity="center_horizontal"
+                    android:gravity="center_vertical"
                     android:orientation="horizontal">
                     <TextView
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Weight"
                         android:textColor="@color/black"
-                        android:layout_weight="1"
-                        android:textSize="18dp"/>
+                        android:textSize="18dp" />
+
                     <TextView
+                        android:id="@+id/petWeight"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:textAlignment="textEnd"
-                        android:text="5 kg"
-                        android:textStyle="bold"
-                        android:textColor="@color/black"
+                        android:layout_centerInParent="true"
                         android:layout_weight="1"
-                        android:textSize="18dp"/>
+                        android:text="5 kg"
+                        android:textAlignment="textEnd"
+                        android:textColor="@color/black"
+                        android:textSize="18dp"
+                        android:textStyle="bold" />
                 </LinearLayout>
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginBottom="10dp"
-                    android:gravity="end"
-                    android:orientation="horizontal">
+                    android:layout_marginTop="30dp"
+                    android:orientation="horizontal"
+                    android:gravity="end">
+
                     <Button
+                        android:id="@+id/editBtn"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        app:cornerRadius="10dp"
+                        android:backgroundTint="@color/gray"
+                        android:drawableLeft="@drawable/baseline_edit_24"
                         android:text="Edit"
-                        android:textSize="14dp"
                         android:textAllCaps="false"
                         android:textColor="@color/black"
-                        android:backgroundTint="@color/gray"
-                        android:drawableLeft="@drawable/baseline_edit_24" />
+                        android:textSize="14dp"
+                        app:cornerRadius="10dp"
+                        />
 
                 </LinearLayout>
             </LinearLayout>
