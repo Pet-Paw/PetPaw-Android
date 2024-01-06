@@ -119,10 +119,8 @@ public class ProfileFragment extends Fragment {
             public void onClick(View v) {
                 binding.displayPosts.setClickable(false);
                 binding.displayPosts.setTypeface(null, Typeface.BOLD);
-                binding.displayPosts.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.secondary_container));
                 binding.displayPets.setClickable(true);
                 binding.displayPets.setTypeface(null, Typeface.NORMAL);
-                binding.displayPets.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.white));
                 binding.postsRecyclerView.setVisibility(View.VISIBLE);
                 binding.petsRecyclerView.setVisibility(View.GONE);
             }
@@ -133,10 +131,8 @@ public class ProfileFragment extends Fragment {
             public void onClick(View v) {
                 binding.displayPets.setClickable(false);
                 binding.displayPets.setTypeface(null, Typeface.BOLD);
-                binding.displayPets.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.secondary_container));
                 binding.displayPosts.setClickable(true);
                 binding.displayPosts.setTypeface(null, Typeface.NORMAL);
-                binding.displayPosts.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.white));
                 binding.petsRecyclerView.setVisibility(View.VISIBLE);
                 binding.postsRecyclerView.setVisibility(View.GONE);
             }
