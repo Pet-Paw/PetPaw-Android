@@ -54,11 +54,11 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.PostVi
 
     @Override
     public void onBindViewHolder(@NonNull PostViewHolder holder, int position) {
-        Log.d("TAG", "*** post number: " + position);
+        Log.d("TAG", "** post number: " + position);
         FirebaseAuth auth = FirebaseAuth.getInstance();
         String currentUserId = Objects.requireNonNull(auth.getCurrentUser()).getUid();
         String postId = postList.get(position).getPostId();
-        Log.d("TAG", "postId: " + postId);
+        Log.d("TAG", "- postId: " + postId);
         List<String> likes = postList.get(position).getLikes();
 
 
@@ -118,7 +118,7 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.PostVi
                 .into(holder.postCardImageView, new com.squareup.picasso.Callback() {
                     @Override
                     public void onSuccess() {
-                        Log.d("TAG", "Load image successfully at " + System.currentTimeMillis());
+                        //Log.d("TAG", "Load image successfully at " + System.currentTimeMillis());
                     }
                     @Override
                     public void onError(Exception e) {

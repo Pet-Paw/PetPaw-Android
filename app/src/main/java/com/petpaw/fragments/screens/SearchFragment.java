@@ -24,11 +24,15 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+//import com.google.firebase.firestore.auth.User;
 import com.petpaw.adapters.PostListAdapter;
+import com.petpaw.adapters.UserListAdapter;
 import com.petpaw.databinding.FragmentSearchBinding;
 
 import com.petpaw.R;
 import com.petpaw.models.Post;
+import com.petpaw.models.User;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,6 +52,8 @@ public class SearchFragment extends Fragment {
 
     private FragmentSearchBinding binding;
     private List<Post> postList = new ArrayList<>();
+    private List<User> userList = new ArrayList<>();
+
     private boolean isPost = true;
 
     public SearchFragment() {
@@ -84,6 +90,16 @@ public class SearchFragment extends Fragment {
             public void onClick(View v) {
                 setUnderline(binding.searchFragmentPostTextView);
                 removeUnderline(binding.searchFragmentUserTextView);
+
+//                binding.searchFragmentPostRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+//                binding.searchFragmentPostRecyclerView.setAdapter(new PostListAdapter(requireContext(), postList));
+                binding.searchFragmentPostRecyclerView.setVisibility(View.VISIBLE);
+
+                //binding.searchFragmentUserRecyclerView.setAdapter(null);
+                binding.searchFragmentUserRecyclerView.setVisibility(View.GONE);
+
+                getPosts("");
+
             }
         });
 
@@ -92,6 +108,12 @@ public class SearchFragment extends Fragment {
             public void onClick(View v) {
                 removeUnderline(binding.searchFragmentPostTextView);
                 setUnderline(binding.searchFragmentUserTextView);
+
+                //binding.searchFragmentPostRecyclerView.setAdapter(null);
+                binding.searchFragmentPostRecyclerView.setVisibility(View.GONE);
+
+                binding.searchFragmentUserRecyclerView.setVisibility(View.VISIBLE);
+                getUsers("");
             }
         });
 
@@ -101,6 +123,8 @@ public class SearchFragment extends Fragment {
                 //if user search for post
                 if(isPost){
                     getPosts(s);
+                }else {
+                    getUsers(s);
                 }
                 return false;
             }
@@ -111,6 +135,10 @@ public class SearchFragment extends Fragment {
                 if(isPost){
                     if(s.isEmpty()){
                         getPosts("");
+                    }
+                }else {
+                    if(s.isEmpty()){
+                        getUsers("");
                     }
                 }
 
@@ -123,6 +151,7 @@ public class SearchFragment extends Fragment {
 
     public void setUnderline(TextView textView) {
         String text = textView.getText().toString();
+        binding.searchFragmentSearchBar.setQuery("", false);
         if(text.equals("POST")){
             isPost = true;
         } else {
@@ -167,6 +196,34 @@ public class SearchFragment extends Fragment {
                     }
                     binding.searchFragmentPostRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
                     binding.searchFragmentPostRecyclerView.setAdapter(new PostListAdapter(requireContext(), postList));
+                }
+            }
+        });
+    }
+
+    private void getUsers(String searchValue) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        CollectionReference usersRef = db.collection("users");
+        Query query = usersRef.orderBy("name", Query.Direction.DESCENDING);
+        query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                userList.clear();
+                if (task.isSuccessful()) {
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        User user = document.toObject(User.class);
+                        if(searchValue.equals("")){
+                            User userTemp = new User(user.getUid(), user.getName(), user.getEmail(), user.getPhone(), user.getAddress(), user.getImageURL());
+                            userList.add(userTemp);
+                        } else {
+                            if(user.getName().toLowerCase().contains(searchValue.toLowerCase())){
+                                User userTemp = new User(user.getUid(), user.getName(), user.getEmail(), user.getPhone(), user.getAddress(), user.getImageURL());
+                                userList.add(userTemp);
+                            }
+                        }
+                    }
+                    binding.searchFragmentUserRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+                    binding.searchFragmentUserRecyclerView.setAdapter(new UserListAdapter(requireContext(), userList));
                 }
             }
         });
