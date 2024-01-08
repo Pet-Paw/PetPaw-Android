@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 public class Pet implements FirebaseDoc {
+    private String id;
     private String name;
     private int age;
     private String breed;
@@ -17,7 +18,8 @@ public class Pet implements FirebaseDoc {
     public Pet() {
     }
 
-    public Pet(String name, int age, String breed, int weight, String imageURL, List<String> images) {
+    public Pet(String id, String name, int age, String breed, int weight, String imageURL, List<String> images) {
+        this.id = id;
         this.name = name;
         this.age = age;
         this.breed = breed;
@@ -74,9 +76,18 @@ public class Pet implements FirebaseDoc {
         this.imageURL = imageURL;
     }
 
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
     @Override
     public Map<String, Object> toDoc() {
         Map<String, Object> doc = new HashMap<>();
+        doc.put("id", id);
         doc.put("name", name);
         doc.put("age", age);
         doc.put("breed", breed);

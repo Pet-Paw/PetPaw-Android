@@ -64,7 +64,7 @@ public class AddPetActivity extends AppCompatActivity {
             //check validation
 
             if(isValid){
-                Pet pet = new Pet(binding.petNameEditText.getText().toString(), Integer.parseInt(binding.petAgeEditText.getText().toString()), binding.petBreedEditText.getText().toString(), Integer.parseInt(binding.petWeightEditText.getText().toString()), null, new ArrayList<>());
+                Pet pet = new Pet("", binding.petNameEditText.getText().toString(), Integer.parseInt(binding.petAgeEditText.getText().toString()), binding.petBreedEditText.getText().toString(), Integer.parseInt(binding.petWeightEditText.getText().toString()), "", new ArrayList<>());
 
                 Log.d("AddPetActivity", "Adding pet to Firestore");
                 db.collection("Pets")
@@ -72,6 +72,7 @@ public class AddPetActivity extends AppCompatActivity {
                         .addOnSuccessListener(documentReference -> {
                             String id = documentReference.getId();
                             petDocRef = documentReference;
+                            petDocRef.update("id", id);
                             db.collection("users").document(auth.getCurrentUser().getUid())
                                             .update("pets", FieldValue.arrayUnion(id));
                             uploadImage(id, false);

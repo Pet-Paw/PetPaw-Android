@@ -1,6 +1,9 @@
 package com.petpaw.adapters;
 
+import static androidx.core.content.ContentProviderCompat.requireContext;
+
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -43,7 +46,7 @@ public class PetListAdapter extends RecyclerView.Adapter<PetListAdapter.PetViewH
     public PetViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         return new PetViewHolder(
                 LayoutInflater.from(parent.getContext()).inflate(
-                        R.layout.item_post_card_view,
+                        R.layout.item_pet_list,
                         parent,
                         false
                 )
@@ -52,9 +55,24 @@ public class PetListAdapter extends RecyclerView.Adapter<PetListAdapter.PetViewH
 
     @Override
     public void onBindViewHolder(@NonNull PetViewHolder holder, int position) {
-        holder.petListProfilePic.setImageResource(R.drawable.cat_placeholder);
-        holder.petListName.setText("Daisy");
+        String imageUrl = petList.get(position).getImageURL();
+        if(imageUrl.length() != 0 && imageUrl != null) {
+            Picasso.get()
+                    .load(imageUrl)
+                    .tag(System.currentTimeMillis())
+                    .into(holder.petListProfilePic, new com.squareup.picasso.Callback() {
+                        @Override
+                        public void onSuccess() {
+                            //Log.d("TAG", "Load image successfully at " + System.currentTimeMillis());
+                        }
 
+                        @Override
+                        public void onError(Exception e) {
+                            Log.d("TAG", "Load image successfully");
+                        }
+                    });
+        }
+        holder.petListName.setText(petList.get(position).getName());
     }
 
     @Override
@@ -70,10 +88,6 @@ public class PetListAdapter extends RecyclerView.Adapter<PetListAdapter.PetViewH
             super(itemView);
             petListProfilePic = itemView.findViewById(R.id.petListProfilePic);
             petListName = itemView.findViewById(R.id.petListName);
-
-            itemView.setOnClickListener(v -> {
-                Log.d("PetListAdapter", "onClick: " + getAdapterPosition());
-            });
         }
     }
 }
