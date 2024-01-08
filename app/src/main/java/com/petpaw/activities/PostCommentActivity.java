@@ -6,11 +6,11 @@ import android.os.Bundle;
 
 import com.petpaw.R;
 
-public class TestActivity extends AppCompatActivity {
+public class PostCommentActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_test);
+        setContentView(R.layout.activity_post_comment);
     }
 }

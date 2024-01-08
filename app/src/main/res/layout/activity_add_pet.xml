@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activities.AddPetActivity"
+    android:orientation="vertical"
+    android:gravity="center_horizontal">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal"
+        android:padding="10dp">
+
+        <ImageView
+            android:id="@+id/backBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:src="@drawable/baseline_arrow_back_ios_24"
+            android:clickable="true"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="20dp"
+            android:layout_weight="1"
+            android:text="Add Pet"
+            android:textAlignment="center"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            android:textSize="22dp" />
+
+    </LinearLayout>
+    
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Pet Image: "
+            android:layout_centerVertical="true"/>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:orientation="vertical">
+            <ImageView
+                android:id="@+id/previewPetImageView"
+                android:layout_width="200dp"
+                android:layout_height="200dp"
+                android:layout_marginBottom="10dp"/>
+            <Button
+                android:id="@+id/selectImageBtn"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:text="Select Image"/>
+        </LinearLayout>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Pet Name: "
+            android:layout_centerVertical="true"/>
+        <EditText
+            android:id="@+id/petNameEditText"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:inputType="text"/>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Pet Age: "
+            android:layout_centerVertical="true"/>
+        <EditText
+            android:id="@+id/petAgeEditText"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:inputType="number"/>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Pet Breed: "
+            android:layout_centerVertical="true"/>
+        <EditText
+            android:id="@+id/petBreedEditText"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:inputType="text"/>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="1dp">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Pet Weight: "
+            android:layout_centerVertical="true"/>
+        <EditText
+            android:id="@+id/petWeightEditText"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:inputType="number"/>
+    </RelativeLayout>
+
+    <Button
+        android:id="@+id/addPetBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Add Pet"/>
+
+</LinearLayout>

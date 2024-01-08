@@ -61,7 +61,7 @@ public class CommentListAdapter extends RecyclerView.Adapter<CommentListAdapter.
         Log.d("TAG", "commentId: " + commentId);
         List<String> likes = commentList.get(position).getLikes();
 
-        db.collection("Users").document(commentList.get(position).getAuthor())
+        db.collection("users").document(commentList.get(position).getAuthor())
                         .get()
                                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                                     @Override

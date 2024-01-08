@@ -33,6 +33,7 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.petpaw.R;
+import com.petpaw.activities.AddPetActivity;
 import com.petpaw.activities.EditProfileActivity;
 import com.petpaw.adapters.PostListAdapter;
 import com.petpaw.databinding.FragmentMessagesBinding;
@@ -144,6 +145,14 @@ public class ProfileFragment extends Fragment {
                 intent.putExtra("address", user.getAddress());
                 intent.putExtra("phone", user.getPhone());
                 startActivityForResult(intent, EDIT_PROFILE_REQUEST_CODE);
+            }
+        });
+
+        binding.addPetBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(requireContext(), AddPetActivity.class);
+                startActivity(intent);
             }
         });
 

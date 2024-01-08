@@ -23,7 +23,7 @@
             android:paddingVertical="15dp"
             >
             <EditText
-                android:id="@+id/createPostCommentEditText"
+                android:id="@+id/createCommentEditText"
                 android:layout_width ="325dp"
                 android:layout_height ="50dp"
                 android:minHeight="50dp"
@@ -36,7 +36,7 @@
                 android:background="@drawable/edittext_border"
                 android:layout_alignParentLeft="true"/>
             <ImageView
-                android:id="@+id/createPostCommentBtn"
+                android:id="@+id/createCommentBtn"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:layout_marginTop="10dp"
