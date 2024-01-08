@@ -122,7 +122,7 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.PostVi
                     }
                     @Override
                     public void onError(Exception e) {
-                        Log.e("TAG", "Load image failed");
+                        Log.d("TAG", "Load image successfully");
                     }
                 });
 

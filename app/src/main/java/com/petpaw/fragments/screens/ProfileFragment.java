@@ -1,5 +1,6 @@
 package com.petpaw.fragments.screens;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Typeface;
@@ -13,6 +14,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager2.widget.ViewPager2;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -25,6 +27,8 @@ import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.tabs.TabLayoutMediator;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
@@ -37,6 +41,8 @@ import com.petpaw.R;
 import com.petpaw.activities.EditProfileActivity;
 import com.petpaw.adapters.PetListAdapter;
 import com.petpaw.adapters.PostListAdapter;
+import com.petpaw.adapters.UserFollowingAdapter;
+import com.petpaw.adapters.UserFollowsAdapter;
 import com.petpaw.databinding.FragmentMessagesBinding;
 import com.petpaw.databinding.FragmentProfileBinding;
 import com.petpaw.models.Pet;
@@ -47,6 +53,7 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -98,6 +105,7 @@ public class ProfileFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
@@ -106,11 +114,13 @@ public class ProfileFragment extends Fragment {
         if (currentUser != null) {
             uid = currentUser.getUid();
         }
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
 
         //View view = inflater.inflate(R.layout.fragment_profile, container, false);
         binding = FragmentProfileBinding.inflate(inflater, container, false);
@@ -151,6 +161,55 @@ public class ProfileFragment extends Fragment {
                 //startActivityForResult(intent, EDIT_PROFILE_REQUEST_CODE);
             }
         });
+
+
+//        ViewPager2 viewPager = binding.viewPager;
+        TabLayout tabLayout = binding.tabLayout;
+        tabLayout.selectTab(null);
+
+
+//        @SuppressLint("ResourceAsColor") TabLayoutMediator tabLayoutMediator = new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> {
+//            switch (position) {
+//                case 0:
+//                    tab.setText("Followers");
+//                    break;
+//
+//                case 1:
+//                    tab.setText("Following");
+//                    break;
+//
+//                case 2:
+//
+//                    break;
+//            }
+//        });
+//        tabLayoutMediator.attach();
+        ViewPager2 viewPager = binding.viewPager;
+
+
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                // Do nothing when a tab is selected
+                viewPager.setAdapter(new UserFollowsAdapter(requireActivity()));
+                viewPager.setCurrentItem(tab.getPosition());
+                viewPager.setVisibility(View.VISIBLE);
+                binding.profileLayout.setVisibility(View.GONE);
+
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+                // Do nothing when a tab is unselected
+
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+                // Do nothing when a tab is reselected
+            }
+        });
+
 
         return binding.getRoot();
     }
@@ -252,6 +311,7 @@ public class ProfileFragment extends Fragment {
                 }
             }
         });
+
     }
 
     private void getUserPets() {
