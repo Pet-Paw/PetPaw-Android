@@ -91,11 +91,14 @@ public class CommentListAdapter extends RecyclerView.Adapter<CommentListAdapter.
 
 
 //      ---------------  Update the like button start -----------
+
         if (likes.contains(currentUserId)) {
             holder.commentLikeBtn.setColorFilter(ContextCompat.getColor(context, R.color.primary), PorterDuff.Mode.SRC_IN);
         } else {
             holder.commentLikeBtn.clearColorFilter();
         }
+
+
 
 //      ---------------  Update the like button end -----------
         holder.commentContentTextView.setText(commentList.get(position).getContent());

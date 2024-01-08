@@ -163,7 +163,7 @@ public class PostDetailFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 if (mBinding.createPostCommentEditText.getText().toString().length() != 0){
-                    Comment cmt = new Comment(null, mAuth.getUid(), mAuth.getCurrentUser().getUid(), null);
+                    Comment cmt = new Comment(null, mAuth.getUid(), mAuth.getCurrentUser().getUid(), new ArrayList<>());
                     db.collection("Comments")
                             .add(cmt.toDoc())
                             .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
