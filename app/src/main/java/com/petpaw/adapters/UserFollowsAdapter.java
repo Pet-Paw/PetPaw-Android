@@ -24,7 +24,7 @@ public class UserFollowsAdapter extends FragmentStateAdapter {
     public Fragment createFragment(int position) {
         switch (position){
             case 0: // followers
-                return  new UserFollowersFragment();
+                return new UserFollowersFragment();
             case 1:
                 return new UserFollowingFragment();
 

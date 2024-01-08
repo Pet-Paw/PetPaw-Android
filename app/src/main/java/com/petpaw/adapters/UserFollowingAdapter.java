@@ -8,11 +8,16 @@ import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.petpaw.R;
+import com.petpaw.fragments.screens.ProfileFragment;
 import com.petpaw.models.User;
 import com.petpaw.utils.ImageHelper;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
@@ -34,10 +39,6 @@ public class UserFollowingAdapter extends RecyclerView.Adapter<UserFollowingAdap
         }
     }
 
-
-
-
-
     @NonNull
     @Override
     public UserFollowingAdapter.UserFollowingViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -53,6 +54,35 @@ public class UserFollowingAdapter extends RecyclerView.Adapter<UserFollowingAdap
         String imageUrl = user.getImageURL();
 
         ImageHelper.loadImage(imageUrl, holder.profilePic);
+
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Context context = holder.itemView.getContext();
+                String selectedUserId = user.getUid();
+                ProfileFragment profileFragment = ProfileFragment.newInstance(selectedUserId, null);
+
+                FragmentManager fragmentManager = ((FragmentActivity) context).getSupportFragmentManager();
+                fragmentManager.beginTransaction()
+                        .replace(R.id.overlay_fragment_container, profileFragment)
+                        .addToBackStack(null)
+                        .commit();
+
+                ((FragmentActivity) context).findViewById(R.id.overlay_fragment_container).setVisibility(View.VISIBLE);
+                ((FragmentActivity) context).findViewById(R.id.userFollowingFragment).setVisibility(View.GONE);
+
+                /*
+                BottomNavigationView bottomNav = ((FragmentActivity) context).findViewById(R.id.bottomNav);
+                int selectedItemId = bottomNav.getSelectedItemId();
+
+                if (selectedItemId == R.id.searchFragment) {
+                    ((FragmentActivity) context).findViewById(R.id.searchLayout).setVisibility(View.GONE);
+                } else if (selectedItemId == R.id.profileFragment) {
+                    ((FragmentActivity) context).findViewById(R.id.profileLayout).setVisibility(View.GONE);
+                }
+                 */
+            }
+        });
 
     }
 

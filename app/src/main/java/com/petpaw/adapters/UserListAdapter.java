@@ -9,11 +9,16 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 //import com.google.firebase.firestore.auth.User;
 import com.petpaw.R;
+import com.petpaw.fragments.screens.ProfileFragment;
 import com.petpaw.models.User;
 import com.squareup.picasso.Picasso;
 
@@ -58,10 +63,42 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserVi
             } else {
                 Picasso.get()
                         .load(usersList.get(position).getImageURL())
-                        .placeholder(R.drawable.default_avatar) // A default placeholder if needed
+                        .placeholder(R.drawable.default_avatar)
                         .into(holder.userCardViewProfilePic);
             }
         }
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int currentPosition = holder.getAdapterPosition();
+                if (currentPosition != RecyclerView.NO_POSITION) {
+                    String selectedUserId = usersList.get(currentPosition).getUid();
+                    ProfileFragment profileFragment = ProfileFragment.newInstance(selectedUserId, null);
+
+                    FragmentManager fragmentManager = ((FragmentActivity) context).getSupportFragmentManager();
+                    fragmentManager.beginTransaction()
+                            .replace(R.id.overlay_fragment_container, profileFragment)
+                            .addToBackStack(null)
+                            .commit();
+
+                    ((FragmentActivity) context).findViewById(R.id.overlay_fragment_container).setVisibility(View.VISIBLE);
+                    ((FragmentActivity) context).findViewById(R.id.searchLayout).setVisibility(View.GONE);
+
+                    /*
+                    BottomNavigationView bottomNav = ((FragmentActivity) context).findViewById(R.id.bottomNav);
+                    int selectedItemId = bottomNav.getSelectedItemId();
+
+                    if (selectedItemId == R.id.searchFragment) {
+                        ((FragmentActivity) context).findViewById(R.id.searchLayout).setVisibility(View.GONE);
+                    } else if (selectedItemId == R.id.profileFragment) {
+                        ((FragmentActivity) context).findViewById(R.id.profileLayout).setVisibility(View.GONE);
+                    }
+                     */
+
+                }
+            }
+        });
+
     }
 
         @Override
