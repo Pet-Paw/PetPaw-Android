@@ -17,10 +17,14 @@
         android:theme="@style/Theme.PetPaw"
         tools:targetApi="31">
         <activity
+<<<<<<< HEAD
             android:name=".activities.AddPetActivity"
             android:exported="false" />
         <activity
             android:name=".activities.PostCommentActivity"
+=======
+            android:name=".activities.EditPetProfileActivity"
+>>>>>>> origin/main
             android:exported="false" />
         <activity
             android:name=".activities.PetProfileActivity"
@@ -30,6 +34,7 @@
             android:exported="false" />
         <activity
             android:name=".activities.UserFollowingActivity"
+<<<<<<< HEAD
             android:exported="false">
 
             <!-- <intent-filter> -->
@@ -38,6 +43,9 @@
 
             <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
             <!-- </intent-filter> -->
+=======
+            android:exported="false" >
+>>>>>>> origin/main
         </activity>
         <activity
             android:name=".activities.SignUpActivity"

@@ -66,10 +66,13 @@ public class SignUpActivity extends AppCompatActivity {
                 Log.w(TAG, "onVerificationFailed", e);
                 if (e instanceof FirebaseAuthInvalidCredentialsException) {
                     Log.w(TAG, "FirebaseAuthInvalidCredentialsException", e);
+                    Toast.makeText(SignUpActivity.this, "Please input a phone numbers are written in the format [+][country code][subscriber number including area code]", Toast.LENGTH_LONG).show();
+
                 } else if (e instanceof FirebaseTooManyRequestsException) {
                     // The SMS quota for the project has been exceeded
                     // ...
                     Log.w(TAG, "FirebaseTooManyRequestsException", e);
+                    Toast.makeText(SignUpActivity.this, "The SMS quota for the project has been exceeded", Toast.LENGTH_LONG).show();
                 }
             }
 
@@ -157,12 +160,14 @@ public class SignUpActivity extends AppCompatActivity {
 
                     Toast.makeText(SignUpActivity.this, "Register successfully", Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(SignUpActivity.this, "Register failed", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(SignUpActivity.this, "Email is already existed", Toast.LENGTH_SHORT).show();
                 }
             });
         } else {
             phoneInSignUpByPhone = emailOrPhone;
             usernameInSignUpByPhone = username;
+
+
             startPhoneNumberVerification(emailOrPhone);
 
         }

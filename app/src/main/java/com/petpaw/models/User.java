@@ -1,6 +1,7 @@
 package com.petpaw.models;
 
 import com.google.firebase.Firebase;
+import com.google.type.LatLng;
 import com.petpaw.interfaces.FirebaseDoc;
 
 import java.util.HashMap;
@@ -14,6 +15,26 @@ public class User implements FirebaseDoc {
     private String phone;
     private String address;
     private String imageURL;
+
+    private LatLng location;
+
+    private String country;
+
+    public LatLng getLocation() {
+        return location;
+    }
+
+    public void setLocation(LatLng location) {
+        this.location = location;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
+    }
 
     public User() {
     }

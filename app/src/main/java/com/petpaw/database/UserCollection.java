@@ -7,8 +7,13 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.petpaw.models.User;
 
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class UserCollection {
     public interface Callback {
@@ -19,11 +24,11 @@ public class UserCollection {
     private static final String COLLECTION_NAME = "users";
     private static UserCollection instance;
     private FirebaseFirestore firebaseFirestore;
-    private CollectionReference usersCollectionReference;
-    private static final int NUMBER_OF_THREADS = 4;
+    protected CollectionReference usersCollectionReference;
+
 
     public static final ExecutorService databaseWriteExecutor =
-            Executors.newFixedThreadPool(NUMBER_OF_THREADS);
+            Executors.newSingleThreadExecutor();
 
     public static UserCollection newInstance() {
         if (instance == null) {
@@ -45,6 +50,7 @@ public class UserCollection {
             if (task.isSuccessful()) {
                 User user = task.getResult().toObject(User.class);
                 callback.onCallBack(user);
+
             } else {
                 System.out.println("Error getting documents: " + task.getException());
                 throw new RuntimeException(task.getException());

@@ -21,4 +21,10 @@
         <item name="android:color">@color/secondary_container</item>
     </style>
 
+    <style name="Circular">
+        <item name="cornerSize">50%</item>
+        <item name="borderRound">2dp</item>
+        <item name="color">@color/black</item>
+    </style>
+
 </resources>

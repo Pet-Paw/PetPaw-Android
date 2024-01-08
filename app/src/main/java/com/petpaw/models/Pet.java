@@ -66,13 +66,23 @@ public class Pet implements FirebaseDoc {
         this.images = images;
     }
 
+    public String getImageURL() {
+        return imageURL;
+    }
+
+    public void setImageURL(String imageURL) {
+        this.imageURL = imageURL;
+    }
+
     @Override
     public Map<String, Object> toDoc() {
         Map<String, Object> doc = new HashMap<>();
         doc.put("name", name);
         doc.put("age", age);
         doc.put("breed", breed);
+        doc.put("weight", weight);
         doc.put("images", images);
+        doc.put("imageURL", imageURL);
         return doc;
     }
 
