@@ -3,7 +3,9 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:paddingVertical="5sp"
+    android:paddingHorizontal="10dp">
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
@@ -14,8 +16,8 @@
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="15dp"
-            android:elevation="18dp"
+            android:layout_margin="12dp"
+            android:elevation="0dp"
             app:cardBackgroundColor="#FFFFFF"
             app:cardCornerRadius="15dp">
             <LinearLayout
@@ -31,12 +33,14 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         app:cardCornerRadius="30dp">
-                        <ImageView
+                        <de.hdodenhof.circleimageview.CircleImageView
                             android:id="@+id/postCardViewProfilePic"
                             android:layout_width="48dp"
                             android:layout_height="48dp"
-                            android:src="@drawable/profile_pic_placeholder"
-                            android:scaleType="centerCrop"/>
+                            android:src="@drawable/default_avatar"
+                            app:civ_border_width="1dp"
+                            app:civ_border_color="@color/primary"
+                            tools:ignore="MissingClass" />
                     </androidx.cardview.widget.CardView>
                     <LinearLayout
                         android:layout_width="wrap_content"
@@ -71,14 +75,22 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="This is where the post contain the description and the user can write anything or nothing!"/>
-                <ImageView
-                    android:id="@+id/postCardImageView"
+
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="200dp"
-                    android:src="@drawable/cat_placeholder"
-                    android:scaleType="centerCrop"
-                    android:layout_gravity="center"
-                    android:layout_marginTop="10dp"/>
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:layout_marginTop="10dp">
+                    <ImageView
+                        android:id="@+id/postCardImageView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="200dp"
+                        android:src="@drawable/cat_placeholder"
+                        android:scaleType="centerCrop"
+                        android:layout_gravity="center" />
+                </LinearLayout>
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

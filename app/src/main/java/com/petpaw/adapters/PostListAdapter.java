@@ -15,12 +15,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 
 import com.petpaw.R;
 
 import com.petpaw.models.Post;
+import com.petpaw.models.User;
 import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
@@ -52,11 +54,11 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.PostVi
 
     @Override
     public void onBindViewHolder(@NonNull PostViewHolder holder, int position) {
-        Log.d("TAG", "*** post number: " + position);
+        Log.d("TAG", "** post number: " + position);
         FirebaseAuth auth = FirebaseAuth.getInstance();
         String currentUserId = Objects.requireNonNull(auth.getCurrentUser()).getUid();
         String postId = postList.get(position).getPostId();
-        Log.d("TAG", "postId: " + postId);
+        Log.d("TAG", "- postId: " + postId);
         List<String> likes = postList.get(position).getLikes();
 
 
@@ -79,6 +81,35 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.PostVi
         holder.postCardViewLikeCountTextView.setText(String.valueOf(postList.get(position).getLikes().size()));
         holder.postCardViewCommentCountTextView.setText(String.valueOf(postList.get(position).getComments().size()));
 
+//        ---------------  Load avatar start -----------
+        Post post = postList.get(position);
+        // Fetch the user's name and avatar URL from Firestore
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("users").document(post.getAuthorId()).get().addOnCompleteListener(task -> {
+            if (task.isSuccessful() && task.getResult() != null) {
+                DocumentSnapshot documentSnapshot = task.getResult();
+                if (documentSnapshot.exists()) {
+                    User user = documentSnapshot.toObject(User.class);
+                    if (user != null) {
+                        // Set user's name
+                        holder.postCardViewUserNameTextView.setText(user.getName());
+
+                        // Set user's avatar
+                        if (user.getImageURL() != null && !user.getImageURL().isEmpty()) {
+                            Picasso.get()
+                                    .load(user.getImageURL())
+                                    .placeholder(R.drawable.default_avatar) // A default placeholder if needed
+                                    .into(holder.postCardViewProfilePic);
+                        } else {
+                            holder.postCardViewProfilePic.setImageResource(R.drawable.default_avatar);
+                        }
+                    }
+                }
+            } else {
+                Log.e("PostListAdapter", "Error fetching user data", task.getException());
+            }
+        });
+
 //        ---------------  Load image start -----------
         String imageUrl = postList.get(position).getImageURL();
         Picasso.get()
@@ -87,7 +118,7 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.PostVi
                 .into(holder.postCardImageView, new com.squareup.picasso.Callback() {
                     @Override
                     public void onSuccess() {
-                        Log.d("TAG", "Load image successfully");
+                        //Log.d("TAG", "Load image successfully at " + System.currentTimeMillis());
                     }
                     @Override
                     public void onError(Exception e) {
@@ -97,7 +128,7 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.PostVi
 
 //        --------------- add onClick like button -----------
         holder.postCardViewLikeImageView.setOnClickListener(view -> {
-            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            //FirebaseFirestore db = FirebaseFirestore.getInstance();
             DocumentReference postRef = db.collection("Posts").document(postId);
             if(!(likes.contains(currentUserId))) {
                 // User hasn't liked

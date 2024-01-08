@@ -5,8 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="center_horizontal"
-    android:orientation="vertical"
-    tools:context=".activities.ProfileActivity">
+    android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -17,6 +16,7 @@
         android:padding="10dp">
 
         <ImageView
+            android:id="@+id/backBtn"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:src="@drawable/baseline_arrow_back_ios_24" />
@@ -34,31 +34,6 @@
 
     </LinearLayout>
 
-    <com.google.android.material.imageview.ShapeableImageView
-        android:id="@+id/profilePic"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
-        android:layout_margin="5dp"
-        android:src="@drawable/default_avatar"
-        app:shapeAppearanceOverlay="@style/Circular" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="5dp"
-        android:text="John Robert"
-        android:textColor="@color/black"
-        android:textSize="20dp" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:drawableLeft="@drawable/baseline_place_24"
-        android:drawablePadding="5dp"
-        android:text="United States"
-        android:textColor="@color/black"
-        android:textSize="16dp" />
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -66,6 +41,48 @@
         android:gravity="center_horizontal"
         android:layout_marginRight="40dp"
         android:layout_marginLeft="40dp">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:gravity="center_horizontal"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Avatar"
+                android:textColor="@color/black"
+                android:textStyle="bold"
+                android:layout_weight="1"
+                android:textSize="20dp"/>
+            <Button
+                android:id="@+id/editAvatarBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:cornerRadius="10dp"
+                android:text="Edit"
+                android:textSize="14dp"
+                android:textAllCaps="false"
+                android:textColor="@color/black"
+                android:backgroundTint="@color/gray"
+                android:drawableLeft="@drawable/baseline_edit_24" />
+
+        </LinearLayout>
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/avatar"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:src="@drawable/default_avatar"
+            app:civ_border_width="1dp"
+            app:civ_border_color="@color/primary"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="15dp"
+            android:background="@color/darkGray"/>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -83,6 +100,7 @@
                 android:layout_weight="1"
                 android:textSize="20dp"/>
             <Button
+                android:id="@+id/editInformationBtn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:cornerRadius="10dp"
@@ -97,94 +115,84 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="5dp"
             android:gravity="center_horizontal"
             android:orientation="horizontal">
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Username"
+                android:text="Name"
                 android:textColor="@color/black"
                 android:layout_weight="1"
                 android:textSize="18dp"/>
-            <TextView
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textAlignment="textEnd"
-                android:text="\@johnrobert"
-                android:textStyle="bold"
-                android:textColor="@color/black"
-                android:layout_weight="1"
-                android:textSize="18dp"/>
+                android:layout_weight="1">
+                <TextView
+                    android:id="@+id/name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAlignment="textEnd"
+                    android:layout_centerInParent="true"
+                    android:text="John Robert"
+                    android:textStyle="bold"
+                    android:textColor="@color/black"
+                    android:textSize="18dp"
+                   />
+                <EditText
+                    android:id="@+id/editNameText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAlignment="textEnd"
+                    android:text="John Robert"
+                    android:textStyle="bold"
+                    android:textColor="@color/black"
+                    android:textSize="18dp"
+                    android:visibility="invisible"
+                    />
+            </RelativeLayout>
+
         </LinearLayout>
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="5dp"
             android:gravity="center_horizontal"
             android:orientation="horizontal">
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="First Name"
+                android:text="Address"
                 android:textColor="@color/black"
                 android:layout_weight="1"
                 android:textSize="18dp"/>
-            <TextView
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textAlignment="textEnd"
-                android:text="John"
-                android:textStyle="bold"
-                android:textColor="@color/black"
-                android:layout_weight="1"
-                android:textSize="18dp"/>
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="5dp"
-            android:gravity="center_horizontal"
-            android:orientation="horizontal">
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Last Name"
-                android:textColor="@color/black"
-                android:layout_weight="1"
-                android:textSize="18dp"/>
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textAlignment="textEnd"
-                android:text="Robert"
-                android:textStyle="bold"
-                android:textColor="@color/black"
-                android:layout_weight="1"
-                android:textSize="18dp"/>
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="5dp"
-            android:gravity="center_horizontal"
-            android:orientation="horizontal">
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Phone Number"
-                android:textColor="@color/black"
-                android:layout_weight="1"
-                android:textSize="18dp"/>
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textAlignment="textEnd"
-                android:text="+1 903 782-1358"
-                android:textStyle="bold"
-                android:textColor="@color/black"
-                android:layout_weight="1"
-                android:textSize="18dp"/>
+                android:layout_weight="1">
+                <TextView
+                    android:id="@+id/address"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAlignment="textEnd"
+                    android:layout_centerInParent="true"
+                    android:text="123 Avenue St."
+                    android:textStyle="bold"
+                    android:textColor="@color/black"
+                    android:layout_weight="1"
+                    android:textSize="18dp"/>
+                <EditText
+                    android:id="@+id/editAddressText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAlignment="textEnd"
+                    android:text="123 Avenue St."
+                    android:textStyle="bold"
+                    android:textColor="@color/black"
+                    android:textSize="18dp"
+                    android:visibility="invisible"
+                    />
+            </RelativeLayout>
         </LinearLayout>
 
         <View
@@ -196,88 +204,72 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp"
             android:gravity="center_horizontal"
             android:orientation="horizontal">
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Location"
+                android:text="Account Details"
                 android:textColor="@color/black"
                 android:layout_weight="1"
                 android:textStyle="bold"
                 android:textSize="20dp"/>
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:cornerRadius="10dp"
-                android:text="Edit"
-                android:textSize="14dp"
-                android:textAllCaps="false"
-                android:textColor="@color/black"
-                android:backgroundTint="@color/gray"
-                android:drawableLeft="@drawable/baseline_edit_24" />
         </LinearLayout>
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="5dp"
+            android:layout_marginBottom="15dp"
             android:gravity="center_horizontal"
             android:orientation="horizontal">
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Country"
+                android:text="Email"
                 android:textColor="@color/black"
                 android:layout_weight="1"
                 android:textSize="18dp"/>
             <TextView
+                android:id="@+id/email"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textAlignment="textEnd"
-                android:text="United States"
+                android:text="john@mail.com"
                 android:textStyle="bold"
                 android:textColor="@color/black"
                 android:layout_weight="1"
                 android:textSize="18dp"/>
         </LinearLayout>
-        <View
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginTop="15dp"
-            android:background="@color/darkGray"/>
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="15dp"
+            android:gravity="center_horizontal"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Phone"
+                android:textColor="@color/black"
+                android:layout_weight="1"
+                android:textSize="18dp"/>
+            <TextView
+                android:id="@+id/phone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAlignment="textEnd"
+                android:text="0924737468"
+                android:textStyle="bold"
+                android:textColor="@color/black"
+                android:layout_weight="1"
+                android:textSize="18dp"/>
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp"
-            android:gravity="center_horizontal"
-            android:orientation="horizontal">
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Password"
-                android:textColor="@color/black"
-                android:layout_weight="1"
-                android:textStyle="bold"
-                android:textSize="20dp"/>
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:cornerRadius="10dp"
-                android:text="Edit"
-                android:textSize="14dp"
-                android:textAllCaps="false"
-                android:textColor="@color/black"
-                android:backgroundTint="@color/gray"
-                android:drawableLeft="@drawable/baseline_edit_24" />
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="5dp"
+            android:layout_marginBottom="8dp"
             android:gravity="center_horizontal"
             android:orientation="horizontal">
             <TextView
@@ -288,6 +280,7 @@
                 android:layout_weight="1"
                 android:textSize="18dp"/>
             <TextView
+                android:id="@+id/password"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textAlignment="textEnd"
@@ -298,10 +291,12 @@
                 android:textSize="18dp"/>
         </LinearLayout>
 
+
         <Button
+            android:id="@+id/saveBtn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="20dp"
             android:text="Save"
             app:cornerRadius="10dp"/>
 

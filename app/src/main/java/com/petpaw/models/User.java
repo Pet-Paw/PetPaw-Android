@@ -18,6 +18,15 @@ public class User implements FirebaseDoc {
     public User() {
     }
 
+    public User(String uid, String username, String email, String phoneNumber, String address, String imageURL) {
+        this.uid= uid;
+        this.name = username;
+        this.email = email;
+        this.phone = phoneNumber;
+        this.address = address;
+        this.imageURL = imageURL;
+    }
+
     public User(String uid, String username, String email, String phoneNumber, String address) {
         this.uid= uid;
         this.name = username;
