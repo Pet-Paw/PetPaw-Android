@@ -63,7 +63,7 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserVi
             } else {
                 Picasso.get()
                         .load(usersList.get(position).getImageURL())
-                        .placeholder(R.drawable.default_avatar) // A default placeholder if needed
+                        .placeholder(R.drawable.default_avatar)
                         .into(holder.userCardViewProfilePic);
             }
         }
@@ -77,12 +77,14 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserVi
 
                     FragmentManager fragmentManager = ((FragmentActivity) context).getSupportFragmentManager();
                     fragmentManager.beginTransaction()
-                            .replace(R.id.overlay_fragment_container, profileFragment) // Replace with your overlay container ID
+                            .replace(R.id.overlay_fragment_container, profileFragment)
                             .addToBackStack(null)
                             .commit();
 
                     ((FragmentActivity) context).findViewById(R.id.overlay_fragment_container).setVisibility(View.VISIBLE);
+                    ((FragmentActivity) context).findViewById(R.id.searchLayout).setVisibility(View.GONE);
 
+                    /*
                     BottomNavigationView bottomNav = ((FragmentActivity) context).findViewById(R.id.bottomNav);
                     int selectedItemId = bottomNav.getSelectedItemId();
 
@@ -91,6 +93,7 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserVi
                     } else if (selectedItemId == R.id.profileFragment) {
                         ((FragmentActivity) context).findViewById(R.id.profileLayout).setVisibility(View.GONE);
                     }
+                     */
 
                 }
             }

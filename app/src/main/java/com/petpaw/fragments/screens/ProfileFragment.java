@@ -201,7 +201,7 @@ public class ProfileFragment extends Fragment {
                     if (selectedItemId == R.id.searchFragment) {
                         getActivity().findViewById(R.id.searchLayout).setVisibility(View.VISIBLE);
                     } else if (selectedItemId == R.id.profileFragment) {
-                        getActivity().findViewById(R.id.profileLayout).setVisibility(View.VISIBLE);
+                        getActivity().findViewById(R.id.userFollowingFragment).setVisibility(View.VISIBLE);
                     }
                 }
             }

@@ -74,8 +74,10 @@ public class MainActivity extends AppCompatActivity {
         mBinding.bottomNav.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                if (item.getItemId() != R.id.searchFragment && item.getItemId() != R.id.profileFragment) {
-                    findViewById(R.id.overlay_fragment_container).setVisibility(View.GONE);
+                FrameLayout overlayContainer = findViewById(R.id.overlay_fragment_container);
+                if (overlayContainer.getVisibility() == View.VISIBLE) {
+                    // If the overlay container is visible, hide it when navigating to a different tab
+                    overlayContainer.setVisibility(View.GONE);
                 }
 
                 return NavigationUI.onNavDestinationSelected(item, navController, false)
@@ -97,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
             if (selectedItemId == R.id.searchFragment) {
                 findViewById(R.id.searchLayout).setVisibility(View.VISIBLE);
             } else if (selectedItemId == R.id.profileFragment) {
-                findViewById(R.id.profileLayout).setVisibility(View.VISIBLE);
+                findViewById(R.id.userFollowingFragment).setVisibility(View.VISIBLE);
             }
         } else {
             super.onBackPressed();
