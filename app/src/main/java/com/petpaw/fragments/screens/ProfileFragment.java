@@ -372,6 +372,31 @@ public class ProfileFragment extends Fragment {
 
     private void getUserPets() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
+        CollectionReference postsRef = db.collection("Pets");
+        Query query = postsRef.whereEqualTo("ownerId", uid);
+        query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    userPetList.clear();
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        Pet pet = document.toObject(Pet.class);
+                        userPetList.add(pet);
+                    }
+                    // Check if the userPostList is empty and log
+                    if (userPetList.isEmpty()) {
+                        Log.d("ProfileFragment", "No pets found for the user.");
+                    }
+
+                    binding.petsRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+                    binding.petsRecyclerView.setAdapter(new PetListAdapter(requireContext(), userPetList));
+                } else {
+                    Log.e("ProfileFragment", "Error getting user pets: ", task.getException());
+                }
+            }
+        });
+        /*
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
         FirebaseAuth auth = FirebaseAuth.getInstance();
         db.collection("users").document(auth.getCurrentUser().getUid())
                         .get()
@@ -400,7 +425,7 @@ public class ProfileFragment extends Fragment {
                             }
                         });
 
-
+         */
     }
 
     private void getUserFollowers() {
