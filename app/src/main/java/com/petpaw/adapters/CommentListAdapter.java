@@ -41,8 +41,8 @@ public class CommentListAdapter extends RecyclerView.Adapter<CommentListAdapter.
 
     @NonNull
     @Override
-    public CommentListAdapter.CommentViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new CommentListAdapter.CommentViewHolder(
+    public CommentViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        return new CommentViewHolder(
                 LayoutInflater.from(parent.getContext()).inflate(
                         R.layout.item_comment_list,
                         parent,
@@ -53,15 +53,13 @@ public class CommentListAdapter extends RecyclerView.Adapter<CommentListAdapter.
 
     @Override
     public void onBindViewHolder(@NonNull CommentListAdapter.CommentViewHolder holder, int position) {
-        Log.d("TAG", "*** post number: " + position);
         FirebaseAuth auth = FirebaseAuth.getInstance();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         String currentUserId = Objects.requireNonNull(auth.getCurrentUser()).getUid();
         String commentId = commentList.get(position).getCommentId();
-        Log.d("TAG", "commentId: " + commentId);
         List<String> likes = commentList.get(position).getLikes();
 
-        db.collection("Users").document(commentList.get(position).getAuthor())
+        db.collection("users").document(commentList.get(position).getAuthor())
                         .get()
                                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                                     @Override
@@ -91,11 +89,14 @@ public class CommentListAdapter extends RecyclerView.Adapter<CommentListAdapter.
 
 
 //      ---------------  Update the like button start -----------
+
         if (likes.contains(currentUserId)) {
             holder.commentLikeBtn.setColorFilter(ContextCompat.getColor(context, R.color.primary), PorterDuff.Mode.SRC_IN);
         } else {
             holder.commentLikeBtn.clearColorFilter();
         }
+
+
 
 //      ---------------  Update the like button end -----------
         holder.commentContentTextView.setText(commentList.get(position).getContent());
@@ -147,21 +148,5 @@ public class CommentListAdapter extends RecyclerView.Adapter<CommentListAdapter.
             commentLikeCountTextView = itemView.findViewById(R.id.commentLikeCountTextView);
             commentUsernameTextView = itemView.findViewById(R.id.commentUsernameTextView);
         }
-    }
-}
-
-class CommentViewHolder extends RecyclerView.ViewHolder {
-
-    ImageView commentUserProfilePic, commentLikeBtn;
-    TextView commentContentTextView, commentLikeCountTextView, commentUsernameTextView;
-
-    public CommentViewHolder(@NonNull View itemView) {
-        super(itemView);
-        commentUserProfilePic = itemView.findViewById(R.id.commentUserProfilePicImageView);
-        commentLikeBtn = itemView.findViewById(R.id.commentLikeBtn);
-        commentContentTextView = itemView.findViewById(R.id.commentContentTextView);
-        commentLikeCountTextView = itemView.findViewById(R.id.commentLikeCountTextView);
-        commentUsernameTextView = itemView.findViewById(R.id.commentUsernameTextView);
-
     }
 }

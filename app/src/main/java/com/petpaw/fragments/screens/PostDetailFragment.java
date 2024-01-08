@@ -97,7 +97,19 @@ public class PostDetailFragment extends Fragment {
                         if (!comments.isEmpty()){
                             getComments(comments);
                         }
-                        mBinding.postCardView.postCardViewUserNameTextView.setText(post.getAuthorId());
+
+                        db.collection("users").document(post.getAuthorId())
+                                        .get()
+                                        .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                                    @Override
+                                                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                                        if (task.isSuccessful()) {
+                                                            DocumentSnapshot doc = task.getResult();
+                                                            mBinding.postCardView.postCardViewUserNameTextView.setText(doc.getString("name"));
+                                                        }
+                                                    }
+                                                });
+
 
                         //        ------- Formate Date ------------
                         Date date = post.getDateModified();
@@ -159,11 +171,11 @@ public class PostDetailFragment extends Fragment {
                         });
                     }
                 });
-        mBinding.createPostCommentBtn.setOnClickListener(new View.OnClickListener() {
+        mBinding.createCommentBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mBinding.createPostCommentEditText.getText().toString().length() != 0){
-                    Comment cmt = new Comment(null, mAuth.getUid(), mAuth.getCurrentUser().getUid(), null);
+                if (mBinding.createCommentEditText.getText().toString().length() != 0){
+                    Comment cmt = new Comment(null, mBinding.createCommentEditText.getText().toString(), mAuth.getCurrentUser().getUid(), new ArrayList<>());
                     db.collection("Comments")
                             .add(cmt.toDoc())
                             .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {

@@ -27,6 +27,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.tabs.TabLayout;
@@ -35,11 +36,14 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldPath;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.petpaw.R;
+import com.petpaw.activities.AddPetActivity;
 import com.petpaw.activities.EditProfileActivity;
 import com.petpaw.adapters.PetListAdapter;
 import com.petpaw.adapters.PostListAdapter;
@@ -207,6 +211,14 @@ public class ProfileFragment extends Fragment {
             }
         });
 
+        binding.addPetBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(requireContext(), AddPetActivity.class);
+                startActivity(intent);
+            }
+        });
+
 
 //        ViewPager2 viewPager = binding.viewPager;
         TabLayout tabLayout = binding.tabLayout;
@@ -257,6 +269,23 @@ public class ProfileFragment extends Fragment {
 
         return binding.getRoot();
     }
+    /*
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == EDIT_PROFILE_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            Activity activity = getActivity();
+            if (activity != null) {
+                ProfileFragment fragment = (ProfileFragment) ((FragmentActivity) activity).getSupportFragmentManager()
+                        .findFragmentByTag("ProfileFragment");
+                if (fragment != null) {
+                    fragment.displayUserInfo();
+                }
+            }
+        }
+    }
+     */
+
 
     @Override
     public void onResume() {
@@ -266,7 +295,7 @@ public class ProfileFragment extends Fragment {
         getUserPosts();
         getUserFollowers();
         getUserFollowings();
-
+        getUserPets();
     }
 
     private void displayUserInfo() {
@@ -342,15 +371,35 @@ public class ProfileFragment extends Fragment {
     }
 
     private void getUserPets() {
-        /*
-        Pet pet = new Pet.Builder("Daisy", 1) // Replace "Buddy" and 1 with actual name and id
-                .bio("Friendly and playful cat")
-                .images(Arrays.asList("image1.jpg", "image2.jpg")) // Replace with actual image names
-                .build();
-        userPetList.add(pet);
-        binding.petsRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-        binding.petsRecyclerView.setAdapter(new PetListAdapter(requireContext(), userPetList));
-         */
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        db.collection("users").document(auth.getCurrentUser().getUid())
+                        .get()
+                        .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                            @Override
+                            public void onSuccess(DocumentSnapshot doc) {
+                                db.collection("Pets")
+                                        .whereIn(FieldPath.documentId(), (List<String>) doc.get("pets"))
+                                        .get()
+                                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                                if (task.isSuccessful()) {
+                                                    userPetList.clear();
+                                                    for (QueryDocumentSnapshot document : task.getResult()) {
+                                                        Log.d("ProfileFragment", document.getId() + " => " + document.getData());
+                                                        userPetList.add(document.toObject(Pet.class));
+                                                        binding.petsRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+                                                        binding.petsRecyclerView.setAdapter(new PetListAdapter(requireContext(), userPetList));
+                                                    }
+                                                } else {
+                                                    Log.d("ProfileFragment", "Error getting documents: ", task.getException());
+                                                }
+                                            }
+                                        });
+                            }
+                        });
+
 
     }
 
