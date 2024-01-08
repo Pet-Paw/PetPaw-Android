@@ -342,6 +342,7 @@ public class ProfileFragment extends Fragment {
                                             @Override
                                             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                                                 if (task.isSuccessful()) {
+                                                    userPetList.clear();
                                                     for (QueryDocumentSnapshot document : task.getResult()) {
                                                         Log.d("ProfileFragment", document.getId() + " => " + document.getData());
                                                         userPetList.add(document.toObject(Pet.class));
