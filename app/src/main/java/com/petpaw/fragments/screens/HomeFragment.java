@@ -36,13 +36,9 @@ import java.util.List;
  * create an instance of this fragment.
  */
 public class HomeFragment extends Fragment {
-
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
-    // TODO: Rename and change types of parameters
     private List<Post> postList = new ArrayList<>();
     private RecyclerView recyclerView;
     private String mParam1;
@@ -75,14 +71,14 @@ public class HomeFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         recyclerView = view.findViewById(R.id.homePostRecyclerView);
-        getPosts();
+//        getPosts();
 
         Button createPostBtn = view.findViewById(R.id.createPostButton);
         createPostBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(requireContext(), CreatePostActivity.class);
-//                intent.putExtra("postId", "tJrkz9WpKfKwfyGt0tyN");
+                intent.putExtra("postId", "qYGHy9HE0z3g9vQWxFcZ");
                 startActivity(intent);
             }
         });

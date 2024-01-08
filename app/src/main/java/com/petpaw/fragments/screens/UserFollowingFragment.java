@@ -1,29 +1,48 @@
-package com.petpaw.activities;
+package com.petpaw.fragments.screens;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.RecyclerView;
-
+import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
+
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager2.widget.ViewPager2;
+
 import android.util.Log;
-import android.widget.EditText;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.SearchView;
 import android.widget.TextView;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.petpaw.R;
+import com.petpaw.activities.MainActivity;
 import com.petpaw.adapters.UserFollowingAdapter;
 import com.petpaw.database.FollowCollection;
 import com.petpaw.database.UserCollection;
-import com.petpaw.databinding.ActivityUserFollowingBinding;
+import com.petpaw.databinding.FragmentUserFollowingBinding;
 import com.petpaw.models.FollowRecord;
 import com.petpaw.models.User;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
-public class UserFollowingActivity extends AppCompatActivity {
-    private static final String TAG = "UserFollowingActivity";
-    private ActivityUserFollowingBinding userFollowingBinding;
+/**
+ * A simple {@link Fragment} subclass.
+ * Use the {@link UserFollowingFragment#newInstance} factory method to
+ * create an instance of this fragment.
+ */
+public class UserFollowingFragment extends Fragment {
+
+
+    private static final String TAG = "UserFollowingFragment";
+    private FragmentUserFollowingBinding userFollowingBinding;
     private FirebaseAuth auth;
     private FirebaseUser firebaseUser;
 
@@ -40,13 +59,39 @@ public class UserFollowingActivity extends AppCompatActivity {
     private List<User> followingUsers = new ArrayList<>();
 
 
+    public UserFollowingFragment() {
+        // Required empty public constructor
+    }
+
+    /**
+     * Use this factory method to create a new instance of
+     * this fragment using the provided parameters.
+     *
+     * @param param1 Parameter 1.
+     * @param param2 Parameter 2.
+     * @return A new instance of fragment UserFollowingFragment.
+     */
+    // TODO: Rename and change types and number of parameters
+    public static UserFollowingFragment newInstance(String param1, String param2) {
+        UserFollowingFragment fragment = new UserFollowingFragment();
+        Bundle args = new Bundle();
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        userFollowingBinding = ActivityUserFollowingBinding.inflate(getLayoutInflater());
-        setContentView(userFollowingBinding.getRoot());
-        recyclerView = findViewById(R.id.followingRecyclerView);
+
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+
+        userFollowingBinding = FragmentUserFollowingBinding.inflate(inflater, container, false);
+
+        recyclerView = userFollowingBinding.followingRecyclerView;
 
         TextView msgNoFollowing = userFollowingBinding.msgNoFollowing;
         msgNoFollowing.setVisibility(TextView.INVISIBLE);
@@ -64,14 +109,14 @@ public class UserFollowingActivity extends AppCompatActivity {
                 @Override
                 public void onCallBack(User user) {
                     currentUser = user;
-                  followCollection.getAllFollowings(currentUser, new FollowCollection.Callback() {
+                    followCollection.getAllFollowings(currentUser, new FollowCollection.Callback() {
                         @Override
                         public void onCallback(List<FollowRecord> res) {
-                             followRecords = res;
+                            followRecords = res;
                         }
 
-                       @Override
-                       public void onCallBackGetUsers(List<User> users) {
+                        @Override
+                        public void onCallBackGetUsers(List<User> users) {
                             followingUsers = users;
                             userFollowingAdapter = new UserFollowingAdapter();
                             userFollowingAdapter.setUsers(followingUsers);
@@ -80,17 +125,41 @@ public class UserFollowingActivity extends AppCompatActivity {
                             if (followingUsers.size() == 0) {
                                 msgNoFollowing.setVisibility(TextView.VISIBLE);
                             }
-                       }
-                  });
+                        }
+                    });
 
 
                 }
             });
-
         }
 
+        userFollowingBinding.backButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                BottomNavigationView bottomNavigationView = requireActivity().findViewById(R.id.bottomNav);
+                bottomNavigationView.setSelectedItemId(R.id.profileFragment);
+
+            }
+        });
 
 
+        SearchView searchBar = userFollowingBinding.searchBar;
+        searchBar.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+//                filter(query);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                filter(newText);
+                return false;
+            }
+        });
+
+        // Inflate the layout for this fragment
+        return userFollowingBinding.getRoot();
     }
 
     private void getCurrentUserAndFollowingUser(String currentUserUid, String followingUserUid) {
@@ -141,8 +210,19 @@ public class UserFollowingActivity extends AppCompatActivity {
         userCollection.getUser(uid, callback);
     }
 
+    private void filter(String text) {
 
+        if (!text.isEmpty()) {
+            List<User> filteredList = new ArrayList<>();
 
-
-
+            for (User user : followingUsers) {
+                if (user.getName().toLowerCase().contains(text.toLowerCase())) {
+                    filteredList.add(user);
+                }
+            }
+            userFollowingAdapter.filter(filteredList);
+        } else {
+            userFollowingAdapter.filter(followingUsers);
+        }
+    }
 }

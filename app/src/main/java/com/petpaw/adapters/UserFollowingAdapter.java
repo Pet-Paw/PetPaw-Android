@@ -4,6 +4,8 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 import com.petpaw.R;
@@ -16,8 +18,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UserFollowingAdapter extends RecyclerView.Adapter<UserFollowingAdapter.UserFollowingViewHolder> {
+public class UserFollowingAdapter extends RecyclerView.Adapter<UserFollowingAdapter.UserFollowingViewHolder>  {
     private List<User> users = new ArrayList<>();
+
     public class UserFollowingViewHolder extends RecyclerView.ViewHolder {
         public TextView username;
         public TextView country;
@@ -62,4 +65,10 @@ public class UserFollowingAdapter extends RecyclerView.Adapter<UserFollowingAdap
         this.users = users;
         notifyDataSetChanged();
     }
+
+    public void filter(List<User> filterList) {
+        users = filterList;
+        notifyDataSetChanged();
+    }
+
 }

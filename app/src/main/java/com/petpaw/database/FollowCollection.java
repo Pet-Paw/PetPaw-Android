@@ -114,31 +114,43 @@ public class FollowCollection {
     }
 
 
-    public List<User> getAllFollowers(User currentUser, Callback callback) {
-        List<User> followers = new ArrayList<>();
-        followsCollectionReference.whereEqualTo("followingUid", currentUser.getUid()).get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                List<FollowRecord> followRecords = task.getResult().toObjects(FollowRecord.class);
+    public void getAllFollowers(User currentUser, Callback callback) {
+        List<User> followings = new ArrayList<>();
+        List<CompletableFuture<Void>> futures = new ArrayList<>();
 
-                for (FollowRecord followRecord : followRecords) {
-                    String followerUid = followRecord.getFollowerUid();
-                    UserCollection.newInstance().getUser(followerUid,
-                            new UserCollection.Callback() {
-                                @Override
-                                public void onCallback(List<User> users) {
+        followsCollectionReference.whereEqualTo("followingUid", currentUser.getUid())
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        List<FollowRecord> followRecords = task.getResult().toObjects(FollowRecord.class);
 
-                                }
-                                @Override
-                                public void onCallBack(User user) {
-                                    followers.add(user);
-                                }
-                            }
-                    );
-                }
-                callback.onCallback(followRecords);
-            }
-        });
-        return followers;
+                        for (FollowRecord followRecord : followRecords) {
+                            String followerUid = followRecord.getFollowerUid();
+
+                            CompletableFuture<Void> future = new CompletableFuture<>();
+                            futures.add(future);
+
+                            UserCollection.newInstance().getUser(followerUid,
+                                    new UserCollection.Callback() {
+                                        @Override
+                                        public void onCallback(List<User> users) {
+                                            // Not used in this case
+                                        }
+                                        @Override
+                                        public void onCallBack(User user) {
+                                            if (user != null) {
+                                                followings.add(user);
+                                            }
+                                            future.complete(null);
+                                        }
+                                    });
+                        }
+                        CompletableFuture<Void> allOf = CompletableFuture.allOf(
+                                futures.toArray(new CompletableFuture[0]));
+
+                        allOf.thenRun(() -> callback.onCallBackGetUsers(followings));
+                    }
+                });
     }
 
 }

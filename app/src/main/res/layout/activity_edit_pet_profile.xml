@@ -26,11 +26,11 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="20dp"
             android:layout_weight="1"
-            android:text="Edit Profile"
+            android:text="Edit Pet Profile"
             android:textAlignment="center"
             android:textColor="@color/black"
-            android:textStyle="bold"
-            android:textSize="22dp" />
+            android:textSize="22dp"
+            android:textStyle="bold" />
 
     </LinearLayout>
 
@@ -51,7 +51,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Avatar"
+                android:text="Pet Avatar"
                 android:textColor="@color/black"
                 android:textStyle="bold"
                 android:layout_weight="1"
@@ -71,10 +71,10 @@
         </LinearLayout>
 
         <de.hdodenhof.circleimageview.CircleImageView
-            android:id="@+id/avatar"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:src="@drawable/default_avatar"
+            android:id="@+id/petAvatar"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:src="@drawable/cat_placeholder"
             app:civ_border_width="1dp"
             app:civ_border_color="@color/primary"/>
 
@@ -94,7 +94,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Information"
+                android:text="Pet Information"
                 android:textColor="@color/black"
                 android:textStyle="bold"
                 android:layout_weight="1"
@@ -115,36 +115,38 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
+            android:gravity="center_vertical"
             android:orientation="horizontal">
+
             <TextView
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Name"
                 android:textColor="@color/black"
-                android:layout_weight="1"
-                android:textSize="18dp"/>
+                android:textSize="18dp" />
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1">
+
                 <TextView
-                    android:id="@+id/name"
+                    android:id="@+id/petName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textAlignment="textEnd"
                     android:layout_centerInParent="true"
-                    android:text="John Robert"
-                    android:textStyle="bold"
+                    android:text="Daisy"
+                    android:textAlignment="textEnd"
                     android:textColor="@color/black"
                     android:textSize="18dp"
-                   />
+                    android:textStyle="bold" />
                 <EditText
                     android:id="@+id/editNameText"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
                     android:textAlignment="textEnd"
-                    android:text="John Robert"
+                    android:inputType="number"
+                    android:text="Daisy"
                     android:textStyle="bold"
                     android:textColor="@color/black"
                     android:textSize="18dp"
@@ -152,41 +154,141 @@
                     />
             </RelativeLayout>
 
-        </LinearLayout>
 
+        </LinearLayout>
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
+            android:gravity="center_vertical"
             android:orientation="horizontal">
+
             <TextView
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Address"
+                android:text="Age"
                 android:textColor="@color/black"
-                android:layout_weight="1"
-                android:textSize="18dp"/>
+                android:textSize="18dp" />
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1">
+
                 <TextView
-                    android:id="@+id/address"
+                    android:id="@+id/petAge"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textAlignment="textEnd"
                     android:layout_centerInParent="true"
-                    android:text="123 Avenue St."
+                    android:text="9"
+                    android:textAlignment="textEnd"
+                    android:textColor="@color/black"
+                    android:textSize="18dp"
+                    android:textStyle="bold" />
+                <EditText
+                    android:id="@+id/editAgeText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:textAlignment="textEnd"
+                    android:inputType="number"
+                    android:text="9"
                     android:textStyle="bold"
                     android:textColor="@color/black"
-                    android:layout_weight="1"
-                    android:textSize="18dp"/>
+                    android:textSize="18dp"
+                    android:visibility="invisible"
+                    />
+            </RelativeLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Weight"
+                android:textColor="@color/black"
+                android:textSize="18dp" />
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
+
+                <TextView
+                    android:id="@+id/petWeight"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:layout_toStartOf="@id/kg"
+                    android:text="5"
+                    android:textColor="@color/black"
+                    android:textSize="18dp"
+                    android:textStyle="bold" />
                 <EditText
-                    android:id="@+id/editAddressText"
-                    android:layout_width="match_parent"
+                    android:id="@+id/editWeightText"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textAlignment="textEnd"
-                    android:text="123 Avenue St."
+                    android:layout_toStartOf="@id/kg"
+                    android:text="5"
+                    android:inputType="numberDecimal"
+                    android:textStyle="bold"
+                    android:textColor="@color/black"
+                    android:textSize="18dp"
+                    android:visibility="invisible" />
+
+                <TextView
+                    android:id="@+id/kg"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerInParent="true"
+                    android:text=" kg"
+                    android:textColor="@color/black"
+                    android:textSize="18dp"
+                    android:textStyle="bold" />
+            </RelativeLayout>
+
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Breed"
+                android:textColor="@color/black"
+                android:textSize="18dp" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
+
+                <TextView
+                    android:id="@+id/petBreed"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:layout_weight="1"
+                    android:text="Domestic Shorthair"
+                    android:textAlignment="textEnd"
+                    android:textColor="@color/black"
+                    android:textSize="18dp"
+                    android:textStyle="bold" />
+                <EditText
+                    android:id="@+id/editBreedText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:textAlignment="textEnd"
+                    android:text="Domestic Shorthair"
+                    android:inputType="textPersonName"
                     android:textStyle="bold"
                     android:textColor="@color/black"
                     android:textSize="18dp"
@@ -194,103 +296,6 @@
                     />
             </RelativeLayout>
         </LinearLayout>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginTop="15dp"
-            android:background="@color/darkGray"/>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:layout_marginBottom="20dp"
-            android:gravity="center_horizontal"
-            android:orientation="horizontal">
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Account Details"
-                android:textColor="@color/black"
-                android:layout_weight="1"
-                android:textStyle="bold"
-                android:textSize="20dp"/>
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="15dp"
-            android:gravity="center_horizontal"
-            android:orientation="horizontal">
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Email"
-                android:textColor="@color/black"
-                android:layout_weight="1"
-                android:textSize="18dp"/>
-            <TextView
-                android:id="@+id/email"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textAlignment="textEnd"
-                android:text="john@mail.com"
-                android:textStyle="bold"
-                android:textColor="@color/black"
-                android:layout_weight="1"
-                android:textSize="18dp"/>
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="15dp"
-            android:gravity="center_horizontal"
-            android:orientation="horizontal">
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Phone"
-                android:textColor="@color/black"
-                android:layout_weight="1"
-                android:textSize="18dp"/>
-            <TextView
-                android:id="@+id/phone"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textAlignment="textEnd"
-                android:text="0924737468"
-                android:textStyle="bold"
-                android:textColor="@color/black"
-                android:layout_weight="1"
-                android:textSize="18dp"/>
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:gravity="center_horizontal"
-            android:orientation="horizontal">
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Password"
-                android:textColor="@color/black"
-                android:layout_weight="1"
-                android:textSize="18dp"/>
-            <TextView
-                android:id="@+id/password"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textAlignment="textEnd"
-                android:text="••••••••••"
-                android:textStyle="bold"
-                android:textColor="@color/black"
-                android:layout_weight="1"
-                android:textSize="18dp"/>
-        </LinearLayout>
-
 
         <Button
             android:id="@+id/saveBtn"
@@ -301,7 +306,4 @@
             app:cornerRadius="10dp"/>
 
     </LinearLayout>
-
-
-
 </LinearLayout>
