@@ -9,7 +9,10 @@ import androidx.navigation.ui.NavigationUI;
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.FrameLayout;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
 import com.petpaw.R;
 import com.petpaw.databinding.ActivityMainBinding;
@@ -71,11 +74,35 @@ public class MainActivity extends AppCompatActivity {
         mBinding.bottomNav.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                if (item.getItemId() != R.id.searchFragment && item.getItemId() != R.id.profileFragment) {
+                    findViewById(R.id.overlay_fragment_container).setVisibility(View.GONE);
+                }
+
                 return NavigationUI.onNavDestinationSelected(item, navController, false)
                         || MainActivity.super.onOptionsItemSelected(item);
             }
         });
-
-
     }
+
+    @Override
+    public void onBackPressed() {
+        FrameLayout overlayContainer = findViewById(R.id.overlay_fragment_container);
+        BottomNavigationView bottomNav = findViewById(R.id.bottomNav);
+        int selectedItemId = bottomNav.getSelectedItemId();
+
+        if (overlayContainer.getVisibility() == View.VISIBLE) {
+            overlayContainer.setVisibility(View.GONE);
+
+            // Restore visibility of the underlying layout
+            if (selectedItemId == R.id.searchFragment) {
+                findViewById(R.id.searchLayout).setVisibility(View.VISIBLE);
+            } else if (selectedItemId == R.id.profileFragment) {
+                findViewById(R.id.profileLayout).setVisibility(View.VISIBLE);
+            }
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+
 }

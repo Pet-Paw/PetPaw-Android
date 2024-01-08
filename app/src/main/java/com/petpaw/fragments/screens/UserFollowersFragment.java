@@ -203,7 +203,6 @@ public class UserFollowersFragment extends Fragment {
     }
 
     private void filter(String text) {
-
         if (!text.isEmpty()) {
             List<User> filteredList = new ArrayList<>();
 
