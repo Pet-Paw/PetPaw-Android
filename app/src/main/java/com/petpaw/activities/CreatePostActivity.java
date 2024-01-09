@@ -1,8 +1,12 @@
 package com.petpaw.activities;
 
+import static androidx.core.content.ContentProviderCompat.requireContext;
+import static java.security.AccessController.getContext;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 //import static io.grpc.Context.LazyStorage.storage;
 
@@ -10,12 +14,17 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.net.Uri;
 import android.nfc.Tag;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import android.content.Intent;
@@ -26,14 +35,18 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.UploadTask;
 import com.petpaw.R;
 import com.petpaw.databinding.ActivityCreatePostBinding;
 import com.petpaw.databinding.ActivityMainBinding;
+import com.petpaw.models.Pet;
 import com.petpaw.models.Post;
 
 import android.util.Log;
@@ -55,24 +68,28 @@ import java.util.Map;
 
 public class CreatePostActivity extends AppCompatActivity {
     ActivityCreatePostBinding binding;
-
+    ProgressDialog progressDialog;
+    private FirebaseFirestore db;
+    private String currentUserId;
     private Uri imageUri;
-//    Uri uploadImageUri;
     private StorageReference storageReference;
-//    private StorageReference getImageStorageReference;
     private DocumentReference postDocRef;
     private boolean isSelectNewImage = false;
 
-    ProgressDialog progressDialog;
 
-//    *** The imageId is also the post id ***
+//    ------------------ testing----------------------
+    private List<String> selectedPetListId = new ArrayList<>(); // For storing the selected pet
+//    -------------------------------------------------
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_post);
 
+        db = FirebaseFirestore.getInstance();
+
         FirebaseAuth auth = FirebaseAuth.getInstance();
-        String currentUserId = auth.getCurrentUser().getUid();
+        currentUserId = auth.getCurrentUser().getUid();
         Log.d("CreatePostActivity", "Current User Id: " + currentUserId);
 
         Intent intent = getIntent();
@@ -96,7 +113,6 @@ public class CreatePostActivity extends AppCompatActivity {
                 isSelectNewImage = true;
             });
 
-            FirebaseFirestore db = FirebaseFirestore.getInstance();
             DocumentReference postRef;
             postRef = db.collection("Posts").document(postId);
             postRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -130,7 +146,7 @@ public class CreatePostActivity extends AppCompatActivity {
 
                             binding.createPostDescriptionEditText.setText(document.getString("content"));
 
-//                            ------- Check valid input --------
+//                            ------- Check valid input  --------
                             binding.createPostSaveButton.setOnClickListener(v -> {
                                 boolean isValid = true;
                                 List<String> tags = new ArrayList<>();
@@ -213,29 +229,26 @@ public class CreatePostActivity extends AppCompatActivity {
             });
 
         }
-        else { //----------if it does not have a postId, then it is creating a new post --------------
+        else { //****************** if it does not have a postId, then it is CREATE a new post *******************
+
+            //** ListView to select pet **
+            //renderPetListView();
+
+            //** Spinner to select pet **
+            renderPetSpinner();
+
             binding.createPostSelectImageButton.setOnClickListener(v -> {
                 selectImage();
             });
 
-            Log.d("CreatePostActivity", "PostId is null");
             binding.createPostButtonLinearLayout.setVisibility(View.GONE);
             binding.createPostUploadButton.setOnClickListener(v -> {
                 boolean isValid = true;
-                List<String> tags = new ArrayList<>();
 
                 String description = binding.createPostDescriptionEditText.getText().toString();
+                List<String> tags = getTags(description);
 
-                if(!description.isEmpty()){
-                    String[] parts = description.split("#");
-                    for(int i=1; i<parts.length; i++) {
-                        String part = parts[i];
-                        if(!part.isEmpty() && part.charAt(0) != '#') {
-                            tags.add(part);
-                        }
-                    }
-                    Log.d("CreatePostActivity", "Tags: " + tags.toString());
-                }
+//                -------- Check valid input --------
 
                 if(isValid){
                     Post post = new Post();
@@ -243,11 +256,10 @@ public class CreatePostActivity extends AppCompatActivity {
                     post.setContent(description);
                     post.setAuthorId(currentUserId);
 //                    **** Still haven't had correct petId ****
-                    post.setPetId("pet123");
+                    post.setPetId(selectedPetListId.get(0));
                     post.setTags(tags);
 
-                    FirebaseFirestore db = FirebaseFirestore.getInstance();
-                    Log.d("CreatePostActivity", "Adding post to Firestore");
+
                     db.collection("Posts")
                             .add(post)
                             .addOnSuccessListener(documentReference -> {
@@ -265,18 +277,117 @@ public class CreatePostActivity extends AppCompatActivity {
 
                                 Toast.makeText(this, "Post Successfully Created", Toast.LENGTH_SHORT).show();
 
-//                        ******** Need to update relevant class Later on ********
                             })
                             .addOnFailureListener(e -> {
                                 Toast.makeText(this, "Error creating post", Toast.LENGTH_SHORT).show();
                             });
+
+
                 }
+
+
             });
         }
 
         binding.createPostBackButton.setOnClickListener(v -> {
             finish();
         });
+    }
+
+    private void renderPetSpinner(){
+        CollectionReference petsRef = db.collection("Pets");
+        List<String> petListId = new ArrayList<>();
+        List<String> petListName = new ArrayList<>();
+
+        Query query = petsRef.whereEqualTo("ownerId", currentUserId);
+        query.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                for (QueryDocumentSnapshot document : task.getResult()) {
+                    petListId.add(document.getId());
+                    petListName.add(document.getString("name"));
+                }
+                ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                        this,
+                        android.R.layout.simple_spinner_item,
+                        petListName
+                );
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                binding.createPostTagsSpinner.setPrompt("Select a pet");
+                binding.createPostTagsSpinner.setAdapter(adapter);
+
+                binding.createPostTagsSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        if(selectedPetListId.size() > 0){
+                            selectedPetListId.remove(0);
+                        }
+                        selectedPetListId.add(petListId.get(position));
+                        Log.d("CreatePostActivity", "Selected pet ID: " + selectedPetListId.get(0).toString());
+                    }
+                    public void onNothingSelected(AdapterView<?> parent) {
+                    }
+                });
+
+            } else {
+                Log.d("Get pet ID query", "Error getting documents: ", task.getException());
+            }
+
+        });
+    }
+
+    /*
+    private void renderPetListView(){
+        CollectionReference petsRef = db.collection("Pets");
+        //------- Fetch data ----------
+        List<String> petListId = new ArrayList<>();
+        List<String> petListName = new ArrayList<>();
+
+        Query query = petsRef.whereEqualTo("ownerId", currentUserId);
+        query.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                for (QueryDocumentSnapshot document : task.getResult()) {
+                    petListId.add(document.getId());
+                    petListName.add(document.getString("name"));
+                }
+                ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                        this,
+                        android.R.layout.simple_list_item_1,
+                        petListName
+                );
+                binding.createPostTagsListView.setAdapter(adapter);
+                binding.createPostTagsListView.setOnItemClickListener((parent, view, position, id) -> {
+
+                    if(view.getTag() == null) {
+                        view.setBackgroundColor(ContextCompat.getColor(this, R.color.primary));
+                        view.setTag(true);
+                        selectedPetListId.add(petListId.get(position));
+                    } else {
+                        view.setBackgroundColor(Color.WHITE);
+                        view.setTag(null);
+                        selectedPetListId.remove(petListId.get(position));
+                    }
+                    Log.d("CreatePostActivity", "Selected pet ID: " + selectedPetListId.toString());
+                });
+            } else {
+                Log.d("Get pet ID query", "Error getting documents: ", task.getException());
+            }
+
+        });
+    }
+    */
+
+    private List<String> getTags(String description) {
+        List<String> tags = new ArrayList<>();
+        if(!description.isEmpty()){
+            String[] parts = description.split("#");
+            for(int i=1; i<parts.length; i++) {
+                String part = parts[i];
+                if(!part.isEmpty() && part.charAt(0) != '#') {
+                    tags.add(part);
+                }
+            }
+            Log.d("CreatePostActivity", "Tags: " + tags.toString());
+        }
+        return tags;
     }
 
     private void selectImage() {

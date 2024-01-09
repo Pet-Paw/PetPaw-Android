@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -53,9 +54,9 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserVi
         FirebaseAuth auth = FirebaseAuth.getInstance();
         String currentUserId = Objects.requireNonNull(auth.getCurrentUser()).getUid();
         String userId = usersList.get(position).getUid();
-        Log.d("TAG", "- user id: " + userId);
 
         if (!(userId.equals(currentUserId))) {
+            Log.d("TAG", "- user id: " + userId);
             holder.userCardViewUsername.setText(usersList.get(position).getName());
             Log.d("TAG", "-- user name: " + usersList.get(position).getName());
             if (usersList.get(position).getImageURL() == null) {
@@ -66,6 +67,8 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserVi
                         .placeholder(R.drawable.default_avatar)
                         .into(holder.userCardViewProfilePic);
             }
+        }else{
+            holder.userCardViewLinearLayout.setVisibility(View.GONE);
         }
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -108,7 +111,7 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserVi
 
 
         public class UserViewHolder extends RecyclerView.ViewHolder {
-
+        LinearLayout userCardViewLinearLayout;
         ImageView userCardViewProfilePic;
         TextView userCardViewUsername;
 
@@ -116,6 +119,7 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserVi
             super(itemView);
             userCardViewProfilePic = itemView.findViewById(R.id.userCardViewProfilePic);
             userCardViewUsername = itemView.findViewById(R.id.userCardViewUsername);
+            userCardViewLinearLayout = itemView.findViewById(R.id.userCardViewLinearLayout);
         }
     }
 }

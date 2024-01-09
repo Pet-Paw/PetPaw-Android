@@ -78,7 +78,7 @@ public class HomeFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(requireContext(), CreatePostActivity.class);
-                intent.putExtra("postId", "qYGHy9HE0z3g9vQWxFcZ");
+//                intent.putExtra("postId", "qYGHy9HE0z3g9vQWxFcZ");
                 startActivity(intent);
             }
         });
