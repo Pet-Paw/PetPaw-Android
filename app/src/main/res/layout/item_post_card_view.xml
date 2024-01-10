@@ -21,7 +21,7 @@
             app:cardBackgroundColor="#FFFFFF"
             app:cardCornerRadius="15dp">
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:padding="15dp">
@@ -48,7 +48,8 @@
                         android:orientation="vertical"
                         android:gravity="center_vertical"
                         android:layout_marginLeft="10dp"
-                        android:layout_gravity="center">
+                        android:layout_gravity="center"
+                        android:layout_weight="1">
 
                         <TextView
                             android:id="@+id/postCardViewUserNameTextView"
@@ -69,6 +70,14 @@
                             android:textAlignment="textStart" />
                     </LinearLayout>
 
+                    <ImageView
+                        android:id="@+id/postCardViewEditImageView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/baseline_edit_24"
+                        android:layout_gravity="center"
+                        android:layout_marginLeft="10dp"/>
+
                 </LinearLayout>
                 <TextView
                     android:id="@+id/postCardViewContentTextView"
@@ -76,20 +85,19 @@
                     android:layout_height="wrap_content"
                     android:text="This is where the post contain the description and the user can write anything or nothing!"/>
 
-                <LinearLayout
+                <FrameLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:orientation="vertical"
-                    android:layout_marginTop="10dp">
+                    android:layout_gravity="center">
+
                     <ImageView
                         android:id="@+id/postCardImageView"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="200dp"
                         android:src="@drawable/cat_placeholder"
-                        android:scaleType="centerCrop"
-                        android:layout_gravity="center" />
-                </LinearLayout>
+                        android:scaleType="fitCenter" />
+
+                </FrameLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"
