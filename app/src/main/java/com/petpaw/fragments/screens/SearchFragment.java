@@ -2,6 +2,7 @@ package com.petpaw.fragments.screens;
 
 import static android.content.ContentValues.TAG;
 
+import android.content.Context;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -57,6 +58,13 @@ public class SearchFragment extends Fragment {
     private List<User> userList = new ArrayList<>();
 
     private boolean isPost = true;
+    private Context context;
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        this.context = context;
+    }
 
     public SearchFragment() {
         // Required empty public constructor
@@ -196,8 +204,10 @@ public class SearchFragment extends Fragment {
                             }
                         }
                     }
-                    binding.searchFragmentPostRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-                    binding.searchFragmentPostRecyclerView.setAdapter(new PostListAdapter(requireContext(), postList));
+                    if (context != null) {
+                        binding.searchFragmentPostRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+                        binding.searchFragmentPostRecyclerView.setAdapter(new PostListAdapter(requireContext(), postList));
+                    }
                 }
             }
         });
@@ -225,8 +235,10 @@ public class SearchFragment extends Fragment {
                             }
                         }
                     }
-                    binding.searchFragmentUserRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-                    binding.searchFragmentUserRecyclerView.setAdapter(new UserListAdapter(requireContext(), userList));
+                    if (context != null) {
+                        binding.searchFragmentUserRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+                        binding.searchFragmentUserRecyclerView.setAdapter(new UserListAdapter(requireContext(), userList));
+                    }
                 }
             }
         });

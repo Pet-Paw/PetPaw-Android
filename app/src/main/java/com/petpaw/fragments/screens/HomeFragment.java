@@ -1,5 +1,6 @@
 package com.petpaw.fragments.screens;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -43,6 +44,13 @@ public class HomeFragment extends Fragment {
     private RecyclerView recyclerView;
     private String mParam1;
     private String mParam2;
+    private Context context;
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        this.context = context;
+    }
 
     public HomeFragment() {
         // Required empty public constructor
@@ -78,7 +86,7 @@ public class HomeFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(requireContext(), CreatePostActivity.class);
-//                intent.putExtra("postId", "qYGHy9HE0z3g9vQWxFcZ");
+                intent.putExtra("postId", "qYGHy9HE0z3g9vQWxFcZ");
                 startActivity(intent);
             }
         });
@@ -107,8 +115,10 @@ public class HomeFragment extends Fragment {
                         Post postTemp = new Post(post.getAuthorId(), post.getDateModified(), post.getContent(), post.isModified(), post.getImageURL(), post.getLikes(), post.getComments(), post.getPostId());
                         postList.add(postTemp);
                     }
-                    recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-                    recyclerView.setAdapter(new PostListAdapter(requireContext(), postList));
+                    if (context != null) {
+                        recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+                        recyclerView.setAdapter(new PostListAdapter(requireContext(), postList));
+                    }
                 }
             }
         });
