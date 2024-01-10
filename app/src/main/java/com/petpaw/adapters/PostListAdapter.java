@@ -1,6 +1,7 @@
 package com.petpaw.adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -21,6 +22,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import com.petpaw.R;
 
+import com.petpaw.activities.CreatePostActivity;
 import com.petpaw.models.Post;
 import com.petpaw.models.User;
 import com.squareup.picasso.Picasso;
@@ -61,10 +63,21 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.PostVi
         Log.d("TAG", "- postId: " + postId);
         List<String> likes = postList.get(position).getLikes();
 
+//        holder.postCardViewUserNameTextView.setText(postList.get(position).getAuthorId());
+//        ----------- show edit icon ----------------
+        if (currentUserId.equals(postList.get(position).getAuthorId())) {
+            holder.postCardViewEditImageView.setVisibility(View.VISIBLE);
+        } else {
+            holder.postCardViewEditImageView.setVisibility(View.GONE);
+        }
 
-        holder.postCardViewUserNameTextView.setText(postList.get(position).getAuthorId());
+        holder.postCardViewEditImageView.setOnClickListener(view -> {
+            Intent intent = new Intent(context, CreatePostActivity.class);
+            intent.putExtra("postId", postId);
+            context.startActivity(intent);
+        });
 
-//        ------- Formate Date ------------
+//        -------------- Formate Date -------------
         Date date = postList.get(position).getDateModified();
         SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy HH:mm");
         holder.postCardViewDate.setText(sdf.format(date));
@@ -160,7 +173,7 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.PostVi
     }
     public class PostViewHolder extends RecyclerView.ViewHolder {
 
-        ImageView postCardViewProfilePic, postCardImageView, postCardViewLikeImageView, postCardViewCommentImageView;
+        ImageView postCardViewProfilePic, postCardImageView, postCardViewLikeImageView, postCardViewCommentImageView, postCardViewEditImageView;
         TextView postCardViewUserNameTextView, postCardViewDate, postCardViewContentTextView, postCardViewLikeCountTextView, postCardViewCommentCountTextView;
 
         public PostViewHolder(@NonNull View itemView) {
@@ -177,6 +190,7 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.PostVi
             postCardViewProfilePic = itemView.findViewById(R.id.postCardViewProfilePic);
             postCardViewLikeImageView = itemView.findViewById(R.id.postCardViewLikeImageView);
             postCardViewCommentImageView = itemView.findViewById(R.id.postCardViewCommentImageView);
+            postCardViewEditImageView = itemView.findViewById(R.id.postCardViewEditImageView);
 
             itemView.setOnClickListener(v -> {
                 Log.d("PostListAdapter", "onClick: " + getAdapterPosition());
@@ -185,19 +199,19 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.PostVi
     }
 }
 
-class PostViewHolder extends RecyclerView.ViewHolder {
-
-    ImageView postCardViewProfilePic, postCardImageView;
-    TextView postCardViewUserNameTextView, postCardViewDate, postCardViewLikeCountTextView, postCardViewCommentCountTextView;
-
-    public PostViewHolder(@NonNull View itemView) {
-        super(itemView);
-        postCardViewProfilePic = itemView.findViewById(R.id.postCardViewProfilePic);
-        postCardImageView = itemView.findViewById(R.id.postCardImageView);
-        postCardViewUserNameTextView = itemView.findViewById(R.id.postCardViewUserNameTextView);
-        postCardViewDate = itemView.findViewById(R.id.postCardViewDate);
-        postCardViewLikeCountTextView = itemView.findViewById(R.id.postCardViewLikeCountTextView);
-        postCardViewCommentCountTextView = itemView.findViewById(R.id.postCardViewCommentCountTextView);
-
-    }
-}
+//class PostViewHolder extends RecyclerView.ViewHolder {
+//
+//    ImageView postCardViewProfilePic, postCardImageView;
+//    TextView postCardViewUserNameTextView, postCardViewDate, postCardViewLikeCountTextView, postCardViewCommentCountTextView;
+//
+//    public PostViewHolder(@NonNull View itemView) {
+//        super(itemView);
+//        postCardViewProfilePic = itemView.findViewById(R.id.postCardViewProfilePic);
+//        postCardImageView = itemView.findViewById(R.id.postCardImageView);
+//        postCardViewUserNameTextView = itemView.findViewById(R.id.postCardViewUserNameTextView);
+//        postCardViewDate = itemView.findViewById(R.id.postCardViewDate);
+//        postCardViewLikeCountTextView = itemView.findViewById(R.id.postCardViewLikeCountTextView);
+//        postCardViewCommentCountTextView = itemView.findViewById(R.id.postCardViewCommentCountTextView);
+//
+//    }
+//}
