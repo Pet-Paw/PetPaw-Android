@@ -2,6 +2,7 @@ package com.petpaw.fragments.screens;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.net.Uri;
@@ -84,6 +85,14 @@ public class ProfileFragment extends Fragment {
     private List<Pet> userPetList = new ArrayList<>();
     private List<User> userFollowingList = new ArrayList<>();
     private List<User> userFollowerList = new ArrayList<>();
+
+    private Context context;
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        this.context = context;
+    }
 
 
     public ProfileFragment() {
@@ -351,7 +360,7 @@ public class ProfileFragment extends Fragment {
                     userPostList.clear();
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         Post post = document.toObject(Post.class);
-                        Post postTemp = new Post(post.getAuthorId(), post.getDateModified(), post.getContent(), post.isModified(), post.getImageURL(), post.getLikes(), post.getComments(), post.getPostId());
+                        Post postTemp = new Post(post.getAuthorId(), post.getDateModified(), post.getContent(), post.isModified(), post.getImageURL(), post.getLikes(), post.getComments(), post.getPostId(), post.getTags(), post.getPetIdList());
                         userPostList.add(postTemp);
                     }
                     // Check if the userPostList is empty and log
@@ -360,8 +369,10 @@ public class ProfileFragment extends Fragment {
                     }
 
                     binding.postNum.setText(userPostList.size() + "");
-                    binding.postsRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-                    binding.postsRecyclerView.setAdapter(new PostListAdapter(requireContext(), userPostList));
+                    if(context != null) {
+                        binding.postsRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+                        binding.postsRecyclerView.setAdapter(new PostListAdapter(requireContext(), userPostList));
+                    }
                 } else {
                     Log.e("ProfileFragment", "Error getting user posts: ", task.getException());
                 }
@@ -371,6 +382,32 @@ public class ProfileFragment extends Fragment {
     }
 
     private void getUserPets() {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        CollectionReference postsRef = db.collection("Pets");
+        Query query = postsRef.whereEqualTo("ownerId", uid);
+        query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    userPetList.clear();
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        Pet pet = document.toObject(Pet.class);
+                        userPetList.add(pet);
+                    }
+                    // Check if the userPostList is empty and log
+                    if (userPetList.isEmpty()) {
+                        Log.d("ProfileFragment", "No pets found for the user.");
+                    }
+                    if(context != null) {
+                        binding.petsRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+                        binding.petsRecyclerView.setAdapter(new PetListAdapter(requireContext(), userPetList));
+                    }
+                } else {
+                    Log.e("ProfileFragment", "Error getting user pets: ", task.getException());
+                }
+            }
+        });
+        /*
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         FirebaseAuth auth = FirebaseAuth.getInstance();
         db.collection("users").document(auth.getCurrentUser().getUid())
@@ -400,7 +437,7 @@ public class ProfileFragment extends Fragment {
                             }
                         });
 
-
+         */
     }
 
     private void getUserFollowers() {
