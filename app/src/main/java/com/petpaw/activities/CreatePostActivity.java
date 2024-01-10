@@ -232,10 +232,10 @@ public class CreatePostActivity extends AppCompatActivity {
         else { //****************** if it does not have a postId, then it is CREATE a new post *******************
 
             //** ListView to select pet **
-            //renderPetListView();
+            renderPetListView();
 
             //** Spinner to select pet **
-            renderPetSpinner();
+            //renderPetSpinner();
 
             binding.createPostSelectImageButton.setOnClickListener(v -> {
                 selectImage();
@@ -257,6 +257,7 @@ public class CreatePostActivity extends AppCompatActivity {
                     post.setAuthorId(currentUserId);
 //                    **** Still haven't had correct petId ****
                     post.setPetId(selectedPetListId.get(0));
+                    post.setPetIdList(selectedPetListId);
                     post.setTags(tags);
 
 
@@ -294,6 +295,7 @@ public class CreatePostActivity extends AppCompatActivity {
         });
     }
 
+    /*
     private void renderPetSpinner(){
         CollectionReference petsRef = db.collection("Pets");
         List<String> petListId = new ArrayList<>();
@@ -333,8 +335,9 @@ public class CreatePostActivity extends AppCompatActivity {
 
         });
     }
+    */
 
-    /*
+
     private void renderPetListView(){
         CollectionReference petsRef = db.collection("Pets");
         //------- Fetch data ----------
@@ -373,7 +376,7 @@ public class CreatePostActivity extends AppCompatActivity {
 
         });
     }
-    */
+
 
     private List<String> getTags(String description) {
         List<String> tags = new ArrayList<>();

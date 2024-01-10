@@ -86,7 +86,7 @@ public class HomeFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(requireContext(), CreatePostActivity.class);
-                intent.putExtra("postId", "qYGHy9HE0z3g9vQWxFcZ");
+//                intent.putExtra("postId", "qYGHy9HE0z3g9vQWxFcZ");
                 startActivity(intent);
             }
         });
@@ -112,7 +112,7 @@ public class HomeFragment extends Fragment {
                     postList.clear();
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         Post post = document.toObject(Post.class);
-                        Post postTemp = new Post(post.getAuthorId(), post.getDateModified(), post.getContent(), post.isModified(), post.getImageURL(), post.getLikes(), post.getComments(), post.getPostId());
+                        Post postTemp = new Post(post.getAuthorId(), post.getDateModified(), post.getContent(), post.isModified(), post.getImageURL(), post.getLikes(), post.getComments(), post.getPostId(), post.getTags(), post.getPetIdList());
                         postList.add(postTemp);
                     }
                     if (context != null) {
