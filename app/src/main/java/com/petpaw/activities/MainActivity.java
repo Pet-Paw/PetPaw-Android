@@ -8,14 +8,17 @@ import androidx.navigation.ui.NavigationUI;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
+import com.google.android.material.navigation.NavigationView;
 import com.petpaw.R;
 import com.petpaw.databinding.ActivityMainBinding;
+import com.petpaw.fragments.screens.SideNavFragment;
 
 public class MainActivity extends AppCompatActivity {
     ActivityMainBinding mBinding;
@@ -25,6 +28,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         mBinding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(mBinding.getRoot());
+
+        if (savedInstanceState == null) {
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.toolbarFragment, SideNavFragment.newInstance())
+                    .commit();
+        }
 
         
         setupUI();
@@ -78,6 +87,14 @@ public class MainActivity extends AppCompatActivity {
                 if (overlayContainer.getVisibility() == View.VISIBLE) {
                     // If the overlay container is visible, hide it when navigating to a different tab
                     overlayContainer.setVisibility(View.GONE);
+                }
+
+                SideNavFragment sideNavFragment = (SideNavFragment) getSupportFragmentManager()
+                        .findFragmentById(R.id.toolbarFragment);
+
+                if (sideNavFragment != null) {
+                    NavigationView sideNav = sideNavFragment.mNavigationView;
+                    sideNav.setCheckedItem(item.getItemId());
                 }
 
                 return NavigationUI.onNavDestinationSelected(item, navController, false)

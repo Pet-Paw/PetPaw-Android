@@ -216,7 +216,6 @@
                         android:layout_height="wrap_content"
                         android:text="Following" />
                 </com.google.android.material.tabs.TabLayout>
-
             </LinearLayout>
         </LinearLayout>
         <View
@@ -288,4 +287,5 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         />
+
 </FrameLayout>
