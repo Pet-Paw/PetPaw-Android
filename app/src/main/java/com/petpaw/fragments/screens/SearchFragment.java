@@ -2,6 +2,7 @@ package com.petpaw.fragments.screens;
 
 import static android.content.ContentValues.TAG;
 
+import android.content.Context;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -19,6 +20,7 @@ import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
@@ -36,6 +38,7 @@ import com.petpaw.models.User;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -55,6 +58,13 @@ public class SearchFragment extends Fragment {
     private List<User> userList = new ArrayList<>();
 
     private boolean isPost = true;
+    private Context context;
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        this.context = context;
+    }
 
     public SearchFragment() {
         // Required empty public constructor
@@ -185,17 +195,19 @@ public class SearchFragment extends Fragment {
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         Post post = document.toObject(Post.class);
                         if(searchValue.equals("")){
-                            Post postTemp = new Post(post.getAuthorId(), post.getDateModified(), post.getContent(), post.isModified(), post.getImageURL(), post.getLikes(), post.getComments(), post.getPostId());
+                            Post postTemp = new Post(post.getAuthorId(), post.getDateModified(), post.getContent(), post.isModified(), post.getImageURL(), post.getLikes(), post.getComments(), post.getPostId(), post.getTags(), post.getPetIdList());
                             postList.add(postTemp);
                         } else {
                             if(post.getContent().toLowerCase().contains(searchValue.toLowerCase())){
-                                Post postTemp = new Post(post.getAuthorId(), post.getDateModified(), post.getContent(), post.isModified(), post.getImageURL(), post.getLikes(), post.getComments(), post.getPostId());
+                                Post postTemp = new Post(post.getAuthorId(), post.getDateModified(), post.getContent(), post.isModified(), post.getImageURL(), post.getLikes(), post.getComments(), post.getPostId(), post.getTags(), post.getPetIdList());
                                 postList.add(postTemp);
                             }
                         }
                     }
-                    binding.searchFragmentPostRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-                    binding.searchFragmentPostRecyclerView.setAdapter(new PostListAdapter(requireContext(), postList));
+                    if (context != null) {
+                        binding.searchFragmentPostRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+                        binding.searchFragmentPostRecyclerView.setAdapter(new PostListAdapter(requireContext(), postList));
+                    }
                 }
             }
         });
@@ -205,6 +217,7 @@ public class SearchFragment extends Fragment {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         CollectionReference usersRef = db.collection("users");
         Query query = usersRef.orderBy("name", Query.Direction.DESCENDING);
+
         query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
@@ -222,8 +235,10 @@ public class SearchFragment extends Fragment {
                             }
                         }
                     }
-                    binding.searchFragmentUserRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-                    binding.searchFragmentUserRecyclerView.setAdapter(new UserListAdapter(requireContext(), userList));
+                    if (context != null) {
+                        binding.searchFragmentUserRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+                        binding.searchFragmentUserRecyclerView.setAdapter(new UserListAdapter(requireContext(), userList));
+                    }
                 }
             }
         });
