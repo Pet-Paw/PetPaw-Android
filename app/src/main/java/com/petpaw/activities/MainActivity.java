@@ -1,12 +1,14 @@
 package com.petpaw.activities;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.NavigationUI;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -79,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = navHostFragment.getNavController();
         NavigationUI.setupWithNavController(mBinding.bottomNav, navController);
 
-        mBinding.bottomNav.setSelectedItemId(R.id.homeFragment);
+//        mBinding.bottomNav.setSelectedItemId(R.id.homeFragment);
         mBinding.bottomNav.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -93,6 +95,7 @@ public class MainActivity extends AppCompatActivity {
                         .findFragmentById(R.id.toolbarFragment);
 
                 if (sideNavFragment != null) {
+
                     NavigationView sideNav = sideNavFragment.mNavigationView;
                     sideNav.setCheckedItem(item.getItemId());
                 }
@@ -121,6 +124,17 @@ public class MainActivity extends AppCompatActivity {
         } else {
             super.onBackPressed();
         }
+    }
+
+    @Override
+    protected void onPostResume() {
+        super.onPostResume();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
     }
 
 

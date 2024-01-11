@@ -14,7 +14,9 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.TextView;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
@@ -22,7 +24,15 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.petpaw.R;
 import com.petpaw.activities.SignInActivity;
+import com.petpaw.database.UserCollection;
 import com.petpaw.databinding.FragmentSideNavBinding;
+import com.petpaw.models.User;
+import com.petpaw.utils.ImageHelper;
+import com.squareup.picasso.Picasso;
+
+import java.util.List;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -39,6 +49,10 @@ public class SideNavFragment extends Fragment implements NavigationView.OnNaviga
     BottomNavigationView bottomNavigationView;
 
     FirebaseUser firebaseUser;
+
+    private User currentUser;
+
+    private UserCollection userCollection = UserCollection.newInstance();
 
 
     public SideNavFragment() {
@@ -108,9 +122,30 @@ public class SideNavFragment extends Fragment implements NavigationView.OnNaviga
             mDrawerLayout.setLayoutParams(new DrawerLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 150));
             bottomNavigationView.setSelectedItemId(R.id.homeFragment);
             mNavigationView.setCheckedItem(R.id.homeFragment);
-        } else {
-
         }
+
+        // update current user info in side nav header
+        CircleImageView profileImage = mNavigationView.getHeaderView(0).findViewById(R.id.profileAvatar);
+        TextView profileName = mNavigationView.getHeaderView(0).findViewById(R.id.profileName);
+
+        if (firebaseUser != null) {
+            userCollection.getUser(firebaseUser.getUid(), new UserCollection.Callback() {
+                @Override
+                public void onCallback(List<User> users) {
+
+                }
+                @Override
+                public void onCallBack(User user) {
+                    currentUser = user;
+                    if (currentUser.getImageURL() != null) {
+                            ImageHelper.loadImage(currentUser.getImageURL(), profileImage);
+                    }
+                    profileName.setText(user.getName());
+                }
+            });
+        }
+
+
 
 
 
