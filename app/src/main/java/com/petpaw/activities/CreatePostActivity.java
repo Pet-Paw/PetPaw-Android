@@ -125,7 +125,6 @@ public class CreatePostActivity extends AppCompatActivity {
 
 //                           ----------- Load image with the URL then the description -----------
                             String imageUrl = document.getString("imageURL");
-//                            Log.d("CreatePostActivity", "Image URL Open New: " + imageUrl);
                             Picasso.get()
                                     .load(imageUrl)
                                     .tag(System.currentTimeMillis())
@@ -146,7 +145,11 @@ public class CreatePostActivity extends AppCompatActivity {
 
                             binding.createPostDescriptionEditText.setText(document.getString("content"));
 
-//                            ------- Check valid input  --------
+//                          ------------ Render Pet List ----------------
+                            selectedPetListId = (List<String>) document.get("petIdList");
+                            renderPetListView(true);
+
+//                          ------------ Check valid input  -------------
                             binding.createPostSaveButton.setOnClickListener(v -> {
                                 boolean isValid = true;
                                 List<String> tags = new ArrayList<>();
@@ -164,7 +167,7 @@ public class CreatePostActivity extends AppCompatActivity {
                                     Log.d("CreatePostActivity", "Tags: " + tags.toString());
                                 }
 
-//                            -------- update if valid input --------
+//                              -------- update if valid input --------
 
                                 if(isValid) {
                                     Map<String, Object> data = new HashMap<>();
@@ -231,10 +234,10 @@ public class CreatePostActivity extends AppCompatActivity {
         }
         else { //****************** if it does not have a postId, then it is CREATE a new post *******************
 
-            //** ListView to select pet **
-            renderPetListView();
+//            ---------- ListView to select pet -----------
+            renderPetListView(false);
 
-            //** Spinner to select pet **
+//            ---------- Spinner to select pet ------------
             //renderPetSpinner();
 
             binding.createPostSelectImageButton.setOnClickListener(v -> {
@@ -337,7 +340,7 @@ public class CreatePostActivity extends AppCompatActivity {
     */
 
 
-    private void renderPetListView(){
+    private void renderPetListView(boolean isEditPost){
         CollectionReference petsRef = db.collection("Pets");
         //------- Fetch data ----------
         List<String> petListId = new ArrayList<>();
@@ -350,18 +353,42 @@ public class CreatePostActivity extends AppCompatActivity {
                     petListId.add(document.getId());
                     petListName.add(document.getString("name"));
                 }
+
                 ArrayAdapter<String> adapter = new ArrayAdapter<>(
                         this,
                         android.R.layout.simple_list_item_1,
                         petListName
                 );
+
                 binding.createPostTagsListView.setAdapter(adapter);
+
+
+                //------- Set color to the selected pet -----------
+                if(isEditPost){
+                    binding.createPostTagsListView.post(() -> {
+
+                        for(int i=0; i<selectedPetListId.size(); i++){
+                            int index = petListId.indexOf(selectedPetListId.get(i));
+
+                            View view = binding.createPostTagsListView.getChildAt(index);
+                            if(view != null) {
+                                view.setBackgroundColor(ContextCompat.getColor(this, R.color.primary));
+                                view.setTag(true);
+                            }
+                        }
+                    });
+                }
+
+                //--------- Set on click listener to the list view -----------
                 binding.createPostTagsListView.setOnItemClickListener((parent, view, position, id) -> {
 
                     if(view.getTag() == null) {
                         view.setBackgroundColor(ContextCompat.getColor(this, R.color.primary));
                         view.setTag(true);
-                        selectedPetListId.add(petListId.get(position));
+                        if(!selectedPetListId.contains(petListId.get(position))) {
+                            selectedPetListId.add(petListId.get(position));
+                        }
+
                     } else {
                         view.setBackgroundColor(Color.WHITE);
                         view.setTag(null);
@@ -369,6 +396,8 @@ public class CreatePostActivity extends AppCompatActivity {
                     }
                     Log.d("CreatePostActivity", "Selected pet ID: " + selectedPetListId.toString());
                 });
+
+
             } else {
                 Log.d("Get pet ID query", "Error getting documents: ", task.getException());
             }
