@@ -2,7 +2,9 @@ package com.petpaw.fragments.screens;
 
 import android.os.Bundle;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
@@ -16,6 +18,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.petpaw.R;
+import com.petpaw.activities.MainActivity;
 import com.petpaw.adapters.UserFollowingAdapter;
 import com.petpaw.database.FollowCollection;
 import com.petpaw.database.UserCollection;
@@ -34,7 +37,7 @@ import java.util.List;
  */
 public class UserFollowersFragment extends Fragment {
 
-    private static final String TAG = "UserFollowingFragment";
+    private static final String TAG = "UserFollowersFragment";
     private FragmentUserFollowersBinding userFollowersBinding;
     private FirebaseAuth auth;
     private FirebaseUser firebaseUser;
@@ -53,47 +56,48 @@ public class UserFollowersFragment extends Fragment {
     private List<User> followerUsers = new ArrayList<>();
 
 
+
     public UserFollowersFragment() {
-        // Required empty public constructor
+
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment UserFollowersFragment.
-     */
+
     // TODO: Rename and change types and number of parameters
-    public static UserFollowersFragment newInstance(String param1, String param2) {
+    public static UserFollowersFragment newInstance(String userId) {
         UserFollowersFragment fragment = new UserFollowersFragment();
         Bundle args = new Bundle();
+        args.putString(ProfileFragment.USER_ID, userId);
         fragment.setArguments(args);
-        return fragment;
 
+        return fragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+
         userFollowersBinding = FragmentUserFollowersBinding.inflate(inflater, container, false);
+
 
         recyclerView = userFollowersBinding.followingRecyclerView;
 
         TextView msgNoFollowing = userFollowersBinding.msgNoFollowing;
         msgNoFollowing.setVisibility(TextView.INVISIBLE);
-
-
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        if (firebaseUser != null) {
+
+
+        assert getArguments() != null;
+        String userId = getArguments().getString(ProfileFragment.USER_ID);
+        if (userId != null) {
 //            getCurrentUserAndFollowingUser(firebaseUser.getUid(), "JhmTNRM4bjbykb92yOxAGoaIMH92");
-            getUser(firebaseUser.getUid(), new UserCollection.Callback() {
+            getUser(userId, new UserCollection.Callback() {
                 @Override
                 public void onCallback(List<User> users) {
 
@@ -111,7 +115,7 @@ public class UserFollowersFragment extends Fragment {
                         @Override
                         public void onCallBackGetUsers(List<User> users) {
                             followerUsers = users;
-                            userFollowingAdapter = new UserFollowingAdapter();
+                            userFollowingAdapter = new UserFollowingAdapter(false, userId);
                             userFollowingAdapter.setUsers(followerUsers);
                             recyclerView.setAdapter(userFollowingAdapter);
 
@@ -127,9 +131,11 @@ public class UserFollowersFragment extends Fragment {
         userFollowersBinding.backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                BottomNavigationView bottomNavigationView = requireActivity().findViewById(R.id.bottomNav);
-                bottomNavigationView.setSelectedItemId(R.id.profileFragment);
-
+                ProfileFragment profileFragment = ProfileFragment.newInstance(userId, 0, "");
+                FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
+                fragmentManager.beginTransaction()
+                        .replace(R.id.profileFragmentLayout, profileFragment)
+                        .commit();
             }
         });
 
@@ -216,4 +222,5 @@ public class UserFollowersFragment extends Fragment {
             userFollowingAdapter.filter(followerUsers);
         }
     }
+
 }

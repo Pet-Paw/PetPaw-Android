@@ -8,6 +8,7 @@ import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.petpaw.R;
@@ -25,6 +26,9 @@ import java.util.List;
 
 public class UserFollowingAdapter extends RecyclerView.Adapter<UserFollowingAdapter.UserFollowingViewHolder>  {
     private List<User> users = new ArrayList<>();
+    private String currentUserId;
+
+    private boolean isFollowing;
 
     public class UserFollowingViewHolder extends RecyclerView.ViewHolder {
         public TextView username;
@@ -37,6 +41,11 @@ public class UserFollowingAdapter extends RecyclerView.Adapter<UserFollowingAdap
             country = itemView.findViewById(R.id.country);
             profilePic = itemView.findViewById(R.id.profilePic);
         }
+    }
+
+    public UserFollowingAdapter(boolean isFollowing, String currentUserId) {
+        this.isFollowing = isFollowing;
+        this.currentUserId = currentUserId;
     }
 
     @NonNull
@@ -59,17 +68,23 @@ public class UserFollowingAdapter extends RecyclerView.Adapter<UserFollowingAdap
             @Override
             public void onClick(View v) {
                 Context context = holder.itemView.getContext();
-                String selectedUserId = user.getUid();
-                ProfileFragment profileFragment = ProfileFragment.newInstance(selectedUserId, null);
+                String userId = users.get(position).getUid();
 
                 FragmentManager fragmentManager = ((FragmentActivity) context).getSupportFragmentManager();
-                fragmentManager.beginTransaction()
-                        .replace(R.id.overlay_fragment_container, profileFragment)
-                        .addToBackStack(null)
-                        .commit();
+                if (isFollowing) {
+                    fragmentManager.beginTransaction()
+                            .replace(R.id.profileFragmentLayout, ProfileFragment.newInstance(userId, R.id.userFollowingFragment, currentUserId))
+                            .commitNow();
+                } else {
+                    fragmentManager.beginTransaction()
+                            .replace(R.id.profileFragmentLayout, ProfileFragment.newInstance(userId, R.id.useFollowerFragment, currentUserId))
+                            .commitNow();
+                }
 
-                ((FragmentActivity) context).findViewById(R.id.overlay_fragment_container).setVisibility(View.VISIBLE);
-                ((FragmentActivity) context).findViewById(R.id.userFollowingFragment).setVisibility(View.GONE);
+
+//
+//                ((FragmentActivity) context).findViewById(R.id.overlay_fragment_container).setVisibility(View.VISIBLE);
+//                ((FragmentActivity) context).findViewById(R.id.userFollowingFragment).setVisibility(View.GONE);
 
                 /*
                 BottomNavigationView bottomNav = ((FragmentActivity) context).findViewById(R.id.bottomNav);

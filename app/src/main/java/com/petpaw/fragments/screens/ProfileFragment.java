@@ -13,6 +13,8 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
@@ -26,6 +28,7 @@ import android.widget.FrameLayout;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -75,6 +78,10 @@ public class ProfileFragment extends Fragment {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
+    private static final String OWNER_UID = "ownerUid";
+
+    public static final String PREVIOUS_FRAGMENT = "previousFragment";
+
     // TODO: Rename and change types of parameters
     private FragmentProfileBinding binding;
     private String mParam1;
@@ -85,6 +92,8 @@ public class ProfileFragment extends Fragment {
     private List<Pet> userPetList = new ArrayList<>();
     private List<User> userFollowingList = new ArrayList<>();
     private List<User> userFollowerList = new ArrayList<>();
+
+    static final String USER_ID = "userId";
 
     private Context context;
 
@@ -108,11 +117,12 @@ public class ProfileFragment extends Fragment {
      * @return A new instance of fragment ProfileFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static ProfileFragment newInstance(String userId, String param2) {
+    public static ProfileFragment newInstance(String userId, int previousFragment, String ownerUid) {
         ProfileFragment fragment = new ProfileFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, userId);
-        args.putString(ARG_PARAM2, param2);
+        args.putInt(PREVIOUS_FRAGMENT, previousFragment);
+        args.putString(OWNER_UID, ownerUid);
         fragment.setArguments(args);
         return fragment;
     }
@@ -203,21 +213,44 @@ public class ProfileFragment extends Fragment {
         binding.backBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (isAdded()) {
-                    FrameLayout overlayContainer = getActivity().findViewById(R.id.overlay_fragment_container);
+//                if (isAdded()) {
+//                    FrameLayout overlayContainer = getActivity().findViewById(R.id.overlay_fragment_container);
                     BottomNavigationView bottomNav = getActivity().findViewById(R.id.bottomNav);
                     int selectedItemId = bottomNav.getSelectedItemId();
+//
+//                    overlayContainer.setVisibility(View.GONE);
+//
+//                    // Restore visibility of the underlying layout
+//                    if (selectedItemId == R.id.searchFragment) {
+//                        getActivity().findViewById(R.id.searchLayout).setVisibility(View.VISIBLE);
+//                    } else if (selectedItemId == R.id.profileFragment) {
+//                        getActivity().findViewById(R.id.userFollowingFragment).setVisibility(View.VISIBLE);
+//                    }
+                    FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
+                    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
-                    overlayContainer.setVisibility(View.GONE);
+                    assert getArguments() != null;
+                    int previousFragment = getArguments().getInt(PREVIOUS_FRAGMENT);
+                    Log.d("ProfileFragment", "previousFragment = " + previousFragment);
+                    String owner_uid = getArguments().getString(OWNER_UID);
+                    if (previousFragment == R.id.userFollowingFragment) {
+                        Toast.makeText(requireContext(), "previousFragment = " + previousFragment, Toast.LENGTH_SHORT).show();
+                        fragmentTransaction.replace(R.id.profileFragmentLayout, UserFollowingFragment.newInstance(owner_uid)).commitNow();
+                    } else if (previousFragment == R.id.useFollowerFragment) {
+                        fragmentTransaction.replace(R.id.profileFragmentLayout, UserFollowersFragment.newInstance(owner_uid)).commitNow();
+                    } else if (previousFragment == R.id.searchFragment || selectedItemId == R.id.searchFragment) {
+//                        fragmentTransaction.replace(R.id.sear, new SearchFragment()).commitNow();
+                        getActivity().onBackPressed();
 
-                    // Restore visibility of the underlying layout
-                    if (selectedItemId == R.id.searchFragment) {
-                        getActivity().findViewById(R.id.searchLayout).setVisibility(View.VISIBLE);
-                    } else if (selectedItemId == R.id.profileFragment) {
-                        getActivity().findViewById(R.id.userFollowingFragment).setVisibility(View.VISIBLE);
+                    } else {
+                        fragmentTransaction.replace(R.id.profileFragmentLayout, new ProfileFragment()).commitNow();
+
                     }
+
+
                 }
-            }
+
+//            }
         });
 
         binding.addPetBtn.setOnClickListener(new View.OnClickListener() {
@@ -227,40 +260,23 @@ public class ProfileFragment extends Fragment {
                 startActivity(intent);
             }
         });
-
-
-//        ViewPager2 viewPager = binding.viewPager;
         TabLayout tabLayout = binding.tabLayout;
         tabLayout.selectTab(null);
-
-
-//        @SuppressLint("ResourceAsColor") TabLayoutMediator tabLayoutMediator = new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> {
-//            switch (position) {
-//                case 0:
-//                    tab.setText("Followers");
-//                    break;
-//
-//                case 1:
-//                    tab.setText("Following");
-//                    break;
-//
-//                case 2:
-//
-//                    break;
-//            }
-//        });
-//        tabLayoutMediator.attach();
         ViewPager2 viewPager = binding.viewPager;
 
 
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                // Do nothing when a tab is selected
-                viewPager.setAdapter(new UserFollowsAdapter(requireActivity()));
+                // passing uid to viewpager
+                Bundle bundle = new Bundle();
+                bundle.putString(USER_ID, uid);
+
+                viewPager.setAdapter(new UserFollowsAdapter(requireActivity(), uid));
                 viewPager.setCurrentItem(tab.getPosition());
                 viewPager.setVisibility(View.VISIBLE);
                 binding.profileLayout.setVisibility(View.GONE);
+
 
             }
 

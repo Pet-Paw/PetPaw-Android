@@ -76,13 +76,11 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserVi
                 int currentPosition = holder.getAdapterPosition();
                 if (currentPosition != RecyclerView.NO_POSITION) {
                     String selectedUserId = usersList.get(currentPosition).getUid();
-                    ProfileFragment profileFragment = ProfileFragment.newInstance(selectedUserId, null);
+//                    ProfileFragment profileFragment = ProfileFragment.newInstance(selectedUserId, null);
 
                     FragmentManager fragmentManager = ((FragmentActivity) context).getSupportFragmentManager();
                     fragmentManager.beginTransaction()
-                            .replace(R.id.overlay_fragment_container, profileFragment)
-                            .addToBackStack(null)
-                            .commit();
+                            .replace(R.id.overlay_fragment_container, ProfileFragment.newInstance(selectedUserId, R.id.searchFragment, "")).commit();
 
                     ((FragmentActivity) context).findViewById(R.id.overlay_fragment_container).setVisibility(View.VISIBLE);
                     ((FragmentActivity) context).findViewById(R.id.searchLayout).setVisibility(View.GONE);
