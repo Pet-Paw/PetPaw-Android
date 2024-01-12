@@ -1,21 +1,26 @@
 package com.petpaw.activities;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.NavigationUI;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
+import com.google.android.material.navigation.NavigationView;
 import com.petpaw.R;
 import com.petpaw.databinding.ActivityMainBinding;
+import com.petpaw.fragments.screens.SideNavFragment;
 
 public class MainActivity extends AppCompatActivity {
     ActivityMainBinding mBinding;
@@ -25,6 +30,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         mBinding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(mBinding.getRoot());
+
+        if (savedInstanceState == null) {
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.toolbarFragment, SideNavFragment.newInstance())
+                    .commit();
+        }
 
         
         setupUI();
@@ -70,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = navHostFragment.getNavController();
         NavigationUI.setupWithNavController(mBinding.bottomNav, navController);
 
-        mBinding.bottomNav.setSelectedItemId(R.id.homeFragment);
+//        mBinding.bottomNav.setSelectedItemId(R.id.homeFragment);
         mBinding.bottomNav.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -82,6 +93,15 @@ public class MainActivity extends AppCompatActivity {
                 }
                 if (petProfileContainer.getVisibility() == View.VISIBLE) {
                     petProfileContainer.setVisibility(View.GONE);
+                }
+
+                SideNavFragment sideNavFragment = (SideNavFragment) getSupportFragmentManager()
+                        .findFragmentById(R.id.toolbarFragment);
+
+                if (sideNavFragment != null) {
+
+                    NavigationView sideNav = sideNavFragment.mNavigationView;
+                    sideNav.setCheckedItem(item.getItemId());
                 }
 
                 return NavigationUI.onNavDestinationSelected(item, navController, false)
@@ -115,6 +135,17 @@ public class MainActivity extends AppCompatActivity {
         } else {
             super.onBackPressed();
         }
+    }
+
+    @Override
+    protected void onPostResume() {
+        super.onPostResume();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
     }
 
 

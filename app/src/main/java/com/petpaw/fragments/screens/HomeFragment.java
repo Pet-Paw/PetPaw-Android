@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -81,12 +82,11 @@ public class HomeFragment extends Fragment {
         recyclerView = view.findViewById(R.id.homePostRecyclerView);
 //        getPosts();
 
-        Button createPostBtn = view.findViewById(R.id.createPostButton);
+        ImageView createPostBtn = view.findViewById(R.id.homeCreatePostImageView);
         createPostBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(requireContext(), CreatePostActivity.class);
-//                intent.putExtra("postId", "qYGHy9HE0z3g9vQWxFcZ");
                 startActivity(intent);
             }
         });
