@@ -26,7 +26,15 @@
                 />
 
             <FrameLayout
-                android:id="@+id/overlay_fragment_container"
+                android:id="@+id/overlay_profile_fragment"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone">
+                <!-- used for showing profiles without affecting bottom nav -->
+            </FrameLayout>
+
+            <FrameLayout
+                android:id="@+id/overlay_pet_fragment"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:visibility="gone">

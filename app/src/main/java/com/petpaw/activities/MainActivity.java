@@ -74,10 +74,14 @@ public class MainActivity extends AppCompatActivity {
         mBinding.bottomNav.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                FrameLayout overlayContainer = findViewById(R.id.overlay_fragment_container);
-                if (overlayContainer.getVisibility() == View.VISIBLE) {
-                    // If the overlay container is visible, hide it when navigating to a different tab
-                    overlayContainer.setVisibility(View.GONE);
+                FrameLayout userProfileContainer = findViewById(R.id.overlay_profile_fragment);
+                FrameLayout petProfileContainer = findViewById(R.id.overlay_pet_fragment);
+                // If the overlay container is visible, hide it when navigating to a different tab
+                if (userProfileContainer.getVisibility() == View.VISIBLE) {
+                    userProfileContainer.setVisibility(View.GONE);
+                }
+                if (petProfileContainer.getVisibility() == View.VISIBLE) {
+                    petProfileContainer.setVisibility(View.GONE);
                 }
 
                 return NavigationUI.onNavDestinationSelected(item, navController, false)
@@ -88,12 +92,19 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        FrameLayout overlayContainer = findViewById(R.id.overlay_fragment_container);
+        FrameLayout userProfileContainer = findViewById(R.id.overlay_profile_fragment);
+        FrameLayout petProfileContainer = findViewById(R.id.overlay_pet_fragment);
         BottomNavigationView bottomNav = findViewById(R.id.bottomNav);
         int selectedItemId = bottomNav.getSelectedItemId();
 
-        if (overlayContainer.getVisibility() == View.VISIBLE) {
-            overlayContainer.setVisibility(View.GONE);
+        if (petProfileContainer.getVisibility() == View.VISIBLE) {
+            petProfileContainer.setVisibility(View.GONE);
+            // Restore visibility of the underlying layout
+            findViewById(R.id.profileLayout).setVisibility(View.VISIBLE);
+        }
+
+        if (userProfileContainer.getVisibility() == View.VISIBLE) {
+            userProfileContainer.setVisibility(View.GONE);
 
             // Restore visibility of the underlying layout
             if (selectedItemId == R.id.searchFragment) {

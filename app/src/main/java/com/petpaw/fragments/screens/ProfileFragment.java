@@ -204,7 +204,7 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 if (isAdded()) {
-                    FrameLayout overlayContainer = getActivity().findViewById(R.id.overlay_fragment_container);
+                    FrameLayout overlayContainer = getActivity().findViewById(R.id.overlay_profile_fragment);
                     BottomNavigationView bottomNav = getActivity().findViewById(R.id.bottomNav);
                     int selectedItemId = bottomNav.getSelectedItemId();
 
@@ -278,23 +278,6 @@ public class ProfileFragment extends Fragment {
 
         return binding.getRoot();
     }
-    /*
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == EDIT_PROFILE_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-            Activity activity = getActivity();
-            if (activity != null) {
-                ProfileFragment fragment = (ProfileFragment) ((FragmentActivity) activity).getSupportFragmentManager()
-                        .findFragmentByTag("ProfileFragment");
-                if (fragment != null) {
-                    fragment.displayUserInfo();
-                }
-            }
-        }
-    }
-     */
-
 
     @Override
     public void onResume() {

@@ -104,14 +104,11 @@ public class AddPetActivity extends AppCompatActivity {
     }
 
     private void uploadImage(String petId, boolean isEditImage) {
-
         progressDialog = new ProgressDialog(this);
         progressDialog.setTitle("Uploading to Database....");
         progressDialog.show();
 
         storageReference = FirebaseStorage.getInstance().getReference("petImages/" + petId);
-
-
         storageReference.putFile(imageUri)
                 .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                     @Override
@@ -167,6 +164,7 @@ public class AddPetActivity extends AppCompatActivity {
                         Log.e("AddPetActivity", "Error uploading image", e);
                     }
                 });
+
     }
 
     @Override
@@ -175,6 +173,7 @@ public class AddPetActivity extends AppCompatActivity {
 
         if (requestCode == 100 && data != null && data.getData() != null){
             imageUri = data.getData();
+
             binding.previewPetImageView.setImageURI(imageUri);
             binding.previewPetImageView.setVisibility(View.VISIBLE);
         }
