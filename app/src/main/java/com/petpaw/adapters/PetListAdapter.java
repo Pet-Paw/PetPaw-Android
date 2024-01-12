@@ -14,13 +14,24 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.petpaw.R;
+import com.petpaw.activities.PetProfileActivity;
+import com.petpaw.fragments.screens.PetProfileFragment;
+import com.petpaw.fragments.screens.ProfileFragment;
 import com.petpaw.models.Pet;
 import com.petpaw.models.Post;
 import com.petpaw.models.User;
@@ -35,6 +46,8 @@ public class PetListAdapter extends RecyclerView.Adapter<PetListAdapter.PetViewH
 
     Context context;
     List<Pet> petList;
+    Pet pet;
+    String selectedPetId, ownerId;
 
     public PetListAdapter(Context context, List<Pet> petList) {
         this.context = context;
@@ -71,8 +84,47 @@ public class PetListAdapter extends RecyclerView.Adapter<PetListAdapter.PetViewH
                             Log.d("TAG", "Load image successfully");
                         }
                     });
+        } else {
+            holder.petListProfilePic.setImageResource(R.drawable.default_pet_avatar);
         }
         holder.petListName.setText(petList.get(position).getName());
+
+        selectedPetId = petList.get(position).getId();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        CollectionReference petsCollection = db.collection("Pets");
+        Query query = petsCollection.whereEqualTo("id", selectedPetId);
+        query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    for (QueryDocumentSnapshot documentSnapshot : task.getResult()) {
+                        pet = documentSnapshot.toObject(Pet.class);
+                        ownerId = pet.getOwnerId();
+                        break;
+                    }
+                }
+            }
+        });
+
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int currentPosition = holder.getAdapterPosition();
+                if (currentPosition != RecyclerView.NO_POSITION) {
+                    selectedPetId = petList.get(currentPosition).getId();
+                    PetProfileFragment petProfileFragment = PetProfileFragment.newInstance(selectedPetId, ownerId);
+
+                    FragmentManager fragmentManager = ((FragmentActivity) context).getSupportFragmentManager();
+                    fragmentManager.beginTransaction()
+                            .replace(R.id.overlay_pet_fragment, petProfileFragment)
+                            .addToBackStack(null)
+                            .commit();
+
+                    ((FragmentActivity) context).findViewById(R.id.overlay_pet_fragment).setVisibility(View.VISIBLE);
+                    ((FragmentActivity) context).findViewById(R.id.profileLayout).setVisibility(View.GONE);
+                }
+            }
+        });
     }
 
     @Override

@@ -80,9 +80,9 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserVi
 
                     FragmentManager fragmentManager = ((FragmentActivity) context).getSupportFragmentManager();
                     fragmentManager.beginTransaction()
-                            .replace(R.id.overlay_fragment_container, ProfileFragment.newInstance(selectedUserId, R.id.searchFragment, "")).commit();
+                            .replace(R.id.overlay_profile_fragment, ProfileFragment.newInstance(selectedUserId, R.id.searchFragment, "")).commit();
 
-                    ((FragmentActivity) context).findViewById(R.id.overlay_fragment_container).setVisibility(View.VISIBLE);
+                    ((FragmentActivity) context).findViewById(R.id.overlay_profile_fragment).setVisibility(View.VISIBLE);
                     ((FragmentActivity) context).findViewById(R.id.searchLayout).setVisibility(View.GONE);
 
                     /*

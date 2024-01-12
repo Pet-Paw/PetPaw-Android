@@ -52,9 +52,6 @@ public class EditProfileActivity extends AppCompatActivity {
         String userAddress = intent.getStringExtra("address");
         String userPhone = intent.getStringExtra("phone");
 
-//        progressDialog = new ProgressDialog(this);
-//        progressDialog.setTitle("Fetching User Detail....");
-//        progressDialog.show();
 
         if (avatarURL != null) {
             Picasso.get().load(avatarURL).into(binding.avatar);
@@ -80,16 +77,11 @@ public class EditProfileActivity extends AppCompatActivity {
 
         binding.saveBtn.setOnClickListener(v-> {
             saveUserInfo();
-            //setResult(Activity.RESULT_OK);
-            //finish();
         });
 
         binding.backBtn.setOnClickListener(v -> {
             finish();
         });
-
-//        if (progressDialog.isShowing())
-//            progressDialog.dismiss();
 
     }
 
@@ -120,14 +112,16 @@ public class EditProfileActivity extends AppCompatActivity {
                                             db.collection("users").document(uid).update("imageURL", avatarUrl)
                                                     .addOnSuccessListener(aVoid -> {
                                                         //setResult(Activity.RESULT_OK);
-                                                        if (progressDialog.isShowing())
+                                                        if (progressDialog.isShowing()) {
                                                             progressDialog.dismiss();
+                                                        }
                                                         finish();
                                                     });
                                         }));
-                            }else{
-                                if (progressDialog.isShowing())
+                            } else{
+                                if (progressDialog.isShowing()) {
                                     progressDialog.dismiss();
+                                }
                                 finish();
                             }
                         });
@@ -137,7 +131,6 @@ public class EditProfileActivity extends AppCompatActivity {
 
         }
     }
-
 
     private void selectImage() {
         Intent intent = new Intent();
