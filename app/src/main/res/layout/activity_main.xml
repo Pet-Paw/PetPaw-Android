@@ -11,13 +11,11 @@
         android:layout_marginTop="56dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        >
+        android:orientation="vertical">
         <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1"
-            >
+            android:layout_weight="1">
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
@@ -31,32 +29,24 @@
                     />
 
                 <FrameLayout
-                    android:id="@+id/overlay_fragment_container"
+                    android:id="@+id/overlay_profile_fragment"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:visibility="gone">
-                    <!-- used for showing profiles without affecting bottom nav -->
+                    <!-- used for showing user profiles without affecting bottom nav -->
                 </FrameLayout>
-            </RelativeLayout>
-            <FrameLayout
-                android:id="@+id/overlay_profile_fragment"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:visibility="gone">
-                <!-- used for showing profiles without affecting bottom nav -->
-            </FrameLayout>
 
-            <FrameLayout
-                android:id="@+id/overlay_pet_fragment"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:visibility="gone">
-                <!-- used for showing profiles without affecting bottom nav -->
-            </FrameLayout>
-        </RelativeLayout>
+                <FrameLayout
+                    android:id="@+id/overlay_pet_fragment"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:visibility="gone">
+                    <!-- used for showing pet profiles without affecting bottom nav -->
+                </FrameLayout>
+
+            </RelativeLayout>
 
         </androidx.core.widget.NestedScrollView>
-
         <com.google.android.material.bottomnavigation.BottomNavigationView
             android:id="@+id/bottomNav"
             android:layout_width="match_parent"
@@ -66,8 +56,6 @@
             app:itemActiveIndicatorStyle="@style/Widget.App.BottomNavigationView.ActiveIndicator"
             app:itemRippleColor="@color/on_surface_variant"
             />
-
-
 
 
     </LinearLayout>
