@@ -15,6 +15,10 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="end">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="20dp"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -23,14 +27,15 @@
                 android:textSize="30dp"
                 android:textAlignment="center"
                 android:gravity="center"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:layout_weight="1"/>
 
-            <Button
-                android:id="@+id/createPostButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Create Post"
-                android:layout_marginLeft="50dp"/>
+               <ImageView
+                   android:id="@+id/homeCreatePostImageView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                   android:padding="5dp"
+                    android:src="@drawable/createposticon"/>
         </LinearLayout>
 
         <androidx.recyclerview.widget.RecyclerView
