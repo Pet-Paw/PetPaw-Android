@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view"
+    >
+
+    <group
+        android:checkableBehavior="single"
+        >
+        <item
+            android:id="@+id/homeFragment"
+            android:icon="@drawable/baseline_home_24"
+            android:title="Home"
+            />
+        <item
+            android:id="@+id/searchFragment"
+            android:icon="@drawable/baseline_search_24"
+            android:title="Search"/>
+        <item
+            android:id="@+id/notificationsFragment"
+            android:icon="@drawable/baseline_notifications_24"
+            android:title="Notifications"/>
+            />
+        <item
+            android:id="@+id/messagesFragment"
+            android:icon="@drawable/baseline_chat_24"
+            android:title="Messages"/>
+
+        <item
+            android:id="@+id/profileFragment"
+            android:icon="@drawable/baseline_person_24"
+            android:title="Profile"/>
+
+        <item
+            android:title="">
+            <menu>
+                <item
+                    android:id="@+id/logout"
+                    android:icon="@drawable/baseline_logout_24"
+                    android:title="Logout"/>
+
+            </menu>
+
+        </item>
+
+
+
+    </group>
+
+</menu>
