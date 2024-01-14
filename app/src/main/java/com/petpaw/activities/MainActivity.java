@@ -1,18 +1,26 @@
 package com.petpaw.activities;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.NavigationUI;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.FrameLayout;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
+import com.google.android.material.navigation.NavigationView;
 import com.petpaw.R;
 import com.petpaw.databinding.ActivityMainBinding;
+import com.petpaw.fragments.screens.SideNavFragment;
 
 public class MainActivity extends AppCompatActivity {
     ActivityMainBinding mBinding;
@@ -22,6 +30,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         mBinding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(mBinding.getRoot());
+
+        if (savedInstanceState == null) {
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.toolbarFragment, SideNavFragment.newInstance())
+                    .commit();
+        }
 
         
         setupUI();
@@ -67,15 +81,72 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = navHostFragment.getNavController();
         NavigationUI.setupWithNavController(mBinding.bottomNav, navController);
 
-        mBinding.bottomNav.setSelectedItemId(R.id.homeFragment);
+//        mBinding.bottomNav.setSelectedItemId(R.id.homeFragment);
         mBinding.bottomNav.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                FrameLayout userProfileContainer = findViewById(R.id.overlay_profile_fragment);
+                FrameLayout petProfileContainer = findViewById(R.id.overlay_pet_fragment);
+                // If the overlay container is visible, hide it when navigating to a different tab
+                if (userProfileContainer.getVisibility() == View.VISIBLE) {
+                    userProfileContainer.setVisibility(View.GONE);
+                }
+                if (petProfileContainer.getVisibility() == View.VISIBLE) {
+                    petProfileContainer.setVisibility(View.GONE);
+                }
+
+                SideNavFragment sideNavFragment = (SideNavFragment) getSupportFragmentManager()
+                        .findFragmentById(R.id.toolbarFragment);
+
+                if (sideNavFragment != null) {
+
+                    NavigationView sideNav = sideNavFragment.mNavigationView;
+                    sideNav.setCheckedItem(item.getItemId());
+                }
+
                 return NavigationUI.onNavDestinationSelected(item, navController, false)
                         || MainActivity.super.onOptionsItemSelected(item);
             }
         });
+    }
 
+    @Override
+    public void onBackPressed() {
+        FrameLayout userProfileContainer = findViewById(R.id.overlay_profile_fragment);
+        FrameLayout petProfileContainer = findViewById(R.id.overlay_pet_fragment);
+        BottomNavigationView bottomNav = findViewById(R.id.bottomNav);
+        int selectedItemId = bottomNav.getSelectedItemId();
+
+        if (petProfileContainer.getVisibility() == View.VISIBLE) {
+            petProfileContainer.setVisibility(View.GONE);
+            // Restore visibility of the underlying layout
+            findViewById(R.id.profileLayout).setVisibility(View.VISIBLE);
+        }
+
+        if (userProfileContainer.getVisibility() == View.VISIBLE) {
+            userProfileContainer.setVisibility(View.GONE);
+
+            // Restore visibility of the underlying layout
+            if (selectedItemId == R.id.searchFragment) {
+                findViewById(R.id.searchLayout).setVisibility(View.VISIBLE);
+            } else if (selectedItemId == R.id.profileFragment) {
+                findViewById(R.id.userFollowingFragment).setVisibility(View.VISIBLE);
+            }
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    @Override
+    protected void onPostResume() {
+        super.onPostResume();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
 
     }
+
+
 }

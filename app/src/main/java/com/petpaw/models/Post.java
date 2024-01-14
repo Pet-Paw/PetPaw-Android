@@ -22,6 +22,8 @@ public class Post {
 
     private List<String> comments;
     private List<String> tags;
+    private List<String> petIdList;
+
     private String postId;
 
     public Post() {
@@ -30,10 +32,11 @@ public class Post {
         this.likes = new ArrayList<>();
         this.comments = new ArrayList<>();
         this.tags = new ArrayList<>();
+        this.petIdList = new ArrayList<>();
         this.postId = "";
     }
 
-    public Post(String authorId, Date dateModified, String content,  boolean isModified, String imageURL, List<String> likes, List<String> comments, String postId){
+    public Post(String authorId, Date dateModified, String content,  boolean isModified, String imageURL, List<String> likes, List<String> comments, String postId, List<String> tags, List<String> petIdList){
         this.authorId = authorId;
         this.dateModified = dateModified;
         this.isModified = isModified;
@@ -42,6 +45,8 @@ public class Post {
         this.likes = likes;
         this.comments = comments;
         this.postId = postId;
+        this.tags = tags;
+        this.petIdList = petIdList;
     }
 
     public Post(String content, String author, String petId) {
@@ -54,6 +59,7 @@ public class Post {
         this.isModified = false;
         this.comments = new ArrayList<>();
         this.tags = new ArrayList<>();
+        this.petIdList = new ArrayList<>();
     }
 
     public String getPostId() {
@@ -136,7 +142,15 @@ public class Post {
         this.tags = tags;
     }
 
-//    @Override
+    public List<String> getPetIdList() {
+        return petIdList;
+    }
+
+    public void setPetIdList(List<String> petIdList) {
+        this.petIdList = petIdList;
+    }
+
+    //    @Override
 //    public Map<String, Object> toDoc(){
 //        Map<String, Object> doc = new HashMap<>();
 //        doc.put("content", this.content);

@@ -6,14 +6,20 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 //import com.google.firebase.firestore.auth.User;
 import com.petpaw.R;
+import com.petpaw.fragments.screens.ProfileFragment;
 import com.petpaw.models.User;
 import com.squareup.picasso.Picasso;
 
@@ -48,9 +54,9 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserVi
         FirebaseAuth auth = FirebaseAuth.getInstance();
         String currentUserId = Objects.requireNonNull(auth.getCurrentUser()).getUid();
         String userId = usersList.get(position).getUid();
-        Log.d("TAG", "- user id: " + userId);
 
         if (!(userId.equals(currentUserId))) {
+            Log.d("TAG", "- user id: " + userId);
             holder.userCardViewUsername.setText(usersList.get(position).getName());
             Log.d("TAG", "-- user name: " + usersList.get(position).getName());
             if (usersList.get(position).getImageURL() == null) {
@@ -58,10 +64,42 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserVi
             } else {
                 Picasso.get()
                         .load(usersList.get(position).getImageURL())
-                        .placeholder(R.drawable.default_avatar) // A default placeholder if needed
+                        .placeholder(R.drawable.default_avatar)
                         .into(holder.userCardViewProfilePic);
             }
+        }else{
+            holder.userCardViewLinearLayout.setVisibility(View.GONE);
         }
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int currentPosition = holder.getAdapterPosition();
+                if (currentPosition != RecyclerView.NO_POSITION) {
+                    String selectedUserId = usersList.get(currentPosition).getUid();
+//                    ProfileFragment profileFragment = ProfileFragment.newInstance(selectedUserId, null);
+
+                    FragmentManager fragmentManager = ((FragmentActivity) context).getSupportFragmentManager();
+                    fragmentManager.beginTransaction()
+                            .replace(R.id.overlay_profile_fragment, ProfileFragment.newInstance(selectedUserId, R.id.searchFragment, "")).commit();
+
+                    ((FragmentActivity) context).findViewById(R.id.overlay_profile_fragment).setVisibility(View.VISIBLE);
+                    ((FragmentActivity) context).findViewById(R.id.searchLayout).setVisibility(View.GONE);
+
+                    /*
+                    BottomNavigationView bottomNav = ((FragmentActivity) context).findViewById(R.id.bottomNav);
+                    int selectedItemId = bottomNav.getSelectedItemId();
+
+                    if (selectedItemId == R.id.searchFragment) {
+                        ((FragmentActivity) context).findViewById(R.id.searchLayout).setVisibility(View.GONE);
+                    } else if (selectedItemId == R.id.profileFragment) {
+                        ((FragmentActivity) context).findViewById(R.id.profileLayout).setVisibility(View.GONE);
+                    }
+                     */
+
+                }
+            }
+        });
+
     }
 
         @Override
@@ -71,7 +109,7 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserVi
 
 
         public class UserViewHolder extends RecyclerView.ViewHolder {
-
+        LinearLayout userCardViewLinearLayout;
         ImageView userCardViewProfilePic;
         TextView userCardViewUsername;
 
@@ -79,6 +117,7 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserVi
             super(itemView);
             userCardViewProfilePic = itemView.findViewById(R.id.userCardViewProfilePic);
             userCardViewUsername = itemView.findViewById(R.id.userCardViewUsername);
+            userCardViewLinearLayout = itemView.findViewById(R.id.userCardViewLinearLayout);
         }
     }
 }

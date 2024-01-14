@@ -63,18 +63,11 @@ public class UserFollowingFragment extends Fragment {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment UserFollowingFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static UserFollowingFragment newInstance(String param1, String param2) {
+
+    public static UserFollowingFragment newInstance(String userId) {
         UserFollowingFragment fragment = new UserFollowingFragment();
         Bundle args = new Bundle();
+        args.putString(ProfileFragment.USER_ID, userId);
         fragment.setArguments(args);
         return fragment;
     }
@@ -95,12 +88,14 @@ public class UserFollowingFragment extends Fragment {
 
         TextView msgNoFollowing = userFollowingBinding.msgNoFollowing;
         msgNoFollowing.setVisibility(TextView.INVISIBLE);
-
-
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        if (firebaseUser != null) {
+
+        assert getArguments() != null;
+        String userId = getArguments().getString(ProfileFragment.USER_ID);
+
+        if (userId != null) {
 //            getCurrentUserAndFollowingUser(firebaseUser.getUid(), "JhmTNRM4bjbykb92yOxAGoaIMH92");
-            getUser(firebaseUser.getUid(), new UserCollection.Callback() {
+            getUser(userId, new UserCollection.Callback() {
                 @Override
                 public void onCallback(List<User> users) {
 
@@ -118,7 +113,7 @@ public class UserFollowingFragment extends Fragment {
                         @Override
                         public void onCallBackGetUsers(List<User> users) {
                             followingUsers = users;
-                            userFollowingAdapter = new UserFollowingAdapter();
+                            userFollowingAdapter = new UserFollowingAdapter(true, userId);
                             userFollowingAdapter.setUsers(followingUsers);
                             recyclerView.setAdapter(userFollowingAdapter);
 
@@ -136,12 +131,13 @@ public class UserFollowingFragment extends Fragment {
         userFollowingBinding.backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                BottomNavigationView bottomNavigationView = requireActivity().findViewById(R.id.bottomNav);
-                bottomNavigationView.setSelectedItemId(R.id.profileFragment);
-
+                ProfileFragment profileFragment = ProfileFragment.newInstance(userId, 0, "");
+                FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
+                fragmentManager.beginTransaction()
+                        .replace(R.id.profileFragmentLayout, profileFragment)
+                        .commit();
             }
         });
-
 
         SearchView searchBar = userFollowingBinding.searchBar;
         searchBar.setOnQueryTextListener(new SearchView.OnQueryTextListener() {

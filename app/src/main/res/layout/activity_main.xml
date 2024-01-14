@@ -1,37 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
     tools:context=".activities.MainActivity"
-    android:orientation="vertical"
-    >
 
-    <androidx.core.widget.NestedScrollView
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <LinearLayout
+        android:layout_marginTop="56dp"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        >
-        <androidx.fragment.app.FragmentContainerView
-            android:id="@+id/fr"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <androidx.fragment.app.FragmentContainerView
+                    android:id="@+id/fr"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:name="androidx.navigation.fragment.NavHostFragment"
+                    app:defaultNavHost="true"
+                    app:navGraph="@navigation/navigation_bottom_nav"
+                    />
+
+                <FrameLayout
+                    android:id="@+id/overlay_profile_fragment"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:visibility="gone">
+                    <!-- used for showing user profiles without affecting bottom nav -->
+                </FrameLayout>
+
+                <FrameLayout
+                    android:id="@+id/overlay_pet_fragment"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:visibility="gone">
+                    <!-- used for showing pet profiles without affecting bottom nav -->
+                </FrameLayout>
+
+            </RelativeLayout>
+
+        </androidx.core.widget.NestedScrollView>
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/bottomNav"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:name="androidx.navigation.fragment.NavHostFragment"
-            app:defaultNavHost="true"
-            app:navGraph="@navigation/navigation_bottom_nav"
-          />
-    </androidx.core.widget.NestedScrollView>
+            android:layout_gravity="bottom"
+            app:menu="@menu/menu_bottom_nav"
+            app:itemActiveIndicatorStyle="@style/Widget.App.BottomNavigationView.ActiveIndicator"
+            app:itemRippleColor="@color/on_surface_variant"
+            />
 
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottomNav"
+
+    </LinearLayout>
+
+    <androidx.fragment.app.FragmentContainerView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        app:menu="@menu/menu_bottom_nav"
-        app:itemActiveIndicatorStyle="@style/Widget.App.BottomNavigationView.ActiveIndicator"
-        app:itemRippleColor="@color/on_surface_variant"
+        android:layout_height="match_parent"
+        android:id="@+id/toolbarFragment"
+        android:name="com.petpaw.fragments.screens.SideNavFragment"
+        tools:layout="@layout/fragment_side_nav"
         />
 
+</RelativeLayout>
 
-</LinearLayout>

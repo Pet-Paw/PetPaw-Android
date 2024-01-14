@@ -31,7 +31,7 @@
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="15dp"
+                android:layout_margin="10dp"
                 android:elevation="18dp"
                 app:cardBackgroundColor="#FFFFFF"
                 app:cardCornerRadius="15dp"
@@ -98,7 +98,7 @@
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="15dp"
+                android:layout_margin="10dp"
                 android:elevation="18dp"
                 app:cardBackgroundColor="#FFFFFF"
                 app:cardCornerRadius="15dp"
@@ -124,7 +124,7 @@
                     <EditText
                         android:id="@+id/createPostDescriptionEditText"
                         android:layout_width ="match_parent"
-                        android:layout_height ="80dp"
+                        android:layout_height ="75dp"
                         android:minHeight="150dp"
                         android:maxHeight="300dp"
                         android:layout_margin="10dp"
@@ -139,19 +139,27 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Tags "
+                        android:text="Tag your pet "
                         android:textStyle="bold"
                         android:textSize="9pt"
                         android:paddingStart="5dp"
                         android:layout_marginTop="2sp"
                         android:drawableEnd="@drawable/outline_bookmark_add_24"/>
 
-                    <LinearLayout
+                    <ListView
+                        android:id="@+id/createPostTagsListView"
                         android:layout_width="match_parent"
-                        android:layout_height="60dp"
-                        android:orientation="vertical">
-                        
-                    </LinearLayout>
+                        android:layout_height="80dp"/>
+
+<!--                    <LinearLayout-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="60dp"-->
+<!--                        android:orientation="vertical">-->
+<!--                        <Spinner-->
+<!--                            android:id="@+id/createPostTagsSpinner"-->
+<!--                            android:layout_width="match_parent"-->
+<!--                            android:layout_height="wrap_content"/>-->
+<!--                    </LinearLayout>-->
 
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
@@ -161,9 +169,9 @@
 
         <Button
             android:id="@+id/createPostUploadButton"
-            android:layout_width="200sp"
+            android:layout_width="200dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10sp"
+            android:layout_marginTop="10dp"
             android:backgroundTint="@color/primary"
             android:text="Create Post"
             android:textColor="#FFFFFF"
@@ -175,11 +183,12 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center"
-            android:visibility="visible">
+            android:visibility="visible"
+            android:layout_marginTop="5dp">
 
             <Button
                 android:id="@+id/createPostSaveButton"
-                android:layout_width="wrap_content"
+                android:layout_width="120dp"
                 android:layout_height="wrap_content"
                 android:backgroundTint="@color/primary"
                 android:text="Save"
@@ -188,7 +197,7 @@
                 android:layout_marginHorizontal="10sp"/>
             <Button
                 android:id="@+id/createPostDeleteButton"
-                android:layout_width="wrap_content"
+                android:layout_width="120dp"
                 android:layout_height="wrap_content"
                 android:backgroundTint="@color/primary"
                 android:text="Delete"
@@ -200,7 +209,7 @@
 
         <Button
             android:id="@+id/createPostBackButton"
-            android:layout_width="100sp"
+            android:layout_width="150sp"
             android:layout_height="wrap_content"
             android:backgroundTint="@color/darkGray"
             android:text="Back"

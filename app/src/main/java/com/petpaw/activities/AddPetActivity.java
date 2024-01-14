@@ -17,6 +17,7 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FieldValue;
@@ -46,10 +47,12 @@ public class AddPetActivity extends AppCompatActivity {
     private StorageReference storageReference;
 
     private DocumentReference petDocRef;
+    private String ownerId;
 
     ProgressDialog progressDialog;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     FirebaseAuth auth = FirebaseAuth.getInstance();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,12 +62,17 @@ public class AddPetActivity extends AppCompatActivity {
         binding.backBtn.setOnClickListener(v -> finish());
         binding.selectImageBtn.setOnClickListener(v -> selectImage());
 
+        FirebaseUser currentUser = auth.getCurrentUser();
+        if (currentUser != null) {
+            ownerId = currentUser.getUid();
+        }
+
         binding.addPetBtn.setOnClickListener(v -> {
             boolean isValid = true;
             //check validation
 
             if(isValid){
-                Pet pet = new Pet("", binding.petNameEditText.getText().toString(), Integer.parseInt(binding.petAgeEditText.getText().toString()), binding.petBreedEditText.getText().toString(), Integer.parseInt(binding.petWeightEditText.getText().toString()), "", new ArrayList<>());
+                Pet pet = new Pet(ownerId, "", binding.petNameEditText.getText().toString(), Integer.parseInt(binding.petAgeEditText.getText().toString()), binding.petBreedEditText.getText().toString(), Integer.parseInt(binding.petWeightEditText.getText().toString()), "", new ArrayList<>());
 
                 Log.d("AddPetActivity", "Adding pet to Firestore");
                 db.collection("Pets")
@@ -96,14 +104,11 @@ public class AddPetActivity extends AppCompatActivity {
     }
 
     private void uploadImage(String petId, boolean isEditImage) {
-
         progressDialog = new ProgressDialog(this);
         progressDialog.setTitle("Uploading to Database....");
         progressDialog.show();
 
         storageReference = FirebaseStorage.getInstance().getReference("petImages/" + petId);
-
-
         storageReference.putFile(imageUri)
                 .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                     @Override
@@ -159,6 +164,7 @@ public class AddPetActivity extends AppCompatActivity {
                         Log.e("AddPetActivity", "Error uploading image", e);
                     }
                 });
+
     }
 
     @Override
@@ -167,6 +173,7 @@ public class AddPetActivity extends AppCompatActivity {
 
         if (requestCode == 100 && data != null && data.getData() != null){
             imageUri = data.getData();
+
             binding.previewPetImageView.setImageURI(imageUri);
             binding.previewPetImageView.setVisibility(View.VISIBLE);
         }

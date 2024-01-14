@@ -4,6 +4,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -27,6 +28,8 @@ import com.squareup.picasso.Picasso;
 public class EditProfileActivity extends AppCompatActivity {
     private ActivityEditProfileBinding binding;
     private Uri avatarImageUri;
+    private ProgressDialog progressDialog;
+
 
 
     @Override
@@ -48,6 +51,7 @@ public class EditProfileActivity extends AppCompatActivity {
         String userEmail = intent.getStringExtra("email");
         String userAddress = intent.getStringExtra("address");
         String userPhone = intent.getStringExtra("phone");
+
 
         if (avatarURL != null) {
             Picasso.get().load(avatarURL).into(binding.avatar);
@@ -73,8 +77,6 @@ public class EditProfileActivity extends AppCompatActivity {
 
         binding.saveBtn.setOnClickListener(v-> {
             saveUserInfo();
-            //setResult(Activity.RESULT_OK);
-            //finish();
         });
 
         binding.backBtn.setOnClickListener(v -> {
@@ -91,25 +93,44 @@ public class EditProfileActivity extends AppCompatActivity {
             String updatedName = binding.editNameText.getText().toString();
             String updatedAddress = binding.editAddressText.getText().toString();
 
-            // Update Firestore
-            db.collection("users").document(uid).update("name", updatedName, "address", updatedAddress);
+            if (updatedName.equals(binding.name.getText().toString()) && updatedAddress.equals(binding.address.getText().toString()) && (avatarImageUri == null)){
+                finish();
+            }else{
+                progressDialog = new ProgressDialog(this);
+                progressDialog.setTitle("Updating Profile...");
+                progressDialog.show();
 
-            // Update Storage if avatar is changed
-            if (avatarImageUri != null) {
-                StorageReference avatarRef = FirebaseStorage.getInstance().getReference("avatarImages/" + uid);
-                avatarRef.putFile(avatarImageUri)
-                        .addOnSuccessListener(taskSnapshot -> avatarRef.getDownloadUrl().addOnSuccessListener(uri -> {
-                    String avatarUrl = uri.toString();
-                    db.collection("users").document(uid).update("imageURL", avatarUrl)
-                            .addOnSuccessListener(aVoid -> {
-                                //setResult(Activity.RESULT_OK);
+                // Update Firestore
+                db.collection("users").document(uid).update("name", updatedName, "address", updatedAddress)
+                        .addOnSuccessListener(aVoida->{
+                            // Update Storage if avatar is changed
+                            if (avatarImageUri != null) {
+                                StorageReference avatarRef = FirebaseStorage.getInstance().getReference("avatarImages/" + uid);
+                                avatarRef.putFile(avatarImageUri)
+                                        .addOnSuccessListener(taskSnapshot -> avatarRef.getDownloadUrl().addOnSuccessListener(uri -> {
+                                            String avatarUrl = uri.toString();
+                                            db.collection("users").document(uid).update("imageURL", avatarUrl)
+                                                    .addOnSuccessListener(aVoid -> {
+                                                        //setResult(Activity.RESULT_OK);
+                                                        if (progressDialog.isShowing()) {
+                                                            progressDialog.dismiss();
+                                                        }
+                                                        finish();
+                                                    });
+                                        }));
+                            } else{
+                                if (progressDialog.isShowing()) {
+                                    progressDialog.dismiss();
+                                }
                                 finish();
-                            });
-                }));
+                            }
+                        });
             }
+
+
+
         }
     }
-
 
     private void selectImage() {
         Intent intent = new Intent();

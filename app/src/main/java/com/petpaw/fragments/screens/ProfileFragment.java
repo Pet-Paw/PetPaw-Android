@@ -2,6 +2,7 @@ package com.petpaw.fragments.screens;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.net.Uri;
@@ -12,6 +13,8 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
@@ -21,13 +24,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 import com.google.firebase.auth.FirebaseAuth;
@@ -47,6 +53,7 @@ import com.petpaw.adapters.PetListAdapter;
 import com.petpaw.adapters.PostListAdapter;
 import com.petpaw.adapters.UserFollowingAdapter;
 import com.petpaw.adapters.UserFollowsAdapter;
+import com.petpaw.adapters.UserListAdapter;
 import com.petpaw.databinding.FragmentMessagesBinding;
 import com.petpaw.databinding.FragmentProfileBinding;
 import com.petpaw.models.Pet;
@@ -70,7 +77,10 @@ public class ProfileFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-    private static final int EDIT_PROFILE_REQUEST_CODE = 100;
+
+    private static final String OWNER_UID = "ownerUid";
+
+    public static final String PREVIOUS_FRAGMENT = "previousFragment";
 
     // TODO: Rename and change types of parameters
     private FragmentProfileBinding binding;
@@ -83,6 +93,16 @@ public class ProfileFragment extends Fragment {
     private List<User> userFollowingList = new ArrayList<>();
     private List<User> userFollowerList = new ArrayList<>();
 
+    static final String USER_ID = "userId";
+
+    private Context context;
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        this.context = context;
+    }
+
 
     public ProfileFragment() {
         // Required empty public constructor
@@ -92,16 +112,17 @@ public class ProfileFragment extends Fragment {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param param1 Parameter 1.
+     * @param userId Parameter 1.
      * @param param2 Parameter 2.
      * @return A new instance of fragment ProfileFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static ProfileFragment newInstance(String param1, String param2) {
+    public static ProfileFragment newInstance(String userId, int previousFragment, String ownerUid) {
         ProfileFragment fragment = new ProfileFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        args.putString(ARG_PARAM1, userId);
+        args.putInt(PREVIOUS_FRAGMENT, previousFragment);
+        args.putString(OWNER_UID, ownerUid);
         fragment.setArguments(args);
         return fragment;
     }
@@ -109,25 +130,49 @@ public class ProfileFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        /*
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
-        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
-        if (currentUser != null) {
-            uid = currentUser.getUid();
-        }
+         */
+        if (getArguments() != null) {
+            uid = getArguments().getString(ARG_PARAM1);
+            mParam2 = getArguments().getString(ARG_PARAM2);
+        } else {
+            // No UID passed, so default to the current user
+            FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+            if (currentUser != null) {
+                uid = currentUser.getUid();
+            }
+            mParam2 = null;
 
+        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
-
-        //View view = inflater.inflate(R.layout.fragment_profile, container, false);
         binding = FragmentProfileBinding.inflate(inflater, container, false);
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+
+        if (currentUser.getUid().equals(uid)) {
+            // Current user's profile
+            binding.editBtn.setVisibility(View.VISIBLE);
+            binding.addPetBtn.setVisibility(View.VISIBLE);
+            binding.settingsBtn.setVisibility(View.VISIBLE);
+            binding.backBtn.setVisibility(View.INVISIBLE);
+            binding.followBtn.setVisibility(View.GONE);
+            binding.messageBtn.setVisibility(View.GONE);
+        } else {
+            // Another user's profile
+            binding.editBtn.setVisibility(View.GONE);
+            binding.addPetBtn.setVisibility(View.GONE);
+            binding.followBtn.setVisibility(View.VISIBLE);
+            binding.messageBtn.setVisibility(View.VISIBLE);
+            binding.backBtn.setVisibility(View.VISIBLE);
+            binding.settingsBtn.setVisibility(View.INVISIBLE);
+        }
         binding.displayPosts.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -162,8 +207,50 @@ public class ProfileFragment extends Fragment {
                 intent.putExtra("address", user.getAddress());
                 intent.putExtra("phone", user.getPhone());
                 startActivity(intent);
-                //startActivityForResult(intent, EDIT_PROFILE_REQUEST_CODE);
             }
+        });
+
+        binding.backBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+//                if (isAdded()) {
+//                    FrameLayout overlayContainer = getActivity().findViewById(R.id.overlay_profile_fragment);
+                    BottomNavigationView bottomNav = getActivity().findViewById(R.id.bottomNav);
+                    int selectedItemId = bottomNav.getSelectedItemId();
+//
+//                    overlayContainer.setVisibility(View.GONE);
+//
+//                    // Restore visibility of the underlying layout
+//                    if (selectedItemId == R.id.searchFragment) {
+//                        getActivity().findViewById(R.id.searchLayout).setVisibility(View.VISIBLE);
+//                    } else if (selectedItemId == R.id.profileFragment) {
+//                        getActivity().findViewById(R.id.userFollowingFragment).setVisibility(View.VISIBLE);
+//                    }
+                    FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
+                    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+
+                    assert getArguments() != null;
+                    int previousFragment = getArguments().getInt(PREVIOUS_FRAGMENT);
+                    Log.d("ProfileFragment", "previousFragment = " + previousFragment);
+                    String owner_uid = getArguments().getString(OWNER_UID);
+                    if (previousFragment == R.id.userFollowingFragment) {
+                        Toast.makeText(requireContext(), "previousFragment = " + previousFragment, Toast.LENGTH_SHORT).show();
+                        fragmentTransaction.replace(R.id.profileFragmentLayout, UserFollowingFragment.newInstance(owner_uid)).commitNow();
+                    } else if (previousFragment == R.id.useFollowerFragment) {
+                        fragmentTransaction.replace(R.id.profileFragmentLayout, UserFollowersFragment.newInstance(owner_uid)).commitNow();
+                    } else if (previousFragment == R.id.searchFragment || selectedItemId == R.id.searchFragment) {
+//                        fragmentTransaction.replace(R.id.sear, new SearchFragment()).commitNow();
+                        getActivity().onBackPressed();
+
+                    } else {
+                        fragmentTransaction.replace(R.id.profileFragmentLayout, new ProfileFragment()).commitNow();
+
+                    }
+
+
+                }
+
+//            }
         });
 
         binding.addPetBtn.setOnClickListener(new View.OnClickListener() {
@@ -173,40 +260,23 @@ public class ProfileFragment extends Fragment {
                 startActivity(intent);
             }
         });
-
-
-//        ViewPager2 viewPager = binding.viewPager;
         TabLayout tabLayout = binding.tabLayout;
         tabLayout.selectTab(null);
-
-
-//        @SuppressLint("ResourceAsColor") TabLayoutMediator tabLayoutMediator = new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> {
-//            switch (position) {
-//                case 0:
-//                    tab.setText("Followers");
-//                    break;
-//
-//                case 1:
-//                    tab.setText("Following");
-//                    break;
-//
-//                case 2:
-//
-//                    break;
-//            }
-//        });
-//        tabLayoutMediator.attach();
         ViewPager2 viewPager = binding.viewPager;
 
 
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                // Do nothing when a tab is selected
-                viewPager.setAdapter(new UserFollowsAdapter(requireActivity()));
+                // passing uid to viewpager
+                Bundle bundle = new Bundle();
+                bundle.putString(USER_ID, uid);
+
+                viewPager.setAdapter(new UserFollowsAdapter(requireActivity(), uid));
                 viewPager.setCurrentItem(tab.getPosition());
                 viewPager.setVisibility(View.VISIBLE);
                 binding.profileLayout.setVisibility(View.GONE);
+
 
             }
 
@@ -222,27 +292,8 @@ public class ProfileFragment extends Fragment {
             }
         });
 
-
-
         return binding.getRoot();
     }
-    /*
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == EDIT_PROFILE_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-            Activity activity = getActivity();
-            if (activity != null) {
-                ProfileFragment fragment = (ProfileFragment) ((FragmentActivity) activity).getSupportFragmentManager()
-                        .findFragmentByTag("ProfileFragment");
-                if (fragment != null) {
-                    fragment.displayUserInfo();
-                }
-            }
-        }
-    }
-     */
-
 
     @Override
     public void onResume() {
@@ -308,7 +359,7 @@ public class ProfileFragment extends Fragment {
                     userPostList.clear();
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         Post post = document.toObject(Post.class);
-                        Post postTemp = new Post(post.getAuthorId(), post.getDateModified(), post.getContent(), post.isModified(), post.getImageURL(), post.getLikes(), post.getComments(), post.getPostId());
+                        Post postTemp = new Post(post.getAuthorId(), post.getDateModified(), post.getContent(), post.isModified(), post.getImageURL(), post.getLikes(), post.getComments(), post.getPostId(), post.getTags(), post.getPetIdList());
                         userPostList.add(postTemp);
                     }
                     // Check if the userPostList is empty and log
@@ -317,8 +368,10 @@ public class ProfileFragment extends Fragment {
                     }
 
                     binding.postNum.setText(userPostList.size() + "");
-                    binding.postsRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-                    binding.postsRecyclerView.setAdapter(new PostListAdapter(requireContext(), userPostList));
+                    if(context != null) {
+                        binding.postsRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+                        binding.postsRecyclerView.setAdapter(new PostListAdapter(requireContext(), userPostList));
+                    }
                 } else {
                     Log.e("ProfileFragment", "Error getting user posts: ", task.getException());
                 }
@@ -328,6 +381,32 @@ public class ProfileFragment extends Fragment {
     }
 
     private void getUserPets() {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        CollectionReference postsRef = db.collection("Pets");
+        Query query = postsRef.whereEqualTo("ownerId", uid);
+        query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    userPetList.clear();
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        Pet pet = document.toObject(Pet.class);
+                        userPetList.add(pet);
+                    }
+                    // Check if the userPostList is empty and log
+                    if (userPetList.isEmpty()) {
+                        Log.d("ProfileFragment", "No pets found for the user.");
+                    }
+                    if(context != null) {
+                        binding.petsRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+                        binding.petsRecyclerView.setAdapter(new PetListAdapter(requireContext(), userPetList));
+                    }
+                } else {
+                    Log.e("ProfileFragment", "Error getting user pets: ", task.getException());
+                }
+            }
+        });
+        /*
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         FirebaseAuth auth = FirebaseAuth.getInstance();
         db.collection("users").document(auth.getCurrentUser().getUid())
@@ -357,7 +436,7 @@ public class ProfileFragment extends Fragment {
                             }
                         });
 
-
+         */
     }
 
     private void getUserFollowers() {
