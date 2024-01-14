@@ -22,7 +22,11 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import com.petpaw.R;
 
+
+import com.petpaw.activities.PostCommentActivity;
+
 import com.petpaw.activities.CreatePostActivity;
+
 import com.petpaw.models.Post;
 import com.petpaw.models.User;
 import com.squareup.picasso.Picasso;
@@ -93,6 +97,14 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.PostVi
         holder.postCardViewContentTextView.setText(postList.get(position).getContent());
         holder.postCardViewLikeCountTextView.setText(String.valueOf(postList.get(position).getLikes().size()));
         holder.postCardViewCommentCountTextView.setText(String.valueOf(postList.get(position).getComments().size()));
+        holder.postCardViewCommentImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(context, PostCommentActivity.class);
+                intent.putExtra("postID", postId);
+                context.startActivity(intent);
+            }
+        });
 
 //        ---------------  Load avatar start -----------
         Post post = postList.get(position);
