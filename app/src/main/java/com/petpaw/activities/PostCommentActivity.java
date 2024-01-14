@@ -116,22 +116,25 @@ public class PostCommentActivity extends AppCompatActivity {
                                 DocumentSnapshot doc = task.getResult();
                                 Post post = doc.toObject(Post.class);
                                 commentIDList = post.getComments();
-                                db.collection("Comments")
-                                        .whereIn(FieldPath.documentId(), commentIDList)
-                                        .get()
-                                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                            @Override
-                                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                                if(task.isSuccessful()){
-                                                    commentList.clear();
-                                                    for (QueryDocumentSnapshot document : task.getResult()) {
-                                                        commentList.add(document.toObject(Comment.class));
+                                if(commentIDList.size() != 0){
+                                    db.collection("Comments")
+                                            .whereIn(FieldPath.documentId(), commentIDList)
+                                            .get()
+                                            .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                                    if(task.isSuccessful()){
+                                                        commentList.clear();
+                                                        for (QueryDocumentSnapshot document : task.getResult()) {
+                                                            commentList.add(document.toObject(Comment.class));
+                                                        }
+                                                        binding.postDetailCommentRecyclerView.setLayoutManager(new LinearLayoutManager(getBaseContext()));
+                                                        binding.postDetailCommentRecyclerView.setAdapter(new CommentListAdapter(getBaseContext(), commentList));
                                                     }
-                                                    binding.postDetailCommentRecyclerView.setLayoutManager(new LinearLayoutManager(getBaseContext()));
-                                                    binding.postDetailCommentRecyclerView.setAdapter(new CommentListAdapter(getBaseContext(), commentList));
                                                 }
-                                            }
-                                        });
+                                            });
+                                }
+
                             }
                         });
     }
