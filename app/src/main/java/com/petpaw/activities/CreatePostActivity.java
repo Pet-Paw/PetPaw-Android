@@ -175,6 +175,8 @@ public class CreatePostActivity extends AppCompatActivity {
                                     data.put("tags", tags);
                                     data.put("dateModified", new Date());
                                     data.put("modified", true);
+                                    data.put("petId", selectedPetListId.get(0));
+                                    data.put("petIdList", selectedPetListId);
 
                                     postRef.update(data)
                                             .addOnSuccessListener(aVoid -> {
@@ -341,6 +343,7 @@ public class CreatePostActivity extends AppCompatActivity {
 
 
     private void renderPetListView(boolean isEditPost){
+        Log.d("CreatePostActivity", "Render pet list view");
         CollectionReference petsRef = db.collection("Pets");
         //------- Fetch data ----------
         List<String> petListId = new ArrayList<>();
@@ -349,6 +352,7 @@ public class CreatePostActivity extends AppCompatActivity {
         Query query = petsRef.whereEqualTo("ownerId", currentUserId);
         query.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
+                Log.d("CreatePostActivity", "Fetch pet ID successfully");
                 for (QueryDocumentSnapshot document : task.getResult()) {
                     petListId.add(document.getId());
                     petListName.add(document.getString("name"));
@@ -361,12 +365,14 @@ public class CreatePostActivity extends AppCompatActivity {
                 );
 
                 binding.createPostTagsListView.setAdapter(adapter);
+                Log.d("CreatePostActivity", "Pet list view adapter set");
 
 
                 //------- Set color to the selected pet -----------
+                Log.d("CreatePostActivity", "Selected pet ID: " + selectedPetListId);
                 if(isEditPost){
                     binding.createPostTagsListView.post(() -> {
-
+                    Log.d("CreatePostActivity", "Selected pet ID: " + selectedPetListId);
                         for(int i=0; i<selectedPetListId.size(); i++){
                             int index = petListId.indexOf(selectedPetListId.get(i));
 
