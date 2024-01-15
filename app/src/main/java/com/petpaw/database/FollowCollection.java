@@ -1,5 +1,8 @@
 package com.petpaw.database;
 
+import android.util.Log;
+import android.widget.Toast;
+
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.petpaw.models.FollowRecord;
@@ -35,44 +38,47 @@ public class FollowCollection {
         followsCollectionReference = firebaseFirestore.collection(COLLECTION_NAME);
     }
 
-    public void addFollowing(User currentUser, User followingUser ) {
-        followsCollectionReference.add(
-                new FollowRecord(currentUser.getUid(), followingUser.getUid())
+    public void addFollowing(String currentUserUid, String followingUserUid) {
+        FollowRecord followRecord = new FollowRecord("", currentUserUid, followingUserUid);
+
+        followsCollectionReference.add(followRecord.toDoc())
+            .addOnSuccessListener(
+            documentReference -> {
+                String uid = documentReference.getId();
+                followRecord.setUid(uid);
+                followsCollectionReference.document(uid).set(followRecord);
+            }
         );
     }
 
-    public void addFollower(User currentUser, User followerUser ) {
-        followsCollectionReference.add(
-                new FollowRecord(followerUser.getUid(), currentUser.getUid())
-        );
+    public void removeFollowing(String currentUserUid, String followingUserUid) {
+        CompletableFuture<String> future = new CompletableFuture<>();
+        followsCollectionReference.whereEqualTo("followerUid", currentUserUid)
+                .whereEqualTo("followingUid", followingUserUid)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        List<FollowRecord> followRecords = task.getResult().toObjects(FollowRecord.class);
+                        if (followRecords.size() > 0) {
+                            FollowRecord followRecord = followRecords.get(0);
+                            followsCollectionReference.document(followRecord.getUid()).delete();
+                            future.complete(followRecord.getUid());
+                        } else {
+                            future.complete(null);
+                        }
+
+                        CompletableFuture<Void> allOf = CompletableFuture.allOf(
+                                future);
+                        allOf.thenRun(() -> {
+                            String followRecordId = future.getNow(null);
+                            if (followRecordId != null) {
+                                Toast.makeText(null, "Follow record id: " + followRecordId, Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+                });
     }
 
-//    public void  getAllFollowings(User currentUser, Callback callback) {
-//        List<User> followings = new ArrayList<>();
-//        followsCollectionReference.whereEqualTo("followerUid", currentUser.getUid()).get().addOnCompleteListener(task -> {
-//            if (task.isSuccessful()) {
-//                List<FollowRecord> followRecords = task.getResult().toObjects(FollowRecord.class);
-//
-//                for (FollowRecord followRecord : followRecords) {
-//                    String followingUid = followRecord.getFollowingUid();
-//                    UserCollection.newInstance().getUser(followingUid,
-//                            new UserCollection.Callback() {
-//                                @Override
-//                                public void onCallback(List<User> users) {
-//
-//                                }
-//                                @Override
-//                                public void onCallBack(User user) {
-//                                    if (user != null)
-//                                        followings.add(user);
-//                                }
-//                            }
-//                    );
-//                }
-//                callback.onCallBackGetUsers(followings);
-//            }
-//        });
-//    }
 
     public void getAllFollowings(User currentUser, Callback callback) {
         List<User> followings = new ArrayList<>();
