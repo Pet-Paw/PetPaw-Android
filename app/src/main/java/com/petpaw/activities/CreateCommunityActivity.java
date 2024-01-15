@@ -124,59 +124,60 @@ public class CreateCommunityActivity extends AppCompatActivity {
         progressDialog.show();
 
         storageReference = FirebaseStorage.getInstance().getReference("communityImages/" + petId);
-        storageReference.putFile(imageUri)
-                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        binding.previewImageView.setImageURI(null);
-                        binding.communityNameEditText.setText("");
-                        binding.descriptionEditText.setText("");
-                        if (progressDialog.isShowing())
-                            progressDialog.dismiss();
-                        Log.d("CreateCommunityActivity", "Image uploaded successfully");
-                        // Get download URL after upload completes
-                        taskSnapshot.getStorage().getDownloadUrl()
-                                .addOnSuccessListener(uri -> {
-                                    Log.d("CreateCommunityActivity", "Image URL: " + uri);
+        if(imageUri != null){
+            storageReference.putFile(imageUri)
+                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                            binding.previewImageView.setImageURI(null);
+                            binding.communityNameEditText.setText("");
+                            binding.descriptionEditText.setText("");
+                            if (progressDialog.isShowing())
+                                progressDialog.dismiss();
+                            Log.d("CreateCommunityActivity", "Image uploaded successfully");
+                            // Get download URL after upload completes
+                            taskSnapshot.getStorage().getDownloadUrl()
+                                    .addOnSuccessListener(uri -> {
+                                        Log.d("CreateCommunityActivity", "Image URL: " + uri);
 
-                                    if(isEditImage){
-                                        Map<String, Object> data = new HashMap<>();
-                                        data.put("imageURL", uri.toString());
-                                        comDocRef.update(data)
-                                                .addOnSuccessListener(aVoid -> {
-                                                    Log.d("CreateCommunityActivity", "Update image path successfully");
+                                        if(isEditImage){
+                                            Map<String, Object> data = new HashMap<>();
+                                            data.put("imageURL", uri.toString());
+                                            comDocRef.update(data)
+                                                    .addOnSuccessListener(aVoid -> {
+                                                        Log.d("CreateCommunityActivity", "Update image path successfully");
 
-                                                    finish();
+                                                        finish();
 //                                                    startActivity(getIntent());
 
 //                                                    recreate();
 
-                                                })      .addOnFailureListener(e->{
-                                                    Log.e("CreateCommunityActivity", "Error updating document", e);
-                                                });
-                                        finish();
-                                    }else{
-                                        Map<String, Object> data = new HashMap<>();
-                                        data.put("imageURL", uri.toString());
-                                        comDocRef.update(data)
-                                                .addOnSuccessListener(aVoid -> {
-                                                    Log.d("CreateCommunityActivity", "DocumentSnapshot successfully updated!");
-                                                    finish();
-                                                })      .addOnFailureListener(e->{
-                                                    Log.e("CreateCommunityActivity", "Error updating document", e);
-                                                });
-                                    }
-                                });
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        if (progressDialog.isShowing())
-                            progressDialog.dismiss();
-                        Log.e("CreateCommunityActivity", "Error uploading image", e);
-                    }
-                });
-
+                                                    })      .addOnFailureListener(e->{
+                                                        Log.e("CreateCommunityActivity", "Error updating document", e);
+                                                    });
+                                            finish();
+                                        }else{
+                                            Map<String, Object> data = new HashMap<>();
+                                            data.put("imageURL", uri.toString());
+                                            comDocRef.update(data)
+                                                    .addOnSuccessListener(aVoid -> {
+                                                        Log.d("CreateCommunityActivity", "DocumentSnapshot successfully updated!");
+                                                        finish();
+                                                    })      .addOnFailureListener(e->{
+                                                        Log.e("CreateCommunityActivity", "Error updating document", e);
+                                                    });
+                                        }
+                                    });
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            if (progressDialog.isShowing())
+                                progressDialog.dismiss();
+                            Log.e("CreateCommunityActivity", "Error uploading image", e);
+                        }
+                    });
+        }
     }
 
     @Override

@@ -113,23 +113,30 @@ public class CreatePostActivity extends AppCompatActivity {
 
 //                           ----------- Load image with the URL then the description -----------
                             String imageUrl = document.getString("imageURL");
-                            Picasso.get()
-                                    .load(imageUrl)
-                                    .tag(System.currentTimeMillis())
-                                    .into(binding.createPostImageView, new com.squareup.picasso.Callback() {
-                                        @Override
-                                        public void onSuccess() {
-                                            binding.createPostImageView.setVisibility(View.VISIBLE);
-                                            if (progressDialog.isShowing())
-                                                progressDialog.dismiss();
-                                            Log.d("TAG", "Load image successfully");
-                                        }
+                            if(imageUrl != null && !imageUrl.isEmpty()) {
+                                binding.createPostImageView.setVisibility(View.VISIBLE);
+                                Picasso.get()
+                                        .load(imageUrl)
+                                        .tag(System.currentTimeMillis())
+                                        .into(binding.createPostImageView, new com.squareup.picasso.Callback() {
+                                            @Override
+                                            public void onSuccess() {
+                                                binding.createPostImageView.setVisibility(View.VISIBLE);
+                                                if (progressDialog.isShowing())
+                                                    progressDialog.dismiss();
+                                                Log.d("TAG", "Load image successfully");
+                                            }
 
-                                        @Override
-                                        public void onError(Exception e) {
-                                            Log.e("TAG", "Load image failed");
-                                        }
-                                    });
+                                            @Override
+                                            public void onError(Exception e) {
+                                                Log.e("TAG", "Load image failed");
+                                            }
+                                        });
+                            }else {
+                                binding.createPostImageView.setVisibility(View.GONE);
+                                if (progressDialog.isShowing())
+                                    progressDialog.dismiss();
+                            }
 
                             String displayDescription = combineContentAndTag(document.getString("content"), (List<String>) document.get("tags"));
                             binding.createPostDescriptionEditText.setText(displayDescription);
@@ -168,7 +175,6 @@ public class CreatePostActivity extends AppCompatActivity {
                                     data.put("tags", tags);
                                     data.put("dateModified", new Date());
                                     data.put("modified", true);
-                                    data.put("petId", selectedPetListId.get(0));
                                     data.put("petIdList", selectedPetListId);
                                     data.put("communityId", communityId);
 
@@ -257,7 +263,6 @@ public class CreatePostActivity extends AppCompatActivity {
                     post.setDateModified(new Date());
                     post.setContent(description);
                     post.setAuthorId(currentUserId);
-                    //post.setPetId(selectedPetListId.get(0));
                     post.setPetIdList(selectedPetListId);
                     post.setTags(tags);
                     post.setCommunityId(communityId);
@@ -457,59 +462,60 @@ public class CreatePostActivity extends AppCompatActivity {
         String fileName = formatter.format(now);
         storageReference = FirebaseStorage.getInstance().getReference("postImages/"+postId);
 
+        if(imageUri != null){
+            storageReference.putFile(imageUri)
+                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                            binding.createPostImageView.setImageURI(null);
+                            binding.createPostImageView.setVisibility(View.GONE);
+                            binding.createPostDescriptionEditText.setText("");
+                            if (progressDialog.isShowing())
+                                progressDialog.dismiss();
+                            Log.d("CreatePostActivity", "Image uploaded successfully");
+                            // Get download URL after upload completes
+                            taskSnapshot.getStorage().getDownloadUrl()
+                                    .addOnSuccessListener(uri -> {
+                                        Log.d("CreatePostActivity", "Image URL: " + uri);
 
-        storageReference.putFile(imageUri)
-                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        binding.createPostImageView.setImageURI(null);
-                        binding.createPostImageView.setVisibility(View.GONE);
-                        binding.createPostDescriptionEditText.setText("");
-                        if (progressDialog.isShowing())
-                            progressDialog.dismiss();
-                        Log.d("CreatePostActivity", "Image uploaded successfully");
-                        // Get download URL after upload completes
-                        taskSnapshot.getStorage().getDownloadUrl()
-                                .addOnSuccessListener(uri -> {
-                                    Log.d("CreatePostActivity", "Image URL: " + uri);
+                                        if(isEditImage){
+                                            Map<String, Object> data = new HashMap<>();
+                                            data.put("imageURL", uri.toString());
+                                            postDocRef.update(data)
+                                                    .addOnSuccessListener(aVoid -> {
+                                                        Log.d("CreatePostActivity", "Update image path successfully");
 
-                                    if(isEditImage){
-                                        Map<String, Object> data = new HashMap<>();
-                                        data.put("imageURL", uri.toString());
-                                        postDocRef.update(data)
-                                                .addOnSuccessListener(aVoid -> {
-                                                    Log.d("CreatePostActivity", "Update image path successfully");
-
-                                                    finish();
-//                                                    startActivity(getIntent());
-
-//                                                    recreate();
-
-                                                })      .addOnFailureListener(e->{
-                                                    Log.e("CreatePostActivity", "Error updating document", e);
-                                                });
-                                        finish();
-                                    }else{
-                                        Map<String, Object> data = new HashMap<>();
-                                        data.put("imageURL", uri.toString());
-                                        postDocRef.update(data)
-                                                .addOnSuccessListener(aVoid -> {
-                                                    Log.d("CreatePostActivity", "DocumentSnapshot successfully updated!");
-                                                finish();
-                                                })      .addOnFailureListener(e->{
-                                                    Log.e("CreatePostActivity", "Error updating document", e);
-                                                });
-                                    }
-                                });
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        if (progressDialog.isShowing())
-                            progressDialog.dismiss();
-                        Log.e("CreatePostActivity", "Error uploading image", e);
-                    }
-                });
+                                                        finish();
+                                                    })      .addOnFailureListener(e->{
+                                                        Log.e("CreatePostActivity", "Error updating document", e);
+                                                    });
+                                            finish();
+                                        }else{
+                                            Map<String, Object> data = new HashMap<>();
+                                            data.put("imageURL", uri.toString());
+                                            postDocRef.update(data)
+                                                    .addOnSuccessListener(aVoid -> {
+                                                        Log.d("CreatePostActivity", "DocumentSnapshot successfully updated!");
+                                                        finish();
+                                                    })      .addOnFailureListener(e->{
+                                                        Log.e("CreatePostActivity", "Error updating document", e);
+                                                    });
+                                        }
+                                    });
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            if (progressDialog.isShowing())
+                                progressDialog.dismiss();
+                            Log.e("CreatePostActivity", "Error uploading image", e);
+                        }
+                    });
+        }else {
+            if (progressDialog.isShowing())
+                progressDialog.dismiss();
+            finish();
+        }
     }
 
     @Override
