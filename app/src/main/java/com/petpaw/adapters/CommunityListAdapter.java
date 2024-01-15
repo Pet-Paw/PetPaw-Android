@@ -11,8 +11,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.fragment.app.FragmentActivity;
-import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -21,12 +19,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.petpaw.R;
-import com.petpaw.fragments.screens.ProfileFragment;
 import com.petpaw.models.Community;
-import com.petpaw.models.User;
 import com.squareup.picasso.Picasso;
-
-import org.w3c.dom.Text;
 
 import java.util.List;
 import java.util.Objects;
@@ -35,13 +29,15 @@ public class CommunityListAdapter extends RecyclerView.Adapter<CommunityListAdap
     Context context;
     List<Community> communityList;
 
+    boolean isSearch;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     FirebaseAuth auth = FirebaseAuth.getInstance();
 
 
-    public CommunityListAdapter(Context context, List<Community> communityList) {
+    public CommunityListAdapter(Context context, List<Community> communityList, Boolean isSearch) {
         this.context = context;
         this.communityList = communityList;
+        this.isSearch = isSearch;
     }
 
     @NonNull
@@ -62,20 +58,19 @@ public class CommunityListAdapter extends RecyclerView.Adapter<CommunityListAdap
         String communityId = communityList.get(position).getId();
 
         holder.communityCardViewName.setText(communityList.get(position).getName());
-
         Picasso.get()
                 .load(communityList.get(position).getImageURL())
                 .placeholder(R.drawable.default_avatar)
                 .into(holder.communityCardViewPic);
+        if(isSearch){
+            if(communityList.get(position).getMembers().contains(currentUserId)){
+                holder.joinCommunityBtn.setVisibility(View.GONE);
+                holder.joinedTextView.setVisibility(View.VISIBLE);
+            }
 
-        if(communityList.get(position).getMembers().contains(currentUserId)){
-            holder.joinCommunityBtn.setVisibility(View.GONE);
-            holder.joinedTextView.setVisibility(View.VISIBLE);
-        }
-
-        holder.joinCommunityBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+            holder.joinCommunityBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
                     db.collection("Communities").document(communityId)
                             .update("members", FieldValue.arrayUnion(currentUserId))
                             .addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -87,32 +82,20 @@ public class CommunityListAdapter extends RecyclerView.Adapter<CommunityListAdap
                                     }
                                 }
                             });
-//                int currentPosition = holder.getAdapterPosition();
-//                if (currentPosition != RecyclerView.NO_POSITION) {
-//                    String selectedUserId = usersList.get(currentPosition).getUid();
-////                    ProfileFragment profileFragment = ProfileFragment.newInstance(selectedUserId, null);
-//
-//                    FragmentManager fragmentManager = ((FragmentActivity) context).getSupportFragmentManager();
-//                    fragmentManager.beginTransaction()
-//                            .replace(R.id.overlay_profile_fragment, ProfileFragment.newInstance(selectedUserId, R.id.searchFragment, "")).commit();
-//
-//                    ((FragmentActivity) context).findViewById(R.id.overlay_profile_fragment).setVisibility(View.VISIBLE);
-//                    ((FragmentActivity) context).findViewById(R.id.searchLayout).setVisibility(View.GONE);
-//
-//                    /*
-//                    BottomNavigationView bottomNav = ((FragmentActivity) context).findViewById(R.id.bottomNav);
-//                    int selectedItemId = bottomNav.getSelectedItemId();
-//
-//                    if (selectedItemId == R.id.searchFragment) {
-//                        ((FragmentActivity) context).findViewById(R.id.searchLayout).setVisibility(View.GONE);
-//                    } else if (selectedItemId == R.id.profileFragment) {
-//                        ((FragmentActivity) context).findViewById(R.id.profileLayout).setVisibility(View.GONE);
-//                    }
-//                     */
-//
-//                }
-            }
-        });
+
+                }
+            });
+        } else {
+            holder.joinCommunityBtn.setVisibility(View.GONE);
+            holder.joinedTextView.setVisibility(View.GONE);
+            holder.communityCardViewLinearLayout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    //chuyen do community detail
+                }
+            });
+        }
+
 
     }
 

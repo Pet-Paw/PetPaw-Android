@@ -16,8 +16,8 @@
             android:id="@+id/action_homeFragment_to_searchFragment"
             app:destination="@id/searchFragment" />
         <action
-            android:id="@+id/action_homeFragment_to_notificationsFragment"
-            app:destination="@id/notificationsFragment" />
+            android:id="@+id/action_homeFragment_to_communityFragment"
+            app:destination="@id/communityFragment" />
         <action
             android:id="@+id/action_homeFragment_to_profileFragment"
             app:destination="@id/profileFragment" />
@@ -28,8 +28,8 @@
         android:label="fragment_messages"
         tools:layout="@layout/fragment_messages" >
         <action
-            android:id="@+id/action_messagesFragment_to_notificationsFragment"
-            app:destination="@id/notificationsFragment" />
+            android:id="@+id/action_messagesFragment_to_communityFragment"
+            app:destination="@id/communityFragment" />
         <action
             android:id="@+id/action_messagesFragment_to_searchFragment"
             app:destination="@id/searchFragment" />
@@ -41,21 +41,21 @@
             app:destination="@id/profileFragment" />
     </fragment>
     <fragment
-        android:id="@+id/notificationsFragment"
-        android:name="com.petpaw.fragments.screens.NotificationsFragment"
-        android:label="fragment_notifications"
-        tools:layout="@layout/fragment_notifications" >
+        android:id="@+id/communityFragment"
+        android:name="com.petpaw.fragments.screens.CommunityFragment"
+        android:label="fragment_community"
+        tools:layout="@layout/fragment_community" >
         <action
-            android:id="@+id/action_notificationsFragment_to_searchFragment"
+            android:id="@+id/action_communityFragment_to_searchFragment"
             app:destination="@id/searchFragment" />
         <action
-            android:id="@+id/action_notificationsFragment_to_homeFragment"
+            android:id="@+id/action_communityFragment_to_homeFragment"
             app:destination="@id/homeFragment" />
         <action
-            android:id="@+id/action_notificationsFragment_to_profileFragment"
+            android:id="@+id/action_communityFragment_to_profileFragment"
             app:destination="@id/profileFragment" />
         <action
-            android:id="@+id/action_notificationsFragment_to_messagesFragment"
+            android:id="@+id/action_communityFragment_to_messagesFragment"
             app:destination="@id/messagesFragment" />
     </fragment>
     <fragment
@@ -67,8 +67,8 @@
             android:id="@+id/action_searchFragment_to_homeFragment"
             app:destination="@id/homeFragment" />
         <action
-            android:id="@+id/action_searchFragment_to_notificationsFragment"
-            app:destination="@id/notificationsFragment" />
+            android:id="@+id/action_searchFragment_to_communityFragment"
+            app:destination="@id/communityFragment" />
         <action
             android:id="@+id/action_searchFragment_to_messagesFragment"
             app:destination="@id/messagesFragment" />
@@ -82,8 +82,8 @@
         android:label="fragment_profile"
         tools:layout="@layout/fragment_profile" >
         <action
-            android:id="@+id/action_profileFragment_to_notificationsFragment"
-            app:destination="@id/notificationsFragment" />
+            android:id="@+id/action_profileFragment_to_communityFragment"
+            app:destination="@id/communityFragment" />
         <action
             android:id="@+id/action_profileFragment_to_searchFragment"
             app:destination="@id/searchFragment" />

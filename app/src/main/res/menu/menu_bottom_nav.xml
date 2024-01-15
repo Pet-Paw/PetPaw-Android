@@ -14,12 +14,6 @@
         android:title="Search"
         />
     <item
-        android:id="@+id/notificationsFragment"
-        android:icon="@drawable/baseline_notifications_24"
-        android:enabled="true"
-        android:title="Notifications"
-        />
-    <item
         android:id="@+id/messagesFragment"
         android:icon="@drawable/baseline_chat_24"
         android:enabled="true"
@@ -31,4 +25,9 @@
         android:enabled="true"
         android:title="Profile"
         />
+    <item
+        android:id="@+id/communityFragment"
+        android:icon="@drawable/baseline_groups_24"
+        android:enabled="true"
+        android:title="Community"/>
 </menu>
