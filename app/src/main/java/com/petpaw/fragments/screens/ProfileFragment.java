@@ -387,7 +387,7 @@ public class ProfileFragment extends Fragment {
                     userPostList.clear();
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         Post post = document.toObject(Post.class);
-                        Post postTemp = new Post(post.getAuthorId(), post.getDateModified(), post.getContent(), post.isModified(), post.getImageURL(), post.getLikes(), post.getComments(), post.getPostId(), post.getTags(), post.getPetIdList());
+                        Post postTemp = new Post(post.getAuthorId(), post.getDateModified(), post.getContent(), post.isModified(), post.getImageURL(), post.getLikes(), post.getComments(), post.getPostId(), post.getTags(), post.getPetIdList(), post.getCommunityId());
                         userPostList.add(postTemp);
                     }
                     // Check if the userPostList is empty and log

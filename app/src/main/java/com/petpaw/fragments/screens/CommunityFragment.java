@@ -130,7 +130,7 @@ public class CommunityFragment extends Fragment {
                     postList.clear();
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         Post post = document.toObject(Post.class);
-                        Post postTemp = new Post(post.getAuthorId(), post.getDateModified(), post.getContent(), post.isModified(), post.getImageURL(), post.getLikes(), post.getComments(), post.getPostId(), post.getTags(), post.getPetIdList());
+                        Post postTemp = new Post(post.getAuthorId(), post.getDateModified(), post.getContent(), post.isModified(), post.getImageURL(), post.getLikes(), post.getComments(), post.getPostId(), post.getTags(), post.getPetIdList(), post.getCommunityId());
                         postList.add(postTemp);
                     }
                     if (context != null) {

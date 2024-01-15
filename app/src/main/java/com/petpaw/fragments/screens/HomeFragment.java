@@ -89,6 +89,7 @@ public class HomeFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(requireContext(), CreatePostActivity.class);
+//                intent.putExtra("communityId", "RWNRXeWkMpRlb20yV7z8");
                 startActivity(intent);
             }
         });
@@ -100,8 +101,6 @@ public class HomeFragment extends Fragment {
                 startActivity(intent);
             }
         });
-
-
 
         return view;
     }
@@ -116,7 +115,7 @@ public class HomeFragment extends Fragment {
     private void getPosts() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         CollectionReference postsRef = db.collection("Posts"); // Get a reference to the Posts collection
-        Query query = postsRef.orderBy("dateModified", Query.Direction.DESCENDING); // Order documents by dateModified in ascending order
+        Query query = postsRef.whereEqualTo("communityId", "").orderBy("communityId").orderBy("dateModified", Query.Direction.DESCENDING); // Order documents by dateModified in ascending order
         query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
@@ -124,13 +123,16 @@ public class HomeFragment extends Fragment {
                     postList.clear();
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         Post post = document.toObject(Post.class);
-                        Post postTemp = new Post(post.getAuthorId(), post.getDateModified(), post.getContent(), post.isModified(), post.getImageURL(), post.getLikes(), post.getComments(), post.getPostId(), post.getTags(), post.getPetIdList());
+                        Post postTemp = new Post(post.getAuthorId(), post.getDateModified(), post.getContent(), post.isModified(), post.getImageURL(), post.getLikes(), post.getComments(), post.getPostId(), post.getTags(), post.getPetIdList(), post.getCommunityId());
                         postList.add(postTemp);
                     }
                     if (context != null) {
                         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
                         recyclerView.setAdapter(new PostListAdapter(requireContext(), postList));
                     }
+                    Log.d("TAG", "onComplete: " + postList);
+                }else{
+                    Log.d("TAG", "ERROR: " + task.getException());
                 }
             }
         });

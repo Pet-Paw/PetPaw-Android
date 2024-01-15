@@ -197,11 +197,11 @@ public class SearchFragment extends Fragment {
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         Post post = document.toObject(Post.class);
                         if(searchValue.equals("")){
-                            Post postTemp = new Post(post.getAuthorId(), post.getDateModified(), post.getContent(), post.isModified(), post.getImageURL(), post.getLikes(), post.getComments(), post.getPostId(), post.getTags(), post.getPetIdList());
+                            Post postTemp = new Post(post.getAuthorId(), post.getDateModified(), post.getContent(), post.isModified(), post.getImageURL(), post.getLikes(), post.getComments(), post.getPostId(), post.getTags(), post.getPetIdList(), post.getCommunityId());
                             postList.add(postTemp);
                         } else {
                             if(post.getContent().toLowerCase().contains(searchValue.toLowerCase())){
-                                Post postTemp = new Post(post.getAuthorId(), post.getDateModified(), post.getContent(), post.isModified(), post.getImageURL(), post.getLikes(), post.getComments(), post.getPostId(), post.getTags(), post.getPetIdList());
+                                Post postTemp = new Post(post.getAuthorId(), post.getDateModified(), post.getContent(), post.isModified(), post.getImageURL(), post.getLikes(), post.getComments(), post.getPostId(), post.getTags(), post.getPetIdList(), post.getCommunityId());
                                 postList.add(postTemp);
                             }
                         }

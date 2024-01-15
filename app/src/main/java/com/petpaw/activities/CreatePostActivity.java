@@ -81,6 +81,7 @@ public class CreatePostActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         String postId = intent.getStringExtra("postId");
+        String communityId = intent.getStringExtra("communityId");
 
 //        Bind the select button to the selectImage function
         binding = ActivityCreatePostBinding.inflate(getLayoutInflater());
@@ -140,20 +141,24 @@ public class CreatePostActivity extends AppCompatActivity {
 //                          ------------ Check valid input  -------------
                             binding.createPostSaveButton.setOnClickListener(v -> {
                                 boolean isValid = true;
-                                List<String> tags = new ArrayList<>();
 
-                                String description = binding.createPostDescriptionEditText.getText().toString();
+//                                List<String> tags = new ArrayList<>();
+//                                String description = binding.createPostDescriptionEditText.getText().toString();
+//                                if(!description.isEmpty()){
+//                                    String[] parts = description.split("#");
+//                                    for(int i=1; i<parts.length; i++) {
+//                                        String part = parts[i];
+//                                        if(!part.isEmpty() && part.charAt(0) != '#') {
+//                                            tags.add(part);
+//                                        }
+//                                    }
+//                                    Log.d("CreatePostActivity", "Tags: " + tags.toString());
+//                                }
 
-                                if(!description.isEmpty()){
-                                    String[] parts = description.split("#");
-                                    for(int i=1; i<parts.length; i++) {
-                                        String part = parts[i];
-                                        if(!part.isEmpty() && part.charAt(0) != '#') {
-                                            tags.add(part);
-                                        }
-                                    }
-                                    Log.d("CreatePostActivity", "Tags: " + tags.toString());
-                                }
+                                String tempDescription = binding.createPostDescriptionEditText.getText().toString();
+                                List<String> tags = getTags(tempDescription);
+                                String description = removeTag(tempDescription, tags);
+                                Log.d("CreatePostActivity", "Description: " + description);
 
 //                              -------- update if valid input --------
 
@@ -165,6 +170,7 @@ public class CreatePostActivity extends AppCompatActivity {
                                     data.put("modified", true);
                                     data.put("petId", selectedPetListId.get(0));
                                     data.put("petIdList", selectedPetListId);
+                                    data.put("communityId", communityId);
 
                                     postRef.update(data)
                                             .addOnSuccessListener(aVoid -> {
@@ -254,7 +260,7 @@ public class CreatePostActivity extends AppCompatActivity {
                     //post.setPetId(selectedPetListId.get(0));
                     post.setPetIdList(selectedPetListId);
                     post.setTags(tags);
-
+                    post.setCommunityId(communityId);
 
                     db.collection("Posts")
                             .add(post)
