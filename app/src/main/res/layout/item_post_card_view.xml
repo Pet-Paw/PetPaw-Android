@@ -79,11 +79,13 @@
                                 android:layout_height="wrap_content"
                                 android:text="Jan 1st 2024"
                                 android:textAlignment="textStart" />
+
                             <TextView
                                 android:id="@+id/postCardViewIsModified"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text=" (modified)" />
+                                android:text=" (modified)"
+                                android:textColor="@color/red" />
                         </LinearLayout>
 
                     </LinearLayout>
