@@ -12,8 +12,10 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FieldValue;
@@ -35,7 +37,7 @@ public class CreateCommunityActivity extends AppCompatActivity {
     ActivityCreateCommunityBinding binding;
     ProgressDialog progressDialog;
     private StorageReference storageReference;
-    Boolean defaultPic;
+    Boolean defaultPic = true;
     private DocumentReference comDocRef;
 
     private Uri imageUri;
@@ -70,7 +72,7 @@ public class CreateCommunityActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if(binding.communityNameEditText.getText().length() != 0){
-                    Community com = new Community(binding.communityNameEditText.getText().toString(), binding.descriptionEditText.getText().toString(), auth.getCurrentUser().getUid(), "https://firebasestorage.googleapis.com/v0/b/petpaw-1d5a6.appspot.com/o/communityImages%2Fdefault_community_picture.jpg?alt=media&token=02941e55-1875-4eb3-8e9e-35d11ef657df", new ArrayList<>());
+                    Community com = new Community("", binding.communityNameEditText.getText().toString(), binding.descriptionEditText.getText().toString(), auth.getCurrentUser().getUid(), "https://firebasestorage.googleapis.com/v0/b/petpaw-1d5a6.appspot.com/o/communityImages%2Fdefault_community_picture.jpg?alt=media&token=02941e55-1875-4eb3-8e9e-35d11ef657df", new ArrayList<>());
                     db.collection("Communities")
                             .add(com.toDoc())
                             .addOnSuccessListener(documentReference -> {
@@ -79,12 +81,21 @@ public class CreateCommunityActivity extends AppCompatActivity {
 //                        comDocRef.update("id", id);
 //                        db.collection("users").document(auth.getCurrentUser().getUid())
 //                                .update("pets", FieldValue.arrayUnion(id));
-                                if(!defaultPic) {
-                                    uploadImage(id, false);
-                                } else {
-                                    finish();
-                                }
-
+                                db.collection("Communities")
+                                        .document(id)
+                                        .update("id", id)
+                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
+                                                if(task.isSuccessful()){
+                                                    if(!defaultPic) {
+                                                        uploadImage(id, false);
+                                                    } else {
+                                                        finish();
+                                                    }
+                                                }
+                                            }
+                                        });
                                 Toast.makeText(getBaseContext(), "Community Successfully Created", Toast.LENGTH_SHORT).show();
 //
                             })

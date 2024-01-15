@@ -67,6 +67,15 @@
                 android:text="POST"
                 android:textStyle="bold" />
             <TextView
+                android:id="@+id/searchFragmentCommunityTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:textSize="18sp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="COMMUNITY"
+                android:textStyle="bold"/>
+            <TextView
                 android:id="@+id/searchFragmentUserTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="30dp"
@@ -79,6 +88,11 @@
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/searchFragmentPostRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/searchFragmentCommunityRecyclerView"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
