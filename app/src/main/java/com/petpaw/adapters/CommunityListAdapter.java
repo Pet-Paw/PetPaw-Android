@@ -1,5 +1,7 @@
 package com.petpaw.adapters;
 
+import static androidx.core.os.BundleKt.bundleOf;
+
 import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,6 +13,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.FragmentManager;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -19,6 +24,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.petpaw.R;
+import com.petpaw.fragments.screens.CommunityDetailFragment;
 import com.petpaw.models.Community;
 import com.squareup.picasso.Picasso;
 
@@ -32,12 +38,15 @@ public class CommunityListAdapter extends RecyclerView.Adapter<CommunityListAdap
     boolean isSearch;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     FirebaseAuth auth = FirebaseAuth.getInstance();
+    private FragmentManager fragmentManager;
 
 
-    public CommunityListAdapter(Context context, List<Community> communityList, Boolean isSearch) {
+
+    public CommunityListAdapter(Context context, List<Community> communityList, Boolean isSearch, FragmentManager fragmentManager) {
         this.context = context;
         this.communityList = communityList;
         this.isSearch = isSearch;
+        this.fragmentManager = fragmentManager;
     }
 
     @NonNull
@@ -91,12 +100,12 @@ public class CommunityListAdapter extends RecyclerView.Adapter<CommunityListAdap
             holder.communityCardViewLinearLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    //chuyen do community detail
+                    //go to community detail
+                    String communityId = "qAkUHHMHAxNusRUajLR4";
+
                 }
             });
         }
-
-
     }
 
     @Override

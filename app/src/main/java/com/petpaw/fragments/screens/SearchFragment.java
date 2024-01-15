@@ -292,7 +292,7 @@ public class SearchFragment extends Fragment {
                     }
                     if (context != null) {
                         binding.searchFragmentCommunityRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-                        binding.searchFragmentCommunityRecyclerView.setAdapter(new CommunityListAdapter(requireContext(), communityList, true));
+                        binding.searchFragmentCommunityRecyclerView.setAdapter(new CommunityListAdapter(requireContext(), communityList, true, getFragmentManager()));
                     }
                 }
             }
