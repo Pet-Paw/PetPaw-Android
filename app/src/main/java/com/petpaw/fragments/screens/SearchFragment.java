@@ -27,6 +27,7 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 //import com.google.firebase.firestore.auth.User;
+import com.petpaw.adapters.CommunityListAdapter;
 import com.petpaw.adapters.PostListAdapter;
 import com.petpaw.adapters.UserListAdapter;
 import com.petpaw.databinding.FragmentSearchBinding;
@@ -59,7 +60,7 @@ public class SearchFragment extends Fragment {
     private List<User> userList = new ArrayList<>();
     private List<Community> communityList = new ArrayList<>();
 
-    private boolean isPost = true;
+    private int searchState = 0;
     private Context context;
 
     @Override
@@ -102,6 +103,7 @@ public class SearchFragment extends Fragment {
             public void onClick(View v) {
                 setUnderline(binding.searchFragmentPostTextView);
                 removeUnderline(binding.searchFragmentUserTextView);
+                removeUnderline(binding.searchFragmentCommunityTextView);
 
 //                binding.searchFragmentPostRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
 //                binding.searchFragmentPostRecyclerView.setAdapter(new PostListAdapter(requireContext(), postList));
@@ -109,6 +111,7 @@ public class SearchFragment extends Fragment {
 
                 //binding.searchFragmentUserRecyclerView.setAdapter(null);
                 binding.searchFragmentUserRecyclerView.setVisibility(View.GONE);
+                binding.searchFragmentCommunityRecyclerView.setVisibility(View.GONE);
 
                 getPosts("");
 
@@ -120,12 +123,31 @@ public class SearchFragment extends Fragment {
             public void onClick(View v) {
                 removeUnderline(binding.searchFragmentPostTextView);
                 setUnderline(binding.searchFragmentUserTextView);
+                removeUnderline(binding.searchFragmentCommunityTextView);
 
                 //binding.searchFragmentPostRecyclerView.setAdapter(null);
                 binding.searchFragmentPostRecyclerView.setVisibility(View.GONE);
 
                 binding.searchFragmentUserRecyclerView.setVisibility(View.VISIBLE);
+                binding.searchFragmentCommunityRecyclerView.setVisibility(View.GONE);
                 getUsers("");
+            }
+        });
+
+        binding.searchFragmentCommunityTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                removeUnderline(binding.searchFragmentPostTextView);
+                setUnderline(binding.searchFragmentCommunityTextView);
+                removeUnderline(binding.searchFragmentUserTextView);
+
+
+                //binding.searchFragmentPostRecyclerView.setAdapter(null);
+                binding.searchFragmentPostRecyclerView.setVisibility(View.GONE);
+
+                binding.searchFragmentCommunityRecyclerView.setVisibility(View.VISIBLE);
+                binding.searchFragmentUserRecyclerView.setVisibility(View.GONE);
+                getCommunities("");
             }
         });
 
@@ -133,10 +155,21 @@ public class SearchFragment extends Fragment {
             @Override
             public boolean onQueryTextSubmit(String s) {
                 //if user search for post
-                if(isPost){
-                    getPosts(s);
-                }else {
-                    getUsers(s);
+//                if(isPost){
+//                    getPosts(s);
+//                }else {
+//                    getUsers(s);
+//                }
+                switch (searchState){
+                    case 0:
+                        getPosts(s);
+                        break;
+                    case 1:
+                        getCommunities(s);
+                        break;
+                    case 2:
+                        getUsers(s);
+                        break;
                 }
                 return false;
             }
@@ -144,16 +177,32 @@ public class SearchFragment extends Fragment {
             @Override
             public boolean onQueryTextChange(String s) {
                 //if user search for post
-                if(isPost){
-                    if(s.isEmpty()){
-                        getPosts("");
-                    }
-                }else {
-                    if(s.isEmpty()){
-                        getUsers("");
-                    }
+//                if(isPost){
+//                    if(s.isEmpty()){
+//                        getPosts("");
+//                    }
+//                }else {
+//                    if(s.isEmpty()){
+//                        getUsers("");
+//                    }
+//                }
+                switch (searchState){
+                    case 0:
+                        if(s.isEmpty()){
+                            getPosts("");
+                        }
+                        break;
+                    case 1:
+                        if(s.isEmpty()) {
+                            getCommunities("");
+                        }
+                        break;
+                    case 2:
+                        if(s.isEmpty()){
+                            getUsers("");
+                        }
+                        break;
                 }
-
                 return false;
             }
         });
@@ -164,10 +213,21 @@ public class SearchFragment extends Fragment {
     public void setUnderline(TextView textView) {
         String text = textView.getText().toString();
         binding.searchFragmentSearchBar.setQuery("", false);
-        if(text.equals("POST")){
-            isPost = true;
-        } else {
-            isPost = false;
+//        if(text.equals("POST")){
+//            isPost = true;
+//        } else {
+//            isPost = false;
+//        }
+        switch(text){
+            case "POST":
+                searchState = 0;
+                break;
+            case "COMMUNITY":
+                searchState = 1;
+                break;
+            case "USER":
+                searchState = 2;
+                break;
         }
         SpannableString content = new SpannableString(textView.getText());
         content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
@@ -209,6 +269,35 @@ public class SearchFragment extends Fragment {
                     if (context != null) {
                         binding.searchFragmentPostRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
                         binding.searchFragmentPostRecyclerView.setAdapter(new PostListAdapter(requireContext(), postList));
+                    }
+                }
+            }
+        });
+    }
+
+    private void getCommunities(String searchValue) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        CollectionReference communitiesRef = db.collection("Communities");
+        Query query = communitiesRef.orderBy("name", Query.Direction.DESCENDING);
+
+        query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                communityList.clear();
+                if (task.isSuccessful()) {
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        Community community = document.toObject(Community.class);
+                        if(searchValue.equals("")){
+                            communityList.add(community);
+                        } else {
+                            if(community.getName().toLowerCase().contains(searchValue.toLowerCase())){
+                                communityList.add(community);
+                            }
+                        }
+                    }
+                    if (context != null) {
+                        binding.searchFragmentCommunityRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+                        binding.searchFragmentCommunityRecyclerView.setAdapter(new CommunityListAdapter(requireContext(), communityList));
                     }
                 }
             }
