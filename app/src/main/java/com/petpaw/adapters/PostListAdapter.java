@@ -96,11 +96,16 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.PostVi
         holder.postCardViewDate.setText(sdf.format(date));
 
 //        -------------- Show tags -------------
-        StringBuilder tagList = new StringBuilder();
-        for (String tag : postList.get(position).getTags()) {
-            tagList.append("#").append(tag).append(" ");
+        if (postList.get(position).getTags().size() == 0) {
+            holder.postCardViewTagsTextView.setVisibility(View.GONE);
+        } else {
+            holder.postCardViewTagsTextView.setVisibility(View.VISIBLE);
+            StringBuilder tagList = new StringBuilder();
+            for (String tag : postList.get(position).getTags()) {
+                tagList.append("#").append(tag).append(" ");
+            }
+            holder.postCardViewTagsTextView.setText(tagList.toString());
         }
-        holder.postCardViewTagsTextView.setText(tagList.toString());
 
 //      ---------------  Update the like button start -----------
         if (likes.contains(currentUserId)) {
@@ -124,24 +129,29 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.PostVi
 
 //        -------------- Show pet name -------------
         StringBuilder petNameList = new StringBuilder();
-        for (String petId : postList.get(position).getPetIdList()) {
-            db.collection("Pets").document(petId).get().addOnCompleteListener(task -> {
-                if (task.isSuccessful() && task.getResult() != null) {
-                    DocumentSnapshot documentSnapshot = task.getResult();
-                    if (documentSnapshot.exists()) {
-                        String petName = documentSnapshot.getString("name");
-                        if(petNameList.length() == 0) {
-                            petNameList.append(petName + " ");
-                        }else{
-                            petNameList.append(", " + petName + " ");
+        if(postList.get(position).getPetIdList().size() == 0){
+            holder.postCardViewPetNameTextView.setVisibility(View.GONE);
+        }else{
+            for (String petId : postList.get(position).getPetIdList()) {
+                db.collection("Pets").document(petId).get().addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && task.getResult() != null) {
+                        DocumentSnapshot documentSnapshot = task.getResult();
+                        if (documentSnapshot.exists()) {
+                            String petName = documentSnapshot.getString("name");
+                            if(petNameList.length() == 0) {
+                                petNameList.append(petName + " ");
+                            }else{
+                                petNameList.append(", " + petName + " ");
+                            }
+                            holder.postCardViewPetNameTextView.setText(petNameList.toString());
                         }
-                        holder.postCardViewPetNameTextView.setText(petNameList.toString());
+                    } else {
+                        Log.e("PostListAdapter", "Error fetching pet data", task.getException());
                     }
-                } else {
-                    Log.e("PostListAdapter", "Error fetching pet data", task.getException());
-                }
-            });
+                });
+            }
         }
+
 
 //        for (int i = 0; i < postList.get(position).getPetIdList().size(); i++) {
 //            int index = i;
