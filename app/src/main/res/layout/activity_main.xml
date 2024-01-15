@@ -44,6 +44,13 @@
                     <!-- used for showing pet profiles without affecting bottom nav -->
                 </FrameLayout>
 
+                <FrameLayout
+                    android:id="@+id/overlay_community_fragment"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:visibility="gone">
+                    <!-- used for showing pet profiles without affecting bottom nav -->
+                </FrameLayout>
             </RelativeLayout>
 
         </androidx.core.widget.NestedScrollView>
