@@ -1,8 +1,5 @@
 package com.petpaw.activities;
 
-import static androidx.core.content.ContentProviderCompat.requireContext;
-import static java.security.AccessController.getContext;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -12,23 +9,13 @@ import androidx.core.content.ContextCompat;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
-import android.nfc.Tag;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.Spinner;
 import android.widget.Toast;
-
-import android.content.Intent;
-import android.net.Uri;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -99,7 +86,7 @@ public class CreatePostActivity extends AppCompatActivity {
         binding = ActivityCreatePostBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-// ------------Check if the intent has a postId, if it does, then it is an edit post -----------------
+// ---------------------------------------- Edit post ------------------------------------------------
         if(postId != null) {
             progressDialog = new ProgressDialog(this);
             progressDialog.setTitle("Fetching Post Detail....");
@@ -143,7 +130,8 @@ public class CreatePostActivity extends AppCompatActivity {
                                         }
                                     });
 
-                            binding.createPostDescriptionEditText.setText(document.getString("content"));
+                            String displayDescription = combineContentAndTag(document.getString("content"), (List<String>) document.get("tags"));
+                            binding.createPostDescriptionEditText.setText(displayDescription);
 
 //                          ------------ Render Pet List ----------------
                             selectedPetListId = (List<String>) document.get("petIdList");
@@ -234,7 +222,7 @@ public class CreatePostActivity extends AppCompatActivity {
             });
 
         }
-        else { //****************** if it does not have a postId, then it is CREATE a new post *******************
+        else { // ------------------------------ CREATE a new post -----------------------------------
 
 //            ---------- ListView to select pet -----------
             renderPetListView(false);
@@ -250,8 +238,11 @@ public class CreatePostActivity extends AppCompatActivity {
             binding.createPostUploadButton.setOnClickListener(v -> {
                 boolean isValid = true;
 
-                String description = binding.createPostDescriptionEditText.getText().toString();
-                List<String> tags = getTags(description);
+                String tempDescription = binding.createPostDescriptionEditText.getText().toString();
+                List<String> tags = getTags(tempDescription);
+                String description = removeTag(tempDescription, tags);
+                Log.d("CreatePostActivity", "Description: " + description);
+
 
 //                -------- Check valid input --------
 
@@ -425,6 +416,20 @@ public class CreatePostActivity extends AppCompatActivity {
             Log.d("CreatePostActivity", "Tags: " + tags.toString());
         }
         return tags;
+    }
+
+    private String removeTag(String description, List<String> tags) {
+        for(int i=0; i<tags.size(); i++) {
+            description = description.replace("#" + tags.get(i), "");
+        }
+        return description;
+    }
+
+    private String combineContentAndTag(String description, List<String> tags) {
+        for(int i=0; i<tags.size(); i++) {
+            description += "#" + tags.get(i) + " ";
+        }
+        return description;
     }
 
     private void selectImage() {
