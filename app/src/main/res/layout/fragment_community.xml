@@ -3,48 +3,53 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/communityLayout"
     tools:context=".fragments.screens.HomeFragment">
 
-    <!-- TODO: Update blank fragment layout -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:paddingVertical="10dp">
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="end">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="20dp"/>
+            android:gravity="center"
+            android:orientation="horizontal">
 
             <TextView
+                android:id="@+id/communityFragmentOwnedTextView"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:text="Home"
-                android:textSize="30dp"
-                android:textAlignment="center"
+                android:layout_height="30dp"
+                android:textSize="18sp"
+                android:layout_weight="1"
                 android:gravity="center"
-                android:textStyle="bold"
-                android:layout_weight="1"/>
+                android:text="OWNED"
+                android:textStyle="bold" />
 
-            <ImageView
-                android:id="@+id/communityCreatePostImageView"
+            <TextView
+                android:id="@+id/communityFragmentJoinedTextView"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="5dp"
-                android:src="@drawable/createposticon"/>
+                android:layout_height="30dp"
+                android:textSize="18sp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="JOINED"
+                android:textStyle="bold"/>
         </LinearLayout>
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/communityPostRecyclerView"
+            android:id="@+id/communityFragmentOwnedRecyclerView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp" />
+            android:layout_height="match_parent" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/communityFragmentJoinedRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
 
     </LinearLayout>
-
 
 </FrameLayout>

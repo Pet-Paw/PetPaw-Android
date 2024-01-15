@@ -1,7 +1,5 @@
 package com.petpaw.fragments.screens;
 
-import static android.content.ContentValues.TAG;
-
 import android.content.Context;
 import android.os.Bundle;
 
@@ -20,7 +18,6 @@ import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
@@ -32,7 +29,6 @@ import com.petpaw.adapters.PostListAdapter;
 import com.petpaw.adapters.UserListAdapter;
 import com.petpaw.databinding.FragmentSearchBinding;
 
-import com.petpaw.R;
 import com.petpaw.models.Community;
 import com.petpaw.models.Post;
 import com.petpaw.models.User;
@@ -40,7 +36,6 @@ import com.petpaw.models.User;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -297,7 +292,7 @@ public class SearchFragment extends Fragment {
                     }
                     if (context != null) {
                         binding.searchFragmentCommunityRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-                        binding.searchFragmentCommunityRecyclerView.setAdapter(new CommunityListAdapter(requireContext(), communityList));
+                        binding.searchFragmentCommunityRecyclerView.setAdapter(new CommunityListAdapter(requireContext(), communityList, true, getFragmentManager()));
                     }
                 }
             }

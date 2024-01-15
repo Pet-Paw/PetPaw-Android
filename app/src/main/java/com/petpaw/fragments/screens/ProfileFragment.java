@@ -115,7 +115,8 @@ public class ProfileFragment extends Fragment {
      * this fragment using the provided parameters.
      *
      * @param userId Parameter 1.
-     * @param param2 Parameter 2.
+     * @param previousFragment Parameter 2.
+     * @param ownerUid Parameter 3.
      * @return A new instance of fragment ProfileFragment.
      */
     // TODO: Rename and change types and number of parameters

@@ -8,15 +8,19 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import android.text.SpannableString;
+import android.text.style.UnderlineSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
@@ -25,8 +29,10 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.petpaw.R;
 import com.petpaw.activities.CreateCommunityActivity;
 import com.petpaw.activities.CreatePostActivity;
+import com.petpaw.adapters.CommunityListAdapter;
 import com.petpaw.adapters.PostListAdapter;
 import com.petpaw.databinding.FragmentCommunityBinding;
+import com.petpaw.models.Community;
 import com.petpaw.models.Post;
 
 import java.util.ArrayList;
@@ -39,9 +45,13 @@ import java.util.List;
  */
 public class CommunityFragment extends Fragment {
     FragmentCommunityBinding binding;
-    private List<Post> postList = new ArrayList<>();
+    private List<Community> ownedCommunityList = new ArrayList<>();
+    private List<Community> joinedCommunityList = new ArrayList<>();
+    private Boolean isOwned = true;
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
+    FirebaseAuth auth = FirebaseAuth.getInstance();
 
-    private String communityID = "RWNRXeWkMpRlb20yV7z8";
+
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -96,49 +106,103 @@ public class CommunityFragment extends Fragment {
                              Bundle savedInstanceState) {
         binding = FragmentCommunityBinding.inflate(inflater, container, false);
 
-//        getPosts();
+        setUnderline(binding.communityFragmentOwnedTextView);
 
-
-        binding.communityCreatePostImageView.setOnClickListener(new View.OnClickListener() {
+        binding.communityFragmentOwnedTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(requireContext(), CreatePostActivity.class);
-                startActivity(intent);
+                setUnderline(binding.communityFragmentOwnedTextView);
+                removeUnderline(binding.communityFragmentJoinedTextView);
+
+//                binding.searchFragmentPostRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+//                binding.searchFragmentPostRecyclerView.setAdapter(new PostListAdapter(requireContext(), postList));
+                binding.communityFragmentOwnedRecyclerView.setVisibility(View.VISIBLE);
+
+                //binding.searchFragmentUserRecyclerView.setAdapter(null);
+                binding.communityFragmentJoinedRecyclerView.setVisibility(View.GONE);
+
+            }
+        });
+
+        binding.communityFragmentJoinedTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                removeUnderline(binding.communityFragmentOwnedTextView);
+                setUnderline(binding.communityFragmentJoinedTextView);
+
+                //binding.searchFragmentPostRecyclerView.setAdapter(null);
+                binding.communityFragmentOwnedRecyclerView.setVisibility(View.GONE);
+                binding.communityFragmentJoinedRecyclerView.setVisibility(View.VISIBLE);
             }
         });
 
         return binding.getRoot();
     }
 
+    public void setUnderline(TextView textView) {
+        String text = textView.getText().toString();
+        if(text.equals("OWNED")){
+            isOwned = true;
+        } else {
+            isOwned = false;
+        }
+        SpannableString content = new SpannableString(textView.getText());
+        content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
+        textView.setText(content);
+    }
+
+    public void removeUnderline(TextView textView) {
+        textView.setText(textView.getText().toString());
+    }
+
     @Override
     public void onResume() {
         Log.d("TAG", "onResume: ");
         super.onResume();
-        getPosts();
+        getCommunities();
     }
 
-    private void getPosts() {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        CollectionReference postsRef = db.collection("Posts"); // Get a reference to the Posts collection
-        Query query = postsRef
-                .whereEqualTo("community", communityID)
-                .orderBy("dateModified", Query.Direction.DESCENDING);// Order documents by dateModified in ascending order
-        query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    postList.clear();
-                    for (QueryDocumentSnapshot document : task.getResult()) {
-                        Post post = document.toObject(Post.class);
-                        Post postTemp = new Post(post.getAuthorId(), post.getDateModified(), post.getContent(), post.isModified(), post.getImageURL(), post.getLikes(), post.getComments(), post.getPostId(), post.getTags(), post.getPetIdList(), post.getCommunityId());
-                        postList.add(postTemp);
-                    }
-                    if (context != null) {
-                        binding.communityPostRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-                        binding.communityPostRecyclerView.setAdapter(new PostListAdapter(requireContext(), postList));
+    private void getCommunities() {
+        ownedCommunityList.clear();
+        joinedCommunityList.clear();
+        db.collection("Communities")
+                .whereEqualTo("owner", auth.getCurrentUser().getUid())
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                    if (task.isSuccessful()) {
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            Community community = document.toObject(Community.class);
+                                ownedCommunityList.add(community);
+                            }
+
+                        if (context != null) {
+                            binding.communityFragmentOwnedRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+                            binding.communityFragmentOwnedRecyclerView.setAdapter(new CommunityListAdapter(requireContext(), ownedCommunityList, false, getFragmentManager()));
+                        }
                     }
                 }
-            }
         });
+        db.collection("Communities")
+                .whereArrayContains("members", auth.getCurrentUser().getUid())
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                Community community = document.toObject(Community.class);
+                                joinedCommunityList.add(community);
+                            }
+
+                            if (context != null) {
+                                binding.communityFragmentJoinedRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+                                binding.communityFragmentJoinedRecyclerView.setAdapter(new CommunityListAdapter(requireContext(), joinedCommunityList, false, getFragmentManager()));
+                            }
+                        }
+                    }
+                });
     }
+
 }
