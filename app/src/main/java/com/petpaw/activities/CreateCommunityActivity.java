@@ -77,7 +77,7 @@ public class CreateCommunityActivity extends AppCompatActivity {
                             .add(com.toDoc())
                             .addOnSuccessListener(documentReference -> {
                                 String id = documentReference.getId();
-//                        comDocRef = documentReference;
+                                comDocRef = documentReference;
 //                        comDocRef.update("id", id);
 //                        db.collection("users").document(auth.getCurrentUser().getUid())
 //                                .update("pets", FieldValue.arrayUnion(id));

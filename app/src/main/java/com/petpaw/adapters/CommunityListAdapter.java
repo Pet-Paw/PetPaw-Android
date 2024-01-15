@@ -9,8 +9,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentManager;
@@ -97,15 +98,16 @@ public class CommunityListAdapter extends RecyclerView.Adapter<CommunityListAdap
         } else {
             holder.joinCommunityBtn.setVisibility(View.GONE);
             holder.joinedTextView.setVisibility(View.GONE);
-            holder.communityCardViewLinearLayout.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    //go to community detail
-                    String communityId = "qAkUHHMHAxNusRUajLR4";
-
-                }
-            });
         }
+        holder.communityCardViewRelativeLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(context, communityId, Toast.LENGTH_SHORT).show();
+                //chuyen do community detail
+            }
+        });
+
+
     }
 
     @Override
@@ -115,7 +117,7 @@ public class CommunityListAdapter extends RecyclerView.Adapter<CommunityListAdap
 
 
     public class CommunityViewHolder extends RecyclerView.ViewHolder {
-        LinearLayout communityCardViewLinearLayout;
+        RelativeLayout communityCardViewRelativeLayout;
         ImageView communityCardViewPic;
         TextView communityCardViewName;
         Button joinCommunityBtn;
@@ -125,7 +127,7 @@ public class CommunityListAdapter extends RecyclerView.Adapter<CommunityListAdap
             super(itemView);
             communityCardViewPic = itemView.findViewById(R.id.communityCardViewPic);
             communityCardViewName = itemView.findViewById(R.id.communityCardViewName);
-            communityCardViewLinearLayout = itemView.findViewById(R.id.communityCardViewLinearLayout);
+            communityCardViewRelativeLayout = itemView.findViewById(R.id.communityCardViewRelativeLayout);
             joinCommunityBtn = itemView.findViewById(R.id.joinCommunityBtn);
             joinedTextView = itemView.findViewById(R.id.joinedTextView);
         }
