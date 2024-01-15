@@ -6,6 +6,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -88,9 +89,11 @@ public class HomeFragment extends Fragment {
         createPostBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(requireContext(), CreatePostActivity.class);
+//                Intent intent = new Intent(requireContext(), CreatePostActivity.class);
 //                intent.putExtra("communityId", "RWNRXeWkMpRlb20yV7z8");
-                startActivity(intent);
+//                startActivity(intent);
+                launchDetailFragment("qAkUHHMHAxNusRUajLR4");
+                Log.d("TAG", "Launching fragment ");
             }
         });
 
@@ -136,5 +139,17 @@ public class HomeFragment extends Fragment {
                 }
             }
         });
+    }
+
+    private void launchDetailFragment(String communityId) {
+        CommunityDetailFragment fragment = CommunityDetailFragment.newInstance(communityId, "");
+        Log.d("TAG", "launchDetailFragment1: " + communityId);
+        FragmentManager fragmentManager = getFragmentManager();
+        Log.d("TAG", "launchDetailFragment2: " + fragmentManager);
+        fragmentManager.beginTransaction()
+                .replace(R.id.homeFragment, fragment)
+                .addToBackStack(null)
+                .commit();
+        Log.d("TAG", "launchDetailFragment3: " + fragmentManager);
     }
 }
