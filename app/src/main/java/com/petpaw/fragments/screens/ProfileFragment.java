@@ -54,6 +54,7 @@ import com.petpaw.adapters.PostListAdapter;
 import com.petpaw.adapters.UserFollowingAdapter;
 import com.petpaw.adapters.UserFollowsAdapter;
 import com.petpaw.adapters.UserListAdapter;
+import com.petpaw.database.FollowCollection;
 import com.petpaw.databinding.FragmentMessagesBinding;
 import com.petpaw.databinding.FragmentProfileBinding;
 import com.petpaw.models.Pet;
@@ -92,6 +93,7 @@ public class ProfileFragment extends Fragment {
     private List<Pet> userPetList = new ArrayList<>();
     private List<User> userFollowingList = new ArrayList<>();
     private List<User> userFollowerList = new ArrayList<>();
+    private FollowCollection followCollection = FollowCollection.newInstance();
 
     static final String USER_ID = "userId";
 
@@ -292,6 +294,32 @@ public class ProfileFragment extends Fragment {
             }
         });
 
+        binding.followBtn.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("SetTextI18n")
+            @Override
+            public void onClick(View v) {
+                followCollection.addFollowing(currentUser.getUid(), uid);
+                int followersNum = Integer.parseInt(binding.followerNum.getText().toString());
+                binding.followerNum.setText((followersNum + 1) + "");
+                binding.followBtn.setVisibility(View.GONE);
+                binding.unFollowBtn.setVisibility(View.VISIBLE);
+            }
+        });
+
+        binding.unFollowBtn.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("SetTextI18n")
+            @Override
+            public void onClick(View v) {
+                followCollection.removeFollowing(currentUser.getUid(), uid);
+                int followersNum = Integer.parseInt(binding.followerNum.getText().toString());
+                binding.followerNum.setText((followersNum - 1) + "");
+                binding.followBtn.setVisibility(View.VISIBLE);
+                binding.unFollowBtn.setVisibility(View.GONE);
+            }
+        });
+
+
+
         return binding.getRoot();
     }
 
@@ -452,6 +480,10 @@ public class ProfileFragment extends Fragment {
                         followerCount++;
                     }
                     binding.followerNum.setText(followerCount + "");
+                    if (followerCount > 0) {
+                        binding.followBtn.setVisibility(View.GONE);
+                        binding.unFollowBtn.setVisibility(View.VISIBLE);
+                    }
 
                 } else {
                     Log.e("ProfileFragment", "Error getting user followers: ", task.getException());
