@@ -168,7 +168,7 @@ public class PetProfileFragment extends Fragment {
             public void onClick(View v) {
                 if (isAdded()) {
                     getActivity().findViewById(R.id.overlay_pet_fragment).setVisibility(View.GONE);
-                    getActivity().findViewById(R.id.profileLayout).setVisibility(View.VISIBLE);
+                    getActivity().findViewById(R.id.profileFragmentLayout).setVisibility(View.VISIBLE);
                 }
             }
         });

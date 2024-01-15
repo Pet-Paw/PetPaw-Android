@@ -87,12 +87,17 @@ public class MainActivity extends AppCompatActivity {
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 FrameLayout userProfileContainer = findViewById(R.id.overlay_profile_fragment);
                 FrameLayout petProfileContainer = findViewById(R.id.overlay_pet_fragment);
+                FrameLayout communityContainer = findViewById(R.id.overlay_community_fragment);
+
                 // If the overlay container is visible, hide it when navigating to a different tab
                 if (userProfileContainer.getVisibility() == View.VISIBLE) {
                     userProfileContainer.setVisibility(View.GONE);
                 }
                 if (petProfileContainer.getVisibility() == View.VISIBLE) {
                     petProfileContainer.setVisibility(View.GONE);
+                }
+                if (communityContainer.getVisibility() == View.VISIBLE) {
+                    communityContainer.setVisibility(View.GONE);
                 }
 
                 SideNavFragment sideNavFragment = (SideNavFragment) getSupportFragmentManager()
@@ -114,16 +119,27 @@ public class MainActivity extends AppCompatActivity {
     public void onBackPressed() {
         FrameLayout userProfileContainer = findViewById(R.id.overlay_profile_fragment);
         FrameLayout petProfileContainer = findViewById(R.id.overlay_pet_fragment);
+        FrameLayout communityContainer = findViewById(R.id.overlay_community_fragment);
+
         BottomNavigationView bottomNav = findViewById(R.id.bottomNav);
         int selectedItemId = bottomNav.getSelectedItemId();
 
         if (petProfileContainer.getVisibility() == View.VISIBLE) {
             petProfileContainer.setVisibility(View.GONE);
             // Restore visibility of the underlying layout
-            findViewById(R.id.profileLayout).setVisibility(View.VISIBLE);
+            findViewById(R.id.profileFragmentLayout).setVisibility(View.VISIBLE);
         }
+        else if (communityContainer.getVisibility() == View.VISIBLE) {
+            communityContainer.setVisibility(View.GONE);
 
-        if (userProfileContainer.getVisibility() == View.VISIBLE) {
+            // Restore visibility of the underlying layout
+            if (selectedItemId == R.id.searchFragment) {
+                findViewById(R.id.searchLayout).setVisibility(View.VISIBLE);
+            } else if (selectedItemId == R.id.communityFragment) {
+                findViewById(R.id.communityLayout).setVisibility(View.VISIBLE);
+            }
+        }
+        else if (userProfileContainer.getVisibility() == View.VISIBLE) {
             userProfileContainer.setVisibility(View.GONE);
 
             // Restore visibility of the underlying layout

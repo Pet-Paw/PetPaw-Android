@@ -126,7 +126,9 @@ public class EditPetProfileActivity extends AppCompatActivity {
                                                     if (progressDialog.isShowing()) {
                                                         progressDialog.dismiss();
                                                     }
-                                                    finish();
+                                                    Intent intent = new Intent(EditPetProfileActivity.this, EmptyActivity.class);
+                                                    startActivity(intent);
+                                                    //finish();
                                                 });
                                     }));
                         }else{

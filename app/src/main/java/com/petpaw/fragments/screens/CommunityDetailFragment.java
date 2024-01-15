@@ -1,5 +1,7 @@
 package com.petpaw.fragments.screens;
 
+import static com.petpaw.fragments.screens.ProfileFragment.PREVIOUS_FRAGMENT;
+
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -40,17 +42,17 @@ public class CommunityDetailFragment extends Fragment {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
+     * @param communityId Parameter 1.
+     * @param previousFragment Parameter 2.
      * @return A new instance of fragment CommunityDetailFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static CommunityDetailFragment newInstance(String param1, String param2) {
+    public static CommunityDetailFragment newInstance(String communityId, int previousFragment) {
         CommunityDetailFragment fragment = new CommunityDetailFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        Log.d("CommunityDetailFragment", "newInstance: " + param1 + " " + param2);
+        args.putString(ARG_PARAM1, communityId);
+        args.putInt(PREVIOUS_FRAGMENT, previousFragment);
+        Log.d("CommunityDetailFragment", "newInstance: " + communityId + ", " + previousFragment);
         fragment.setArguments(args);
         return fragment;
     }

@@ -118,11 +118,10 @@
             android:gravity="center_horizontal"
             android:orientation="horizontal">
             <TextView
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Name"
                 android:textColor="@color/black"
-                android:layout_weight="1"
                 android:textSize="18dp"/>
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -160,11 +159,10 @@
             android:gravity="center_horizontal"
             android:orientation="horizontal">
             <TextView
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Address"
                 android:textColor="@color/black"
-                android:layout_weight="1"
                 android:textSize="18dp"/>
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -224,11 +222,10 @@
             android:gravity="center_horizontal"
             android:orientation="horizontal">
             <TextView
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Email"
                 android:textColor="@color/black"
-                android:layout_weight="1"
                 android:textSize="18dp"/>
             <TextView
                 android:id="@+id/email"
@@ -248,11 +245,10 @@
             android:gravity="center_horizontal"
             android:orientation="horizontal">
             <TextView
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Phone"
                 android:textColor="@color/black"
-                android:layout_weight="1"
                 android:textSize="18dp"/>
             <TextView
                 android:id="@+id/phone"
@@ -273,11 +269,10 @@
             android:gravity="center_horizontal"
             android:orientation="horizontal">
             <TextView
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Password"
                 android:textColor="@color/black"
-                android:layout_weight="1"
                 android:textSize="18dp"/>
             <TextView
                 android:id="@+id/password"
