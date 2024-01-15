@@ -32,6 +32,7 @@ import com.petpaw.adapters.UserListAdapter;
 import com.petpaw.databinding.FragmentSearchBinding;
 
 import com.petpaw.R;
+import com.petpaw.models.Community;
 import com.petpaw.models.Post;
 import com.petpaw.models.User;
 
@@ -56,6 +57,7 @@ public class SearchFragment extends Fragment {
     private FragmentSearchBinding binding;
     private List<Post> postList = new ArrayList<>();
     private List<User> userList = new ArrayList<>();
+    private List<Community> communityList = new ArrayList<>();
 
     private boolean isPost = true;
     private Context context;

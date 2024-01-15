@@ -7,7 +7,6 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -26,8 +25,8 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.petpaw.R;
 import com.petpaw.activities.CreateCommunityActivity;
 import com.petpaw.activities.CreatePostActivity;
-import com.petpaw.activities.MainActivity;
 import com.petpaw.adapters.PostListAdapter;
+import com.petpaw.databinding.FragmentCommunityBinding;
 import com.petpaw.models.Post;
 
 import java.util.ArrayList;
@@ -35,17 +34,24 @@ import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link HomeFragment#newInstance} factory method to
+ * Use the {@link CommunityFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class HomeFragment extends Fragment {
+public class CommunityFragment extends Fragment {
+    FragmentCommunityBinding binding;
+    private List<Post> postList = new ArrayList<>();
+
+    private String communityID = "RWNRXeWkMpRlb20yV7z8";
+
+    // TODO: Rename parameter arguments, choose names that match
+    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
-    private List<Post> postList = new ArrayList<>();
-    private RecyclerView recyclerView;
+    // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+
     private Context context;
 
     @Override
@@ -54,12 +60,21 @@ public class HomeFragment extends Fragment {
         this.context = context;
     }
 
-    public HomeFragment() {
+    public CommunityFragment() {
         // Required empty public constructor
     }
 
-    public static HomeFragment newInstance(String param1, String param2) {
-        HomeFragment fragment = new HomeFragment();
+    /**
+     * Use this factory method to create a new instance of
+     * this fragment using the provided parameters.
+     *
+     * @param param1 Parameter 1.
+     * @param param2 Parameter 2.
+     * @return A new instance of fragment CommunityFragment.
+     */
+    // TODO: Rename and change types and number of parameters
+    public static CommunityFragment newInstance(String param1, String param2) {
+        CommunityFragment fragment = new CommunityFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -79,13 +94,12 @@ public class HomeFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_home, container, false);
-        recyclerView = view.findViewById(R.id.homePostRecyclerView);
+        binding = FragmentCommunityBinding.inflate(inflater, container, false);
+
 //        getPosts();
 
-        ImageView createPostBtn = view.findViewById(R.id.homeCreatePostImageView);
-        Button comBtn = view.findViewById(R.id.comBtn);
-        createPostBtn.setOnClickListener(new View.OnClickListener() {
+
+        binding.communityCreatePostImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(requireContext(), CreatePostActivity.class);
@@ -93,17 +107,7 @@ public class HomeFragment extends Fragment {
             }
         });
 
-        comBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(requireContext(), CreateCommunityActivity.class);
-                startActivity(intent);
-            }
-        });
-
-
-
-        return view;
+        return binding.getRoot();
     }
 
     @Override
@@ -116,7 +120,9 @@ public class HomeFragment extends Fragment {
     private void getPosts() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         CollectionReference postsRef = db.collection("Posts"); // Get a reference to the Posts collection
-        Query query = postsRef.orderBy("dateModified", Query.Direction.DESCENDING); // Order documents by dateModified in ascending order
+        Query query = postsRef
+                .whereEqualTo("community", communityID)
+                .orderBy("dateModified", Query.Direction.DESCENDING);// Order documents by dateModified in ascending order
         query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
@@ -128,8 +134,8 @@ public class HomeFragment extends Fragment {
                         postList.add(postTemp);
                     }
                     if (context != null) {
-                        recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-                        recyclerView.setAdapter(new PostListAdapter(requireContext(), postList));
+                        binding.communityPostRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+                        binding.communityPostRecyclerView.setAdapter(new PostListAdapter(requireContext(), postList));
                     }
                 }
             }
