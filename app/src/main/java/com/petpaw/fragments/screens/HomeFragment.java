@@ -24,6 +24,7 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.petpaw.R;
+import com.petpaw.activities.CreateCommunityActivity;
 import com.petpaw.activities.CreatePostActivity;
 import com.petpaw.activities.MainActivity;
 import com.petpaw.adapters.PostListAdapter;
@@ -83,6 +84,7 @@ public class HomeFragment extends Fragment {
 //        getPosts();
 
         ImageView createPostBtn = view.findViewById(R.id.homeCreatePostImageView);
+        Button comBtn = view.findViewById(R.id.comBtn);
         createPostBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -90,6 +92,16 @@ public class HomeFragment extends Fragment {
                 startActivity(intent);
             }
         });
+
+        comBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(requireContext(), CreateCommunityActivity.class);
+                startActivity(intent);
+            }
+        });
+
+
 
         return view;
     }

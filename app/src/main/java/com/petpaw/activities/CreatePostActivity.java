@@ -258,7 +258,7 @@ public class CreatePostActivity extends AppCompatActivity {
                     post.setDateModified(new Date());
                     post.setContent(description);
                     post.setAuthorId(currentUserId);
-                    post.setPetId(selectedPetListId.get(0));
+                    //post.setPetId(selectedPetListId.get(0));
                     post.setPetIdList(selectedPetListId);
                     post.setTags(tags);
 
