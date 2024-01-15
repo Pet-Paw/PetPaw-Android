@@ -13,12 +13,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
@@ -28,10 +26,8 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.petpaw.R;
 import com.petpaw.activities.EditPetProfileActivity;
-import com.petpaw.activities.EmptyActivity;
-import com.petpaw.activities.PetProfileActivity;
+import com.petpaw.activities.MessageActivity;
 import com.petpaw.adapters.PetGridAdapter;
-import com.petpaw.databinding.ActivityPetProfileBinding;
 import com.petpaw.databinding.FragmentPetProfileBinding;
 import com.petpaw.databinding.FragmentProfileBinding;
 import com.petpaw.models.Pet;
@@ -190,7 +186,7 @@ public class PetProfileFragment extends Fragment {
                     if (isAdded() && getActivity() != null) {
                         getActivity().findViewById(R.id.overlay_pet_fragment).setVisibility(View.GONE);
                         getActivity().findViewById(R.id.profileLayout).setVisibility(View.VISIBLE);
-                        Intent intent = new Intent(requireContext(), EmptyActivity.class);
+                        Intent intent = new Intent(requireContext(), MessageActivity.class);
                         startActivity(intent);
                     }
                 })

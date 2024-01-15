@@ -3,6 +3,7 @@ package com.petpaw.adapters;
 import android.annotation.SuppressLint;
 import android.provider.MediaStore;
 import android.text.Layout;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +17,7 @@ import com.petpaw.models.Message;
 import com.petpaw.models.User;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -24,14 +26,20 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
     private Map<String, User> userMap;
     private OnMessageClickListener onClickListener;
 
-    public MessageListAdapter(List<Message> messageList) {
-        this.messageList = messageList;
+    public MessageListAdapter() {
+        this.messageList = new ArrayList<>();
         userMap = null;
     }
 
     @SuppressLint("NotifyDataSetChanged")
     public void setMessageList(List<Message> messageList) {
         this.messageList = messageList;
+        notifyDataSetChanged();
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    public void setUserMap(Map<String, User> userMap) {
+        this.userMap = userMap;
         notifyDataSetChanged();
     }
 
@@ -58,8 +66,21 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
 
         if (userMap != null) {
             User user = userMap.get(message.getSenderId());
-            // TODO: load user avatar and username
-//            Picasso.get().load()
+            holder.mBinding.tvUser.setText(user.getName());
+            Picasso.get()
+                    .load(user.getImageURL())
+                    .tag(System.currentTimeMillis())
+                    .into(holder.mBinding.iv, new com.squareup.picasso.Callback() {
+                        @Override
+                        public void onSuccess() {
+                            Log.d("TAG", "Load image successfully");
+                        }
+
+                        @Override
+                        public void onError(Exception e) {
+                            Log.e("TAG", "Load image failed");
+                        }
+                    });
         }
 
     }

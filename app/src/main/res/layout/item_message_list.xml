@@ -12,20 +12,17 @@
         android:layout_height="match_parent"
         android:paddingHorizontal="20dp"
         android:orientation="horizontal"
+        android:padding="15dp"
         >
 
-        <androidx.cardview.widget.CardView
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/iv"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            app:cardCornerRadius="1000dp"
-            android:layout_marginBottom="12dp"
-            >
-            <ImageView
-                android:id="@+id/iv"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                />
-        </androidx.cardview.widget.CardView>
+            android:src="@drawable/default_avatar"
+            app:civ_border_width="1dp"
+            app:civ_border_color="@color/primary"
+            android:layout_marginLeft="5dp"/>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -50,6 +47,7 @@
                 android:text="fdsfsfvs sd fdsf sd dfs fas"
                 android:fontFamily="@font/regular"
                 android:textSize="12sp"
+                android:layout_marginTop="5dp"
                 />
         </LinearLayout>
 

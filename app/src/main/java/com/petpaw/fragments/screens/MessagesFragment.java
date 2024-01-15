@@ -1,5 +1,6 @@
 package com.petpaw.fragments.screens;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -24,6 +25,7 @@ import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.petpaw.activities.MessageActivity;
 import com.petpaw.adapters.ConversationListAdapter;
 import com.petpaw.databinding.FragmentMessagesBinding;
 import com.petpaw.interfaces.OnConversationClickListener;
@@ -45,7 +47,6 @@ public class MessagesFragment extends Fragment {
 
     private FirebaseFirestore mDb;
 
-    private FirebaseUser mFirebaseUser;
 
     private int mNumConversations;
     private List<Conversation> mConversationList;
@@ -88,7 +89,11 @@ public class MessagesFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        setupFirebaseUser();
+        setupRvConversationList();
+        getConversationsFromDb();
+
+
+//        setupFirebaseUser();
     }
 
     private void setupFirebaseUser() {
@@ -111,7 +116,7 @@ public class MessagesFragment extends Fragment {
 
     private void getConversationsFromDb() {
         mDb.collection(Conversation.CONVERSATIONS)
-                .whereArrayContains("memberIdList", mFirebaseUser.getUid())
+                .whereArrayContains("memberIdList", mAuth.getCurrentUser().getUid())
                 .get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
@@ -128,7 +133,7 @@ public class MessagesFragment extends Fragment {
                             conversation.setUid(doc.getId());
 
                             for (String userId: conversation.getMemberIdList()) {
-                                if (!Objects.equals(userId, mFirebaseUser.getUid())) {
+                                if (!Objects.equals(userId, mAuth.getCurrentUser().getUid())) {
                                     mUserIdList.add(userId);
                                 }
                             }
@@ -183,11 +188,11 @@ public class MessagesFragment extends Fragment {
 
                         for (DocumentSnapshot doc: queryDocumentSnapshots) {
                             User user = doc.toObject(User.class);
-                            user.setUid(doc.getId());
-                            userMap.put(doc.getId(), user);
+                            userMap.put(user.getUid(), user);
                         }
-
+                        Log.d("TAG", "User Map: " + userMap);
                         mConversationListAdapter.setUserMap(userMap);
+
                     }
                 });
     }
@@ -196,13 +201,15 @@ public class MessagesFragment extends Fragment {
         mBinding.rvConversationList.setLayoutManager(
                 new LinearLayoutManager(requireActivity(), LinearLayoutManager.VERTICAL, false)
         );
-        mConversationListAdapter = new ConversationListAdapter(mFirebaseUser);
+        mConversationListAdapter = new ConversationListAdapter();
         mBinding.rvConversationList.setAdapter(mConversationListAdapter);
 
         mConversationListAdapter.setOnClickListener(new OnConversationClickListener() {
             @Override
             public void onClick(Conversation conversation) {
-
+                Intent intent = new Intent(requireContext(), MessageActivity.class);
+                intent.putExtra("conversationID", conversation.getUid());
+                startActivity(intent);
             }
         });
     }
