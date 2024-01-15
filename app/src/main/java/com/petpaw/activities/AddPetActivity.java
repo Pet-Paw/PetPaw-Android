@@ -73,7 +73,7 @@ public class AddPetActivity extends AppCompatActivity {
             boolean isValid = true;
             //check validation
 
-            if(isValid){
+            if(binding.petNameEditText.getText().length() != 0 && binding.petBreedEditText.getText().length() != 0 && binding.petWeightEditText.getText().length() != 0 && binding.petAgeEditText.getText().length() != 0){
                 Pet pet = new Pet(ownerId, "", binding.petNameEditText.getText().toString(), Integer.parseInt(binding.petAgeEditText.getText().toString()), binding.petBreedEditText.getText().toString(), Integer.parseInt(binding.petWeightEditText.getText().toString()), "https://firebasestorage.googleapis.com/v0/b/petpaw-1d5a6.appspot.com/o/petImages%2Fdefault_pet_avatar.png?alt=media&token=d2be6754-a0e0-43a4-a4a1-c20ae8873c3f", new ArrayList<>());
 
                 Log.d("AddPetActivity", "Adding pet to Firestore");
@@ -97,6 +97,8 @@ public class AddPetActivity extends AppCompatActivity {
                         .addOnFailureListener(e -> {
                             Toast.makeText(getBaseContext(), "Error Adding Pet", Toast.LENGTH_SHORT).show();
                         });
+            } else {
+                Toast.makeText(this, "You must fill in all pet information!", Toast.LENGTH_SHORT).show();
             }
         });
 
