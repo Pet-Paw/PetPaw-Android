@@ -79,11 +79,13 @@
                                 android:layout_height="wrap_content"
                                 android:text="Jan 1st 2024"
                                 android:textAlignment="textStart" />
+
                             <TextView
                                 android:id="@+id/postCardViewIsModified"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text=" (modified)" />
+                                android:text=" (modified)"
+                                android:textColor="@color/red" />
                         </LinearLayout>
 
                     </LinearLayout>
@@ -108,7 +110,8 @@
                     android:layout_height="wrap_content"
                     android:text="#tag1 #tag2 #tag3"
                     android:textColor="@color/primary"
-                    android:textStyle="bold|italic" />
+                    android:textStyle="bold|italic"
+                    android:paddingBottom="5dp"/>
                 <FrameLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -127,6 +130,7 @@
                 </FrameLayout>
 
                 <LinearLayout
+                    android:id="@+id/postCardViewPetNameLinearLayout"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="horizontal"

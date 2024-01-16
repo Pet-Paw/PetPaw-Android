@@ -238,12 +238,13 @@ public class SearchFragment extends Fragment {
         Log.d("TAG", "onResume: ");
         super.onResume();
         getPosts("");
+        getCommunities("");
     }
 
     private void getPosts(String searchValue) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         CollectionReference postsRef = db.collection("Posts"); // Get a reference to the Posts collection
-        Query query = postsRef.orderBy("dateModified", Query.Direction.DESCENDING); // Order documents by dateModified in ascending order
+        Query query = postsRef.whereEqualTo("communityId", null).orderBy("communityId").orderBy("dateModified", Query.Direction.DESCENDING); // Order documents by dateModified in ascending order
         query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
@@ -252,11 +253,11 @@ public class SearchFragment extends Fragment {
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         Post post = document.toObject(Post.class);
                         if(searchValue.equals("")){
-                            Post postTemp = new Post(post.getAuthorId(), post.getDateModified(), post.getContent(), post.isModified(), post.getImageURL(), post.getLikes(), post.getComments(), post.getPostId(), post.getTags(), post.getPetIdList());
+                            Post postTemp = new Post(post.getAuthorId(), post.getDateModified(), post.getContent(), post.isModified(), post.getImageURL(), post.getLikes(), post.getComments(), post.getPostId(), post.getTags(), post.getPetIdList(), post.getCommunityId());
                             postList.add(postTemp);
                         } else {
                             if(post.getContent().toLowerCase().contains(searchValue.toLowerCase())){
-                                Post postTemp = new Post(post.getAuthorId(), post.getDateModified(), post.getContent(), post.isModified(), post.getImageURL(), post.getLikes(), post.getComments(), post.getPostId(), post.getTags(), post.getPetIdList());
+                                Post postTemp = new Post(post.getAuthorId(), post.getDateModified(), post.getContent(), post.isModified(), post.getImageURL(), post.getLikes(), post.getComments(), post.getPostId(), post.getTags(), post.getPetIdList(), post.getCommunityId());
                                 postList.add(postTemp);
                             }
                         }
@@ -292,7 +293,7 @@ public class SearchFragment extends Fragment {
                     }
                     if (context != null) {
                         binding.searchFragmentCommunityRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-                        binding.searchFragmentCommunityRecyclerView.setAdapter(new CommunityListAdapter(requireContext(), communityList, true));
+                        binding.searchFragmentCommunityRecyclerView.setAdapter(new CommunityListAdapter(requireContext(), communityList, true, getFragmentManager()));
                     }
                 }
             }

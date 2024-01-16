@@ -14,6 +14,11 @@
         android:title="Search"
         />
     <item
+        android:id="@+id/communityFragment"
+        android:icon="@drawable/baseline_groups_24"
+        android:enabled="true"
+        android:title="Community"/>
+    <item
         android:id="@+id/messagesFragment"
         android:icon="@drawable/baseline_chat_24"
         android:enabled="true"
@@ -30,5 +35,4 @@
         android:enabled="true"
         android:title="Profile"
         />
-
 </menu>

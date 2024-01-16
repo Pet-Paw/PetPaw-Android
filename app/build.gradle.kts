@@ -3,9 +3,11 @@ plugins {
     id("com.google.gms.google-services")
 }
 
+
 android {
     namespace = "com.petpaw"
     compileSdk = 34
+    packagingOptions { resources.excludes.add("META-INF/*") }
 
     defaultConfig {
         applicationId = "com.petpaw"
@@ -33,6 +35,8 @@ android {
     buildFeatures {
         viewBinding = true
     }
+
+
 }
 
 dependencies {
@@ -48,6 +52,7 @@ dependencies {
     implementation("com.google.android.gms:play-services-tasks:18.0.2")
     implementation("androidx.navigation:navigation-runtime:2.7.6")
     implementation("com.google.firebase:firebase-database:20.3.0")
+    implementation("com.google.auth:google-auth-library-oauth2-http:1.19.0")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
@@ -59,6 +64,7 @@ dependencies {
     implementation("com.google.firebase:firebase-storage:20.3.0")
     implementation("com.google.firebase:firebase-auth:22.3.0")
     implementation("com.google.firebase:firebase-firestore:24.10.0")
+    implementation("com.google.firebase:firebase-messaging")
 
     // Picasso
     implementation("com.squareup.picasso:picasso:2.8")

@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -70,6 +71,10 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.PostVi
         Log.d("TAG", "- postId: " + postId);
         List<String> likes = postList.get(position).getLikes();
 
+//        -------------- String CommnunityId -------------
+        String communityId = postList.get(position).getCommunityId();
+        Log.d("TAG", "- communityId: " + communityId);
+
 //        ------------ isModified -------------------
         if (postList.get(position).isModified()) {
             holder.postCardViewIsModified.setVisibility(View.VISIBLE);
@@ -87,6 +92,7 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.PostVi
         holder.postCardViewEditImageView.setOnClickListener(view -> {
             Intent intent = new Intent(context, CreatePostActivity.class);
             intent.putExtra("postId", postId);
+            intent.putExtra("communityId", communityId);
             context.startActivity(intent);
         });
 
@@ -130,7 +136,7 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.PostVi
 //        -------------- Show pet name -------------
         StringBuilder petNameList = new StringBuilder();
         if(postList.get(position).getPetIdList().size() == 0){
-            holder.postCardViewPetNameTextView.setVisibility(View.GONE);
+            holder.postCardViewPetNameLinearLayout.setVisibility(View.GONE);
         }else{
             for (String petId : postList.get(position).getPetIdList()) {
                 db.collection("Pets").document(petId).get().addOnCompleteListener(task -> {
@@ -151,31 +157,6 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.PostVi
                 });
             }
         }
-
-
-//        for (int i = 0; i < postList.get(position).getPetIdList().size(); i++) {
-//            int index = i;
-//            db.collection("Pets").document(postList.get(position).getPetIdList().get(i)).get().addOnCompleteListener(task -> {
-//                if (task.isSuccessful() && task.getResult() != null) {
-//                    DocumentSnapshot documentSnapshot = task.getResult();
-//                    if (documentSnapshot.exists()) {
-//                        String petName = documentSnapshot.getString("name");
-//                        Log.d("TAG", "petName: " + petName);
-//                        Log.d("TAG", "index: " + index);
-//                        Log.d("TAG", "size: " + postList.get(position).getPetIdList().size());
-//                        if(index == (postList.get(position).getPetIdList().size() - 1)){
-//                            petNameList.append(petName + " ");
-//                        }else{
-//                            petNameList.append(petName + ", ");
-//                        }
-//                        holder.postCardViewPetNameTextView.setText(petNameList.toString());
-//                    }
-//                } else {
-//                    Log.e("PostListAdapter", "Error fetching pet data", task.getException());
-//                }
-//            });
-//        }
-
 
 //        ---------------  Load username and avatar start --------------
         Post post = postList.get(position);
@@ -207,19 +188,24 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.PostVi
 
 //        ---------------  Load image start -----------
         String imageUrl = postList.get(position).getImageURL();
-        Picasso.get()
-                .load(imageUrl)
-                .tag(System.currentTimeMillis())
-                .into(holder.postCardImageView, new com.squareup.picasso.Callback() {
-                    @Override
-                    public void onSuccess() {
-                        //Log.d("TAG", "Load image successfully at " + System.currentTimeMillis());
-                    }
-                    @Override
-                    public void onError(Exception e) {
-                        Log.d("TAG", "Load image successfully");
-                    }
-                });
+        if(imageUrl == null || imageUrl.isEmpty()) {
+            holder.postCardImageView.setVisibility(View.GONE);
+        } else {
+            Picasso.get()
+                    .load(imageUrl)
+                    .tag(System.currentTimeMillis())
+                    .into(holder.postCardImageView, new com.squareup.picasso.Callback() {
+                        @Override
+                        public void onSuccess() {
+                            //Log.d("TAG", "Load image successfully at " + System.currentTimeMillis());
+                        }
+                        @Override
+                        public void onError(Exception e) {
+                            Log.d("TAG", "Load image successfully");
+                        }
+                    });
+        }
+
 
 //        --------------- add onClick like button -----------
         holder.postCardViewLikeImageView.setOnClickListener(view -> {
@@ -256,7 +242,7 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.PostVi
 
         ImageView postCardViewProfilePic, postCardImageView, postCardViewLikeImageView, postCardViewCommentImageView, postCardViewEditImageView;
         TextView postCardViewIsModified, postCardViewUserNameTextView, postCardViewDate, postCardViewContentTextView, postCardViewLikeCountTextView, postCardViewCommentCountTextView, postCardViewTagsTextView, postCardViewPetNameTextView;
-
+        LinearLayout postCardViewPetNameLinearLayout;
         public PostViewHolder(@NonNull View itemView) {
             super(itemView);
 //            --------TextView----------
@@ -275,6 +261,9 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.PostVi
             postCardViewLikeImageView = itemView.findViewById(R.id.postCardViewLikeImageView);
             postCardViewCommentImageView = itemView.findViewById(R.id.postCardViewCommentImageView);
             postCardViewEditImageView = itemView.findViewById(R.id.postCardViewEditImageView);
+
+//            --------LinearLayout----------
+            postCardViewPetNameLinearLayout = itemView.findViewById(R.id.postCardViewPetNameLinearLayout);
 
             itemView.setOnClickListener(v -> {
                 Log.d("PostListAdapter", "onClick: " + getAdapterPosition());

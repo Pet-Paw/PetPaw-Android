@@ -135,7 +135,6 @@ public class CommunityFragment extends Fragment {
                 binding.communityFragmentJoinedRecyclerView.setVisibility(View.VISIBLE);
             }
         });
-
         return binding.getRoot();
     }
 
@@ -178,8 +177,9 @@ public class CommunityFragment extends Fragment {
                             }
 
                         if (context != null) {
+                            Log.d("TAG", "Owned community List: " + ownedCommunityList.toString());
                             binding.communityFragmentOwnedRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-                            binding.communityFragmentOwnedRecyclerView.setAdapter(new CommunityListAdapter(requireContext(), ownedCommunityList, false));
+                            binding.communityFragmentOwnedRecyclerView.setAdapter(new CommunityListAdapter(requireContext(), ownedCommunityList, false, getFragmentManager()));
                         }
                     }
                 }
@@ -197,8 +197,9 @@ public class CommunityFragment extends Fragment {
                             }
 
                             if (context != null) {
+                                Log.d("TAG", "Joined community List: " + joinedCommunityList.toString());
                                 binding.communityFragmentJoinedRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-                                binding.communityFragmentJoinedRecyclerView.setAdapter(new CommunityListAdapter(requireContext(), joinedCommunityList, false));
+                                binding.communityFragmentJoinedRecyclerView.setAdapter(new CommunityListAdapter(requireContext(), joinedCommunityList, false, getFragmentManager()));
                             }
                         }
                     }

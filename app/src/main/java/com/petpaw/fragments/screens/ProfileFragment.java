@@ -57,6 +57,7 @@ import com.petpaw.adapters.UserListAdapter;
 import com.petpaw.database.FollowCollection;
 import com.petpaw.databinding.FragmentMessagesBinding;
 import com.petpaw.databinding.FragmentProfileBinding;
+import com.petpaw.models.FollowRecord;
 import com.petpaw.models.Pet;
 import com.petpaw.models.Post;
 import com.petpaw.models.User;
@@ -115,7 +116,8 @@ public class ProfileFragment extends Fragment {
      * this fragment using the provided parameters.
      *
      * @param userId Parameter 1.
-     * @param param2 Parameter 2.
+     * @param previousFragment Parameter 2.
+     * @param ownerUid Parameter 3.
      * @return A new instance of fragment ProfileFragment.
      */
     // TODO: Rename and change types and number of parameters
@@ -387,7 +389,7 @@ public class ProfileFragment extends Fragment {
                     userPostList.clear();
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         Post post = document.toObject(Post.class);
-                        Post postTemp = new Post(post.getAuthorId(), post.getDateModified(), post.getContent(), post.isModified(), post.getImageURL(), post.getLikes(), post.getComments(), post.getPostId(), post.getTags(), post.getPetIdList());
+                        Post postTemp = new Post(post.getAuthorId(), post.getDateModified(), post.getContent(), post.isModified(), post.getImageURL(), post.getLikes(), post.getComments(), post.getPostId(), post.getTags(), post.getPetIdList(), post.getCommunityId());
                         userPostList.add(postTemp);
                     }
                     // Check if the userPostList is empty and log
@@ -480,10 +482,21 @@ public class ProfileFragment extends Fragment {
                         followerCount++;
                     }
                     binding.followerNum.setText(followerCount + "");
-                    if (followerCount > 0) {
-                        binding.followBtn.setVisibility(View.GONE);
-                        binding.unFollowBtn.setVisibility(View.VISIBLE);
-                    }
+                    String currentUserUid = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
+                    followCollection.isFollowing(currentUserUid, uid, new FollowCollection.Callback() {
+                        @Override
+                        public void onCallback(List<FollowRecord> followRecords) {
+                            if (followRecords.size() > 0) {
+                                binding.followBtn.setVisibility(View.GONE);
+                                binding.unFollowBtn.setVisibility(View.VISIBLE);
+                            }
+                        }
+
+                        @Override
+                        public void onCallBackGetUsers(List<User> users) {
+
+                        }
+                    });
 
                 } else {
                     Log.e("ProfileFragment", "Error getting user followers: ", task.getException());
