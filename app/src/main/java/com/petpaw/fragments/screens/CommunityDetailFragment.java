@@ -18,6 +18,8 @@ import android.view.ViewGroup;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -98,10 +100,16 @@ public class CommunityDetailFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
         binding = FragmentCommunityDetailBinding.inflate(inflater, container, false);
+
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        assert currentUser != null;
+        String userId = currentUser.getUid();
+
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         CollectionReference communitiesRef = db.collection("Communities"); // Get a reference to the Communities collection
+
+//        --------------------- Setting the Community Detail --------------------------
         db.collection("Communities")
                 .document(communityId)
                 .get()
@@ -110,12 +118,38 @@ public class CommunityDetailFragment extends Fragment {
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                         if(task.isSuccessful()) {
                             DocumentSnapshot document = task.getResult();
+//                            ----------------- bind Name and Description -----------------
                             binding.communityDetailName.setText(document.get("name").toString());
                             binding.communityDetailDescription.setText(document.get("description").toString());
+
+//                            ------------------- community Image --------------------
+
+
+//                            ------------------- button Visibility --------------------
+                            String ownerId = document.get("owner").toString();
+                            List<String> membersList = (List<String>) document.get("members");
+
+                            if(ownerId.equals(userId)){
+                                binding.deleteCommunityBtn.setVisibility(View.VISIBLE);
+                                binding.leaveCommunityBtn.setVisibility(View.GONE);
+                                binding.createPostCommunityBtn.setVisibility(View.VISIBLE);
+                            } else if(membersList.contains(userId)){
+                                binding.deleteCommunityBtn.setVisibility(View.GONE);
+                                binding.leaveCommunityBtn.setVisibility(View.VISIBLE);
+                                binding.createPostCommunityBtn.setVisibility(View.VISIBLE);
+                            }
+                            else {
+                                binding.deleteCommunityBtn.setVisibility(View.GONE);
+                                binding.leaveCommunityBtn.setVisibility(View.GONE);
+                                binding.createPostCommunityBtn.setVisibility(View.GONE);
+
+                            }
+
                         }
                     }
                 });
 
+//        ----------------------- Create Post Button --------------------------
         binding.createPostCommunityBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
