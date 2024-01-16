@@ -79,6 +79,17 @@ public class FollowCollection {
                 });
     }
 
+    public void isFollowing(String currentUserUid, String followingUserUid, Callback callback) {
+        followsCollectionReference.whereEqualTo("followerUid", currentUserUid)
+                .whereEqualTo("followingUid", followingUserUid)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        List<FollowRecord> followRecords = task.getResult().toObjects(FollowRecord.class);
+                        callback.onCallback(followRecords);
+                    }
+                });
+    }
 
     public void getAllFollowings(User currentUser, Callback callback) {
         List<User> followings = new ArrayList<>();
