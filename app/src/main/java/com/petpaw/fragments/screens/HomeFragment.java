@@ -45,9 +45,9 @@ public class HomeFragment extends Fragment {
 
     private List<Post> postList = new ArrayList<>();
     private RecyclerView recyclerView;
+    private Context context;
     private String mParam1;
     private String mParam2;
-    private Context context;
 
     @Override
     public void onAttach(@NonNull Context context) {
