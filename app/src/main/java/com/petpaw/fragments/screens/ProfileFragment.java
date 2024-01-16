@@ -2,10 +2,13 @@ package com.petpaw.fragments.screens;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -19,11 +22,14 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 
+import android.os.StrictMode;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.GridView;
 import android.widget.ImageView;
@@ -34,6 +40,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 import com.google.firebase.auth.FirebaseAuth;
@@ -54,15 +61,19 @@ import com.petpaw.adapters.PostListAdapter;
 import com.petpaw.adapters.UserFollowingAdapter;
 import com.petpaw.adapters.UserFollowsAdapter;
 import com.petpaw.adapters.UserListAdapter;
+import com.petpaw.clients.NotiSender;
 import com.petpaw.database.FollowCollection;
+import com.petpaw.database.NotificationCollection;
 import com.petpaw.databinding.FragmentMessagesBinding;
 import com.petpaw.databinding.FragmentProfileBinding;
 import com.petpaw.models.FollowRecord;
+import com.petpaw.models.NotificationPetPaw;
 import com.petpaw.models.Pet;
 import com.petpaw.models.Post;
 import com.petpaw.models.User;
 import com.squareup.picasso.Picasso;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -95,6 +106,10 @@ public class ProfileFragment extends Fragment {
     private List<User> userFollowingList = new ArrayList<>();
     private List<User> userFollowerList = new ArrayList<>();
     private FollowCollection followCollection = FollowCollection.newInstance();
+
+    private String token;
+
+    private NotificationCollection notificationCollection = NotificationCollection.newInstance();
 
     static final String USER_ID = "userId";
 
@@ -140,6 +155,10 @@ public class ProfileFragment extends Fragment {
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
          */
+        token = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
+                .permitAll().build();
+        StrictMode.setThreadPolicy(policy);
         if (getArguments() != null) {
             uid = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
@@ -150,7 +169,6 @@ public class ProfileFragment extends Fragment {
                 uid = currentUser.getUid();
             }
             mParam2 = null;
-
         }
     }
 
@@ -301,6 +319,16 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 followCollection.addFollowing(currentUser.getUid(), uid);
+                NotiSender notiSender = new NotiSender(token, currentUser.getUid());
+                notiSender.sendNotificationToDifferentAccount(uid,"Followed you");
+                try {
+                    notiSender.sendNotificationOnCurrentAccount("You followed " + user.getName());
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+
+                updateNotificationBadge(currentUser.getUid());
+
                 int followersNum = Integer.parseInt(binding.followerNum.getText().toString());
                 binding.followerNum.setText((followersNum + 1) + "");
                 binding.followBtn.setVisibility(View.GONE);
@@ -312,6 +340,14 @@ public class ProfileFragment extends Fragment {
             @SuppressLint("SetTextI18n")
             @Override
             public void onClick(View v) {
+                try {
+                    NotiSender notiSender = new NotiSender(token, currentUser.getUid());
+                    notiSender.sendNotificationOnCurrentAccount("You unfollowed " + user.getName());
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                updateNotificationBadge(currentUser.getUid());
+
                 followCollection.removeFollowing(currentUser.getUid(), uid);
                 int followersNum = Integer.parseInt(binding.followerNum.getText().toString());
                 binding.followerNum.setText((followersNum - 1) + "");
@@ -522,6 +558,29 @@ public class ProfileFragment extends Fragment {
                 } else {
                     Log.e("ProfileFragment", "Error getting user followers: ", task.getException());
                 }
+            }
+        });
+    }
+
+    private void updateNotificationBadge(String currentUserId) {
+        NavigationView mNavigationView = requireActivity().findViewById(R.id.nav_view);
+        TextView notificationCount = mNavigationView.getMenu().findItem(R.id.notificationsFragment).getActionView().findViewById(R.id.notificationsFragment);
+        notificationCount.setGravity(Gravity.CENTER_VERTICAL);
+        notificationCount.setTypeface(null, Typeface.BOLD);
+        notificationCount.setTextColor(getResources().getColor(R.color.primary));
+        notificationCollection.getTotalNewNotification(currentUserId, new NotificationCollection.Callback() {
+            @Override
+            public void onCallback(List<NotificationPetPaw> notifications) {
+                requireActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (notifications.size() > 0) {
+                            notificationCount.setText(String.valueOf(notifications.size()));
+                        } else {
+                            notificationCount.setText("0");
+                        }
+                    }
+                });
             }
         });
     }

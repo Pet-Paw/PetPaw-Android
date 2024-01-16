@@ -39,23 +39,37 @@ public class NotificationChannelService extends FirebaseMessagingService {
             // sending message to current user
             if (message.getNotification() != null) {
                 String notificationBody = message.getNotification().getBody();
+
+                String currentUserId = message.getData().get("fromUid");
+                String toUserId = message.getData().get("toUid");
+
+
+                assert currentUserId != null;
+                if (currentUserId.equals(toUserId)) {
+                    return;
+                }
+
                 if (message.getNotification().getBody() == null) {
                     return;
                 }
-                sendNotification(notificationBody);
-                return;
+
+
+                String title = message.getNotification().getTitle();
+                sendNotification(notificationBody, title);
+
             }
 
-            // sending message to other user
-            String userId = message.getData().get("userId");
-            String messageBody = message.getData().get("message");
-
-            String currentUserId = Objects.requireNonNull(mAuth.getCurrentUser()).getUid();
-            assert userId != null;
-            if (!userId.equals(currentUserId)) {
-                return;
-            }
-            sendNotification(messageBody);
+//            // sending message to other user
+//            String userId = message.getData().get("userId");
+//            String messageBody = message.getData().get("message");
+//
+//            String currentUserId = Objects.requireNonNull(mAuth.getCurrentUser()).getUid();
+//            assert userId != null;
+//            if (!userId.equals(currentUserId)) {
+//                return;
+//            }
+//            String title = message.getData().get("title");
+//            sendNotification(messageBody, title);
         }
     }
 
@@ -68,7 +82,7 @@ public class NotificationChannelService extends FirebaseMessagingService {
     }
 
 
-    private void sendNotification(String messageBody) {
+    private void sendNotification(String messageBody, String title) {
         Intent intent = new Intent(this, StartActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
@@ -77,8 +91,8 @@ public class NotificationChannelService extends FirebaseMessagingService {
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notificationBuilder =
                 new NotificationCompat.Builder(this, channelId)
-                        .setSmallIcon(R.drawable.chat_icon)
-                        .setContentTitle("PetPaw")
+                        .setSmallIcon(R.drawable.icon)
+                        .setContentTitle(title)
                         .setContentText(messageBody)
                         .setAutoCancel(true)
                         .setSound(defaultSoundUri)

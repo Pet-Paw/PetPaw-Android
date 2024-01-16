@@ -27,6 +27,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.RemoteMessage;
 import com.petpaw.clients.NotiSender;
+import com.petpaw.database.UserCollection;
 import com.petpaw.databinding.ActivityStartBinding;
 import com.petpaw.R;
 
@@ -36,6 +37,7 @@ import java.io.IOException;
 public class StartActivity extends AppCompatActivity {
     private static final String TAG = "StartActivity";
     private ActivityStartBinding startBinding;
+    private UserCollection userCollection = UserCollection.newInstance();
     FirebaseUser firebaseUser;
     FirebaseAuth mAuth;
     private final ActivityResultLauncher<String> requestPermissionLauncher =
@@ -71,29 +73,6 @@ public class StartActivity extends AppCompatActivity {
                     channelName, NotificationManager.IMPORTANCE_LOW));
         }
 
-        FirebaseMessaging.getInstance().getToken()
-                .addOnCompleteListener(new OnCompleteListener<String>() {
-                    @Override
-                    public void onComplete(@NonNull Task<String> task) {
-                        if (!task.isSuccessful()) {
-                            Log.w(TAG, "Fetching FCM registration token failed", task.getException());
-                            return;
-                        }
-
-                        // Get new FCM registration token
-                        String token = task.getResult();
-                        NotiSender notiSender = new NotiSender(token, firebaseUser.getUid());
-                        try {
-                            notiSender.sendNotification("Hello");
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
-
-                        // Log and toast
-                        Toast.makeText(StartActivity.this, token, Toast.LENGTH_SHORT).show();
-                        Log.d(TAG, "token: "+  token);
-                    }
-                });
         askNotificationPermission();
     }
 

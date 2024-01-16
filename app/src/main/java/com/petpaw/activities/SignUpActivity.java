@@ -25,11 +25,13 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthOptions;
 import com.google.firebase.auth.PhoneAuthProvider;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.petpaw.R;
 import com.petpaw.database.UserCollection;
 import com.petpaw.databinding.ActivitySignUpBinding;
 import com.petpaw.models.User;
 
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 public class SignUpActivity extends AppCompatActivity {
@@ -151,14 +153,7 @@ public class SignUpActivity extends AppCompatActivity {
                 if (task.isSuccessful()) {
                     FirebaseUser firebaseUser = auth.getCurrentUser();
                     String userId = firebaseUser.getUid();
-                    User newUser = new User(userId, username, emailOrPhone, "",  address);
-                    userCollection.createUser(newUser);
-
-                    Intent intent = new Intent(SignUpActivity.this, SignInActivity.class);
-                    startActivity(intent);
-                    finish();
-
-                    Toast.makeText(SignUpActivity.this, "Register successfully", Toast.LENGTH_SHORT).show();
+                    createUser(userId, username, emailOrPhone, "", address);
                 } else {
                     Toast.makeText(SignUpActivity.this, "Email is already existed", Toast.LENGTH_SHORT).show();
                 }
@@ -186,12 +181,7 @@ public class SignUpActivity extends AppCompatActivity {
                     Log.d(TAG, "signInWithCredential:success");
                     Toast.makeText(SignUpActivity.this, "Signup successfully", Toast.LENGTH_SHORT).show();
 
-                    // Create user in fireStore
-                    FirebaseUser firebaseUser = auth.getCurrentUser();
-                    String userId = firebaseUser.getUid();
-                    User newUser = new User(userId, usernameInSignUpByPhone, "", phoneInSignUpByPhone,  "");
-                    userCollection.createUser(newUser);
-
+                    createUser(auth.getCurrentUser().getUid(), usernameInSignUpByPhone, "", phoneInSignUpByPhone, "");
 
                     Intent intent = new Intent(SignUpActivity.this, SignInActivity.class);
                     startActivity(intent);
@@ -227,5 +217,25 @@ public class SignUpActivity extends AppCompatActivity {
         signInWithPhoneAuthCredential(credential);
     }
 
+    private void createUser(String userId, String username, String emailOrPhone, String phoneNumber, String address) {
+        FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(new OnCompleteListener<String>() {
+                    @Override
+                    public void onComplete(@NonNull Task<String> task) {
+                        if (!task.isSuccessful()) {
+                            Log.w(TAG, "Fetching FCM registration token failed", task.getException());
+                            Toast.makeText(SignUpActivity.this, "Fetching FCM registration token failed", Toast.LENGTH_SHORT).show();
+                        }
+                        String physicalDeviceToken = task.getResult();
+                        User newUser = new User(userId, username, emailOrPhone, "",  address, physicalDeviceToken);
+                        userCollection.createUser(newUser);
+
+                        Intent intent = new Intent(SignUpActivity.this, SignInActivity.class);
+                        startActivity(intent);
+                        finish();
+                        Toast.makeText(SignUpActivity.this, "Register successfully", Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
 
 }

@@ -1,5 +1,6 @@
 package com.petpaw.adapters;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -56,7 +57,7 @@ public class UserFollowingAdapter extends RecyclerView.Adapter<UserFollowingAdap
     }
 
     @Override
-    public void onBindViewHolder(@NonNull UserFollowingAdapter.UserFollowingViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull UserFollowingAdapter.UserFollowingViewHolder holder, @SuppressLint("RecyclerView") int position) {
         User user = users.get(position);
         holder.username.setText(user.getName());
         holder.country.setText(user.getCountry());
