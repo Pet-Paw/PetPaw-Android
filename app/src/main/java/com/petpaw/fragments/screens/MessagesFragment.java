@@ -20,6 +20,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -84,6 +85,12 @@ public class MessagesFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mBinding = FragmentMessagesBinding.inflate(inflater, container, false);
+        mBinding.newChatBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                createConversation(new ArrayList<>());
+            }
+        });
         return mBinding.getRoot();
     }
 
@@ -95,6 +102,7 @@ public class MessagesFragment extends Fragment {
 
 //        setupFirebaseUser();
     }
+
 
     private void setupFirebaseUser() {
 //        mAuth.signInWithEmailAndPassword("u01@qq.com", "Binh1234")
@@ -215,6 +223,27 @@ public class MessagesFragment extends Fragment {
                 startActivity(intent);
             }
         });
+    }
+
+    //create new conversation from userIdList
+    private void createConversation(List<String> userIdList){
+        userIdList.add(mAuth.getCurrentUser().getUid());
+        // TODO: Check if 1v1 conversation is already created
+        Conversation conversation = new Conversation();
+        conversation.setMemberIdList(userIdList);
+        mDb.collection("Conversations")
+                .add(conversation.toDoc())
+                .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentReference> task) {
+                        if(task.isSuccessful()){
+                            Intent intent = new Intent(getActivity(), MessageActivity.class);
+                            intent.putExtra("conversationID", task.getResult().getId());
+                            startActivity(intent);
+                        }
+
+                    }
+                });
     }
 
 }

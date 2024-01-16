@@ -28,6 +28,12 @@
         </com.google.android.material.textfield.TextInputLayout>
     </LinearLayout>
 
+    <Button
+        android:id="@+id/newChatBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="New chat test"/>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

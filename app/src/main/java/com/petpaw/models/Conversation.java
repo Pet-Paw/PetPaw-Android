@@ -1,9 +1,13 @@
 package com.petpaw.models;
 
-import java.util.Comparator;
-import java.util.List;
+import com.petpaw.interfaces.FirebaseDoc;
 
-public class Conversation {
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public class Conversation implements FirebaseDoc {
     public static final String CONVERSATIONS = "Conversations";
 
     private String uid;
@@ -38,10 +42,18 @@ public class Conversation {
         this.lastMessage = lastMessage;
     }
 
+    @Override
+    public Map<String, Object> toDoc() {
+        Map<String, Object> doc = new HashMap<>();
+        doc.put("memberIdList", memberIdList);
+        return doc;
+    }
+
     public static class ConversationComparator implements Comparator<Conversation> {
         @Override
         public int compare(Conversation o1, Conversation o2) {
             return o1.lastMessage.getSentAt().compareTo(o2.lastMessage.getSentAt());
         }
     }
+
 }
