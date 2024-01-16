@@ -14,17 +14,54 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.petpaw.R;
+import com.petpaw.clients.NotiSender;
+import com.petpaw.database.UserCollection;
 import com.petpaw.databinding.ActivityMainBinding;
 import com.petpaw.fragments.screens.SideNavFragment;
 
-public class MainActivity extends AppCompatActivity {
-    ActivityMainBinding mBinding;
+import java.io.IOException;
 
+public class MainActivity extends AppCompatActivity {
+    private static final String TAG = "MainActivity";
+    private UserCollection userCollection = UserCollection.newInstance();
+    ActivityMainBinding mBinding;
+    FirebaseUser firebaseUser;
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+
+        FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(new OnCompleteListener<String>() {
+                    @Override
+                    public void onComplete(@NonNull Task<String> task) {
+                        if (!task.isSuccessful()) {
+                            Log.w(TAG, "Fetching FCM registration token failed", task.getException());
+                            return;
+                        }
+
+                        // Get new FCM registration token
+                        String token = task.getResult();
+                        userCollection.updateDeviceToken(firebaseUser.getUid(), token);
+
+                        // Log and toast
+                        Toast.makeText(MainActivity.this, token, Toast.LENGTH_SHORT).show();
+                        Log.d(TAG, "token: "+  token);
+                    }
+                });
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -90,6 +127,7 @@ public class MainActivity extends AppCompatActivity {
                 FrameLayout petProfileContainer = findViewById(R.id.overlay_pet_fragment);
                 FrameLayout communityContainer = findViewById(R.id.overlay_community_fragment);
                 FrameLayout notificationsContainer = findViewById(R.id.overlay_notification_fragment);
+                mBinding.fr.setVisibility(View.VISIBLE);
 
                 // If the overlay container is visible, hide it when navigating to a different tab
                 if (userProfileContainer.getVisibility() == View.VISIBLE) {

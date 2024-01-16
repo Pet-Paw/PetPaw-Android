@@ -1,6 +1,7 @@
 package com.petpaw.fragments.screens;
 
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -11,6 +12,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -25,6 +27,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.petpaw.R;
 import com.petpaw.activities.SignInActivity;
+import com.petpaw.database.NotificationCollection;
 import com.petpaw.database.UserCollection;
 import com.petpaw.databinding.FragmentSideNavBinding;
 import com.petpaw.models.User;
@@ -49,6 +52,8 @@ public class SideNavFragment extends Fragment implements NavigationView.OnNaviga
     public NavigationView mNavigationView;
     BottomNavigationView bottomNavigationView;
 
+    NotificationCollection notificationCollection = NotificationCollection.newInstance();
+
     FirebaseUser firebaseUser;
 
     private User currentUser;
@@ -56,6 +61,7 @@ public class SideNavFragment extends Fragment implements NavigationView.OnNaviga
     private UserCollection userCollection = UserCollection.newInstance();
     boolean isNotified = false;
 
+    TextView notificationCount;
 
     public SideNavFragment() {
         // Required empty public constructor
@@ -85,6 +91,10 @@ public class SideNavFragment extends Fragment implements NavigationView.OnNaviga
 
         mNavigationView = mBinding.navView;
         mNavigationView.setNavigationItemSelectedListener(this);
+
+        notificationCount = mNavigationView.getMenu().findItem(R.id.notificationsFragment).getActionView().findViewById(R.id.notificationsFragment);
+        initializeCountDrawer();
+
 
 
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle( requireActivity(), mDrawerLayout,
@@ -177,6 +187,12 @@ public class SideNavFragment extends Fragment implements NavigationView.OnNaviga
             FrameLayout notificationContainer = requireActivity().findViewById(R.id.overlay_notification_fragment);
             defaultContainer.setVisibility(View.GONE);
             notificationContainer.setVisibility(View.VISIBLE);
+
+            FrameLayout profileContainer = requireActivity().findViewById(R.id.overlay_profile_fragment);
+            profileContainer.setVisibility(View.GONE);
+
+
+
         } else if (itemId == R.id.messagesFragment) {
             bottomNavigationView.setSelectedItemId(R.id.messagesFragment);
         } else if (itemId == R.id.communityFragment) {
@@ -185,6 +201,7 @@ public class SideNavFragment extends Fragment implements NavigationView.OnNaviga
             bottomNavigationView.setSelectedItemId(R.id.profileFragment);
         } else if (itemId == R.id.logout) {
             FirebaseAuth.getInstance().signOut();
+            userCollection.updateDeviceToken(firebaseUser.getUid(), null);
             Intent intent = new Intent(requireActivity(), SignInActivity.class);
             startActivity(intent);
             requireActivity().finish();
@@ -195,5 +212,19 @@ public class SideNavFragment extends Fragment implements NavigationView.OnNaviga
 
     private void popBackStack() {
         requireActivity().getSupportFragmentManager().popBackStack();
+    }
+
+     public void initializeCountDrawer(){
+        notificationCount.setGravity(Gravity.CENTER_VERTICAL);
+        notificationCount.setTypeface(null, Typeface.BOLD);
+        notificationCount.setTextColor(getResources().getColor(R.color.primary));
+
+        notificationCollection.getTotalNewNotification(firebaseUser.getUid(), notifications -> {
+            if (notifications.size() > 0) {
+                notificationCount.setText(String.valueOf(notifications.size()));
+            } else {
+                notificationCount.setText("0");
+            }
+        });
     }
 }

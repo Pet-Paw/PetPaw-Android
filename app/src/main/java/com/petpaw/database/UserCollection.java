@@ -57,4 +57,8 @@ public class UserCollection {
             }
         });
     }
+
+    public void updateDeviceToken(String uid, String token) {
+        usersCollectionReference.document(uid).update("physicalDeviceToken", token);
+    }
 }

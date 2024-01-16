@@ -15,7 +15,7 @@ public class User implements FirebaseDoc {
     private String phone;
     private String address;
     private String imageURL;
-
+    private String physicalDeviceToken;
     private LatLng location;
 
     private String country;
@@ -39,21 +39,26 @@ public class User implements FirebaseDoc {
     public User() {
     }
 
-    public User(String uid, String username, String email, String phoneNumber, String address, String imageURL) {
+    public User(String uid, String username, String email, String phoneNumber, String address,
+                String imageURL,
+                String physicalDeviceToken) {
         this.uid= uid;
         this.name = username;
         this.email = email;
         this.phone = phoneNumber;
         this.address = address;
         this.imageURL = imageURL;
+        this.physicalDeviceToken = physicalDeviceToken;
     }
 
-    public User(String uid, String username, String email, String phoneNumber, String address) {
+    public User(String uid, String username, String email, String phoneNumber, String address, String physicalDeviceToken) {
         this.uid= uid;
         this.name = username;
         this.email = email;
         this.phone = phoneNumber;
         this.address = address;
+        this.physicalDeviceToken = physicalDeviceToken;
+
     }
 
 
@@ -99,6 +104,15 @@ public class User implements FirebaseDoc {
 
     public String getAddress() {
         return address;
+    }
+
+
+    public String getPhysicalDeviceToken() {
+        return physicalDeviceToken;
+    }
+
+    public void setPhysicalDeviceToken(String physicalDeviceToken) {
+        this.physicalDeviceToken = physicalDeviceToken;
     }
 
     public void setAddress(String address) {

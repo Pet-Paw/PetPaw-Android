@@ -3,12 +3,22 @@ package com.petpaw.fragments.screens;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.petpaw.R;
+import com.petpaw.adapters.NotificationAdapter;
+import com.petpaw.database.NotificationCollection;
+import com.petpaw.databinding.FragmentNotificationsBinding;
+import com.petpaw.models.NotificationPetPaw;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -21,6 +31,18 @@ public class NotificationsFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
+    private FragmentNotificationsBinding binding;
+
+    private FirebaseAuth auth;
+
+    private FirebaseUser firebaseUser;
+    private List<NotificationPetPaw> notifications = new ArrayList<>();
+
+    private NotificationCollection notificationCollection = NotificationCollection.newInstance();
+
+    private RecyclerView recyclerView;
+    private NotificationAdapter notificationAdapter;
+
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -55,12 +77,33 @@ public class NotificationsFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_notifications, container, false);
+        binding = FragmentNotificationsBinding.inflate(inflater, container, false);
+
+        recyclerView = binding.notificationsRecyclerView;
+        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        assert firebaseUser != null;
+        String userId = firebaseUser.getUid();
+
+        notificationCollection.getAccountNotification(userId, new NotificationCollection.Callback() {
+            @Override
+            public void onCallback(List<NotificationPetPaw> notifications) {
+                notificationAdapter = new NotificationAdapter();
+                notificationAdapter.setNotifications(notifications);
+                recyclerView.setAdapter(notificationAdapter);
+            }
+        });
+
+
+
+
+
+        return binding.getRoot();
     }
 }
