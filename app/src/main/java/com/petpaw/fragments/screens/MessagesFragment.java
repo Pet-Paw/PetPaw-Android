@@ -178,6 +178,9 @@ public class MessagesFragment extends Fragment {
     }
 
     private void getUsersFromDb() {
+        if(mUserIdList.isEmpty()){
+            return;
+        }
         mDb.collection(User.USERS)
                 .whereIn(FieldPath.documentId(), mUserIdList)
                 .get()

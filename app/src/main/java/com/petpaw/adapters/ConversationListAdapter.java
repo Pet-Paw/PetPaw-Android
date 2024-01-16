@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.petpaw.R;
 import com.petpaw.databinding.ItemConversationListBinding;
 import com.petpaw.interfaces.OnConversationClickListener;
 import com.petpaw.models.Conversation;
@@ -86,22 +87,44 @@ public class ConversationListAdapter extends RecyclerView.Adapter<ConversationLi
             preview += conversation.getLastMessage().getContent();
             holder.mBinding.tvContent.setText(preview);
             holder.mBinding.tvUser.setText(user.getName());
-            Picasso.get()
-                    .load(user.getImageURL())
-                    .tag(System.currentTimeMillis())
-                    .into(holder.mBinding.iv, new com.squareup.picasso.Callback() {
-                        @Override
-                        public void onSuccess() {
-                            Log.d("TAG", "Load image successfully");
-                        }
+            if(user.getImageURL() == null){
+                holder.mBinding.iv.setImageResource(R.drawable.default_avatar);
+            } else {
+                Picasso.get()
+                        .load(user.getImageURL())
+                        .tag(System.currentTimeMillis())
+                        .into(holder.mBinding.iv, new com.squareup.picasso.Callback() {
+                            @Override
+                            public void onSuccess() {
+                                Log.d("TAG", "Load image successfully");
+                            }
 
-                        @Override
-                        public void onError(Exception e) {
-                            Log.e("TAG", "Load image failed");
-                        }
-                    });
+                            @Override
+                            public void onError(Exception e) {
+                                Log.e("TAG", "Load image failed");
+                            }
+                        });
+            }
+
         } else {
             // TODO: handle group chat image + name + last message
+            holder.mBinding.iv.setImageResource(R.drawable.group_chat_image);
+            String names = "";
+            for (String userId: conversation.getMemberIdList()) {
+                if (!Objects.equals(userId, mAuth.getCurrentUser().getUid())) {
+                    names += userMap.get(userId).getName();
+                    if(conversation.getMemberIdList().indexOf(userMap.get(userId).getUid()) != (conversation.getMemberIdList().size() - 1)){
+                        names += ", ";
+                    }
+                }
+            }
+            String preview = "";
+            if(conversation.getLastMessage().getSenderId().equals(mAuth.getCurrentUser().getUid())){
+                preview += "You: ";
+            }
+            preview += conversation.getLastMessage().getContent();
+            holder.mBinding.tvContent.setText(preview);
+            holder.mBinding.tvUser.setText(names);
         }
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {

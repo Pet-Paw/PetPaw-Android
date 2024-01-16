@@ -34,7 +34,7 @@
         <TextView
             android:id="@+id/tvName"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginEnd="20dp"
             android:layout_marginStart="20dp"
             android:layout_weight="1"
@@ -45,13 +45,19 @@
             android:gravity="center_vertical"
             />
 
+
     </LinearLayout>
+
+    <com.google.android.material.divider.MaterialDivider
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvMessageList"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"/>
+        android:layout_weight="1"
+        android:padding="10dp"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -62,11 +68,13 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:background="@drawable/edittext_border"
+            android:background="@drawable/edit_text_border"
             android:layout_marginStart="10dp"
             android:layout_marginTop="10dp"
             android:layout_marginEnd="10dp"
             android:layout_marginBottom="10dp"
+            android:backgroundTint="@color/primary"
+            android:paddingHorizontal="10dp"
             />
         <ImageView
             android:id="@+id/sendMessageBtn"
@@ -76,6 +84,7 @@
             android:layout_alignParentRight="true"
             android:src="@drawable/baseline_send_24"
             android:clickable="true"
+            app:tint="@color/primary"
             />
     </LinearLayout>
 

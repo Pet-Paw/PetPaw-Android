@@ -28,6 +28,7 @@ import com.petpaw.interfaces.OnConversationClickListener;
 import com.petpaw.models.Conversation;
 import com.petpaw.models.Message;
 import com.petpaw.models.User;
+import com.petpaw.utils.ImageHelper;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -101,7 +102,6 @@ public class MessageActivity extends AppCompatActivity {
                             if(task.isSuccessful()){
                                 conversation = task.getResult().toObject(Conversation.class);
                             }
-
                             getMessages();
                         }
                     });
@@ -145,24 +145,38 @@ public class MessageActivity extends AppCompatActivity {
                                 if (!Objects.equals(userId, auth.getCurrentUser().getUid())) {
                                     User user = userMap.get(userId);
                                     binding.tvName.setText(user.getName());
-                                    Picasso.get()
-                                            .load(user.getImageURL())
-                                            .tag(System.currentTimeMillis())
-                                            .into(binding.ivUserPic, new com.squareup.picasso.Callback() {
-                                                @Override
-                                                public void onSuccess() {
-                                                    Log.d("TAG", "Load image successfully");
-                                                }
+                                    if(user.getImageURL() == null){
+                                        binding.ivUserPic.setImageResource(R.drawable.default_avatar);
+                                    } else {
+                                        Picasso.get()
+                                                .load(user.getImageURL())
+                                                .tag(System.currentTimeMillis())
+                                                .into(binding.ivUserPic, new com.squareup.picasso.Callback() {
+                                                    @Override
+                                                    public void onSuccess() {
+                                                        Log.d("TAG", "Load image successfully");
+                                                    }
 
-                                                @Override
-                                                public void onError(Exception e) {
-                                                    Log.e("TAG", "Load image failed");
-                                                }
-                                            });
+                                                    @Override
+                                                    public void onError(Exception e) {
+                                                        Log.e("TAG", "Load image failed");
+                                                    }
+                                                });
+                                    }
                                 }
                             }
                         } else {
-                            //TODO: handle group image and name
+                            binding.ivUserPic.setImageResource(R.drawable.group_chat_image);
+                            String names = "";
+                            for (String userId: conversation.getMemberIdList()) {
+                                if (!Objects.equals(userId, auth.getCurrentUser().getUid())) {
+                                    names += userMap.get(userId).getName();
+                                    if(conversation.getMemberIdList().indexOf(userMap.get(userId).getUid()) != (conversation.getMemberIdList().size() - 1)){
+                                        names += ", ";
+                                    }
+                                }
+                            }
+                            binding.tvName.setText(names);
                         }
 
                         messageListAdapter.setUserMap(userMap);
@@ -175,7 +189,7 @@ public class MessageActivity extends AppCompatActivity {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getBaseContext(), LinearLayoutManager.VERTICAL, false);
         linearLayoutManager.setReverseLayout(true);
         binding.rvMessageList.setLayoutManager(linearLayoutManager);
-        messageListAdapter = new MessageListAdapter();
+        messageListAdapter = new MessageListAdapter(getBaseContext());
         binding.rvMessageList.setAdapter(messageListAdapter);
 
     }
