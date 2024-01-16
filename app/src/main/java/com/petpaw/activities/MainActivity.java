@@ -81,6 +81,7 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = navHostFragment.getNavController();
         NavigationUI.setupWithNavController(mBinding.bottomNav, navController);
 
+
 //        mBinding.bottomNav.setSelectedItemId(R.id.homeFragment);
         mBinding.bottomNav.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
@@ -88,6 +89,7 @@ public class MainActivity extends AppCompatActivity {
                 FrameLayout userProfileContainer = findViewById(R.id.overlay_profile_fragment);
                 FrameLayout petProfileContainer = findViewById(R.id.overlay_pet_fragment);
                 FrameLayout communityContainer = findViewById(R.id.overlay_community_fragment);
+                FrameLayout notificationsContainer = findViewById(R.id.overlay_notification_fragment);
 
                 // If the overlay container is visible, hide it when navigating to a different tab
                 if (userProfileContainer.getVisibility() == View.VISIBLE) {
@@ -98,6 +100,9 @@ public class MainActivity extends AppCompatActivity {
                 }
                 if (communityContainer.getVisibility() == View.VISIBLE) {
                     communityContainer.setVisibility(View.GONE);
+                }
+                if (notificationsContainer.getVisibility() == View.VISIBLE) {
+                    notificationsContainer.setVisibility(View.GONE);
                 }
 
                 SideNavFragment sideNavFragment = (SideNavFragment) getSupportFragmentManager()

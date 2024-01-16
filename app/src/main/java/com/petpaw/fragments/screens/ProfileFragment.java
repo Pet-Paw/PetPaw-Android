@@ -57,6 +57,7 @@ import com.petpaw.adapters.UserListAdapter;
 import com.petpaw.database.FollowCollection;
 import com.petpaw.databinding.FragmentMessagesBinding;
 import com.petpaw.databinding.FragmentProfileBinding;
+import com.petpaw.models.FollowRecord;
 import com.petpaw.models.Pet;
 import com.petpaw.models.Post;
 import com.petpaw.models.User;
@@ -481,10 +482,21 @@ public class ProfileFragment extends Fragment {
                         followerCount++;
                     }
                     binding.followerNum.setText(followerCount + "");
-                    if (followerCount > 0) {
-                        binding.followBtn.setVisibility(View.GONE);
-                        binding.unFollowBtn.setVisibility(View.VISIBLE);
-                    }
+                    String currentUserUid = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
+                    followCollection.isFollowing(currentUserUid, uid, new FollowCollection.Callback() {
+                        @Override
+                        public void onCallback(List<FollowRecord> followRecords) {
+                            if (followRecords.size() > 0) {
+                                binding.followBtn.setVisibility(View.GONE);
+                                binding.unFollowBtn.setVisibility(View.VISIBLE);
+                            }
+                        }
+
+                        @Override
+                        public void onCallBackGetUsers(List<User> users) {
+
+                        }
+                    });
 
                 } else {
                     Log.e("ProfileFragment", "Error getting user followers: ", task.getException());

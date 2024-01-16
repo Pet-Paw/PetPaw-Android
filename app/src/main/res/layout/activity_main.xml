@@ -51,6 +51,12 @@
                     android:visibility="gone">
                     <!-- used for showing pet profiles without affecting bottom nav -->
                 </FrameLayout>
+
+                <FrameLayout
+                    android:id="@+id/overlay_notification_fragment"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:visibility="gone"></FrameLayout>
             </RelativeLayout>
 
         </androidx.core.widget.NestedScrollView>
@@ -62,6 +68,7 @@
             app:menu="@menu/menu_bottom_nav"
             app:itemActiveIndicatorStyle="@style/Widget.App.BottomNavigationView.ActiveIndicator"
             app:itemRippleColor="@color/on_surface_variant"
+
             />
 
 
