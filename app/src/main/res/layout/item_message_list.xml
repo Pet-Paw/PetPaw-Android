@@ -8,54 +8,62 @@
     >
 
     <LinearLayout
+        android:id="@+id/llMessage"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:paddingHorizontal="20dp"
         android:orientation="horizontal"
+        android:padding="5dp"
         >
 
-        <androidx.cardview.widget.CardView
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/iv"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            app:cardCornerRadius="1000dp"
-            android:layout_marginBottom="12dp"
-            >
-            <ImageView
-                android:id="@+id/iv"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                />
-        </androidx.cardview.widget.CardView>
+            android:src="@drawable/default_avatar"
+            app:civ_border_width="1dp"
+            app:civ_border_color="@color/primary"
+            android:layout_alignParentLeft="true" />
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginStart="20dp"
-            >
+            android:orientation="vertical">
             <TextView
                 android:id="@+id/tvUser"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Marfds"
                 android:fontFamily="@font/medium"
-                android:textSize="15sp"
+                android:textSize="12sp"
                 android:textColor="@color/text"
+                android:layout_marginStart="20dp"
                 />
-
-            <TextView
-                android:id="@+id/tvContent"
+            <LinearLayout
+                android:id="@+id/llMessageBox"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="fdsfsfvs sd fdsf sd dfs fas"
-                android:fontFamily="@font/regular"
-                android:textSize="12sp"
-                />
+                android:orientation="vertical"
+                android:layout_marginStart="20dp"
+                android:background="@drawable/message_box"
+                android:padding="10dp"
+                android:layout_toRightOf="@id/iv"
+                >
+
+
+                <TextView
+                    android:id="@+id/tvContent"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="fdsfsfvs sd fdsf sd dfs fas"
+                    android:fontFamily="@font/regular"
+                    android:textSize="12sp"
+                    android:layout_marginTop="5dp"
+                    android:maxWidth="200dp"
+                    />
+            </LinearLayout>
         </LinearLayout>
 
     </LinearLayout>
 
-    <com.google.android.material.divider.MaterialDivider
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
 </LinearLayout>

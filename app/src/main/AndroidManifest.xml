@@ -35,7 +35,7 @@
             android:name=".activities.CreateCommunityActivity"
             android:exported="false" />
         <activity
-            android:name=".activities.EmptyActivity"
+            android:name=".activities.MessageActivity"
             android:exported="false" />
         <activity
             android:name=".activities.AddPetActivity"

@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Message implements FirebaseDoc {
-    public static final String MESSAGES = "MESSAGES";
+    public static final String MESSAGES = "messages";
     private String uid;
     private String senderId;
     private String content;
