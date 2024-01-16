@@ -16,6 +16,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.PetPaw"
         tools:targetApi="31">
+        <activity
+            android:name=".activities.EmptyActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.Empty"
+            android:exported="false" />
 
         <service
             android:name=".models.NotificationChannelService"
@@ -26,10 +32,6 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
-
-
-
-
 
         <activity
             android:name=".activities.CreateCommunityActivity"

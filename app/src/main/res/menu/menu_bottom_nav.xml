@@ -25,11 +25,6 @@
         android:title="Messages"
         />
     <item
-        android:id="@+id/communityFragment"
-        android:icon="@drawable/baseline_groups_24"
-        android:enabled="true"
-        android:title="Community"/>
-    <item
         android:id="@+id/profileFragment"
         android:icon="@drawable/baseline_person_24"
         android:enabled="true"
