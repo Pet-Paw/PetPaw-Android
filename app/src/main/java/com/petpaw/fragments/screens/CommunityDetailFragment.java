@@ -8,6 +8,8 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -15,18 +17,23 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.petpaw.R;
 import com.petpaw.activities.CreatePostActivity;
+import com.petpaw.activities.EmptyActivity;
 import com.petpaw.adapters.PostListAdapter;
 import com.petpaw.databinding.FragmentCommunityDetailBinding;
 import com.petpaw.models.Post;
@@ -159,6 +166,66 @@ public class CommunityDetailFragment extends Fragment {
             }
         });
         getPosts();
+
+//        ----------------------- Delete Community Button --------------------------
+        binding.deleteCommunityBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                db.collection("Communities").document(communityId)
+                        .delete()
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                Toast.makeText(requireContext(), "Community Deleted", Toast.LENGTH_SHORT).show();
+//                                not including deleting the posts belongs to the community
+
+//                                go back to previous fragment
+                                getActivity().onBackPressed();
+
+//                                trigger the onResume of the previous fragment
+                                Intent intent = new Intent(requireContext(), EmptyActivity.class);
+                                startActivity(intent);
+                            }
+                        });
+            }
+        });
+
+//        ----------------------- Leave Community Button --------------------------
+        binding.leaveCommunityBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                db.collection("Communities").document(communityId)
+                        .update("members", FieldValue.arrayRemove(userId))
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                Toast.makeText(requireContext(), "Community Left", Toast.LENGTH_SHORT).show();
+//                                go back to previous fragment
+                                getActivity().onBackPressed();
+
+//                                trigger the onResume of the previous fragment
+                                Intent intent = new Intent(requireContext(), EmptyActivity.class);
+                                startActivity(intent);
+                            }
+                        });
+            }
+        });
+
+//        ----------------------- Back Button --------------------------
+        binding.backBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                assert getArguments() != null;
+                int previousFragment = getArguments().getInt(PREVIOUS_FRAGMENT);
+                Log.d("ProfileFragment", "previousFragment = " + previousFragment);
+                String owner_uid = getArguments().getString("owner_uid");
+                if (previousFragment == R.id.communityFragment) {
+                    getActivity().onBackPressed();
+                } else {
+                    getActivity().onBackPressed();
+                }
+            }
+        });
 
         return binding.getRoot();
     }

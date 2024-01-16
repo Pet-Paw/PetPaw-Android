@@ -238,6 +238,7 @@ public class SearchFragment extends Fragment {
         Log.d("TAG", "onResume: ");
         super.onResume();
         getPosts("");
+        getCommunities("");
     }
 
     private void getPosts(String searchValue) {
