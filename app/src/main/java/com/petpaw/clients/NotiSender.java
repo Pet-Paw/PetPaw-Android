@@ -28,21 +28,21 @@ import okhttp3.Response;
 public class NotiSender {
     OkHttpClient client = new OkHttpClient();
     String token;
-
+    String currentUserId;
     MediaType mediaType = MediaType.parse("application/json");
-
+    JSONObject jsonData = new JSONObject();
     JSONObject jsonNotif = new JSONObject();
     JSONObject wholeObj = new JSONObject();
 
-    public NotiSender(String token) {
+
+    public NotiSender(String token, String currentUserId) {
         this.token = token;
+        this.currentUserId = currentUserId;
     }
 
 
     @Background
     public void sendNotification(String body) throws IOException {
-
-
         Thread sendNotiThread =  new Thread(new Runnable() {
 
             @Override
@@ -50,7 +50,9 @@ public class NotiSender {
                 try {
                     jsonNotif.put("title", token);
                     jsonNotif.put("body", body);
+                    jsonData.put("userId", currentUserId);
                     wholeObj.put("to", token);
+                    wholeObj.put("data", jsonData);
                     wholeObj.put("notification", jsonNotif);
                 } catch (JSONException e) {
                     throw new RuntimeException(e);

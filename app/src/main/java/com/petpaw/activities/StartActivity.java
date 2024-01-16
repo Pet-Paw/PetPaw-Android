@@ -82,8 +82,7 @@ public class StartActivity extends AppCompatActivity {
 
                         // Get new FCM registration token
                         String token = task.getResult();
-
-                        NotiSender notiSender = new NotiSender(token);
+                        NotiSender notiSender = new NotiSender(token, firebaseUser.getUid());
                         try {
                             notiSender.sendNotification("Hello");
                         } catch (IOException e) {

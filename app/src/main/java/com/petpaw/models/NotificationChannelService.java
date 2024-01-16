@@ -43,6 +43,7 @@ public class NotificationChannelService extends FirebaseMessagingService {
                     return;
                 }
                 sendNotification(notificationBody);
+                return;
             }
 
             // sending message to other user
