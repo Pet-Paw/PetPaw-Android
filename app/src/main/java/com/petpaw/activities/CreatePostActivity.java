@@ -82,6 +82,8 @@ public class CreatePostActivity extends AppCompatActivity {
         Intent intent = getIntent();
         String postId = intent.getStringExtra("postId");
         String communityId = intent.getStringExtra("communityId");
+        Log.d("CreatePostActivity", "Update community ID: " + communityId);
+
 
 //        Bind the select button to the selectImage function
         binding = ActivityCreatePostBinding.inflate(getLayoutInflater());

@@ -1,5 +1,6 @@
 package com.petpaw.fragments.screens;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -19,11 +20,13 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.petpaw.activities.MessageActivity;
 import com.petpaw.adapters.ConversationListAdapter;
 import com.petpaw.databinding.FragmentMessagesBinding;
 import com.petpaw.interfaces.OnConversationClickListener;
@@ -45,7 +48,6 @@ public class MessagesFragment extends Fragment {
 
     private FirebaseFirestore mDb;
 
-    private FirebaseUser mFirebaseUser;
 
     private int mNumConversations;
     private List<Conversation> mConversationList;
@@ -84,13 +86,24 @@ public class MessagesFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mBinding = FragmentMessagesBinding.inflate(inflater, container, false);
+        mBinding.newChatBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                createConversation(new ArrayList<>());
+            }
+        });
         return mBinding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        setupFirebaseUser();
+        setupRvConversationList();
+        getConversationsFromDb();
+
+
+//        setupFirebaseUser();
     }
+
 
     private void setupFirebaseUser() {
 //        mAuth.signInWithEmailAndPassword("u01@qq.com", "Binh1234")
@@ -112,7 +125,7 @@ public class MessagesFragment extends Fragment {
 
     private void getConversationsFromDb() {
         mDb.collection(Conversation.CONVERSATIONS)
-                .whereArrayContains("memberIdList", mFirebaseUser.getUid())
+                .whereArrayContains("memberIdList", mAuth.getCurrentUser().getUid())
                 .get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
@@ -129,7 +142,7 @@ public class MessagesFragment extends Fragment {
                             conversation.setUid(doc.getId());
 
                             for (String userId: conversation.getMemberIdList()) {
-                                if (!Objects.equals(userId, mFirebaseUser.getUid())) {
+                                if (!Objects.equals(userId, mAuth.getCurrentUser().getUid())) {
                                     mUserIdList.add(userId);
                                 }
                             }
@@ -174,6 +187,9 @@ public class MessagesFragment extends Fragment {
     }
 
     private void getUsersFromDb() {
+        if(mUserIdList.isEmpty()){
+            return;
+        }
         mDb.collection(User.USERS)
                 .whereIn(FieldPath.documentId(), mUserIdList)
                 .get()
@@ -184,11 +200,11 @@ public class MessagesFragment extends Fragment {
 
                         for (DocumentSnapshot doc: queryDocumentSnapshots) {
                             User user = doc.toObject(User.class);
-                            user.setUid(doc.getId());
-                            userMap.put(doc.getId(), user);
+                            userMap.put(user.getUid(), user);
                         }
-
+                        Log.d("TAG", "User Map: " + userMap);
                         mConversationListAdapter.setUserMap(userMap);
+
                     }
                 });
     }
@@ -197,15 +213,38 @@ public class MessagesFragment extends Fragment {
         mBinding.rvConversationList.setLayoutManager(
                 new LinearLayoutManager(requireActivity(), LinearLayoutManager.VERTICAL, false)
         );
-        mConversationListAdapter = new ConversationListAdapter(mFirebaseUser);
+        mConversationListAdapter = new ConversationListAdapter();
         mBinding.rvConversationList.setAdapter(mConversationListAdapter);
 
         mConversationListAdapter.setOnClickListener(new OnConversationClickListener() {
             @Override
             public void onClick(Conversation conversation) {
-
+                Intent intent = new Intent(requireContext(), MessageActivity.class);
+                intent.putExtra("conversationID", conversation.getUid());
+                startActivity(intent);
             }
         });
+    }
+
+    //create new conversation from userIdList
+    private void createConversation(List<String> userIdList){
+        userIdList.add(mAuth.getCurrentUser().getUid());
+        // TODO: Check if 1v1 conversation is already created
+        Conversation conversation = new Conversation();
+        conversation.setMemberIdList(userIdList);
+        mDb.collection("Conversations")
+                .add(conversation.toDoc())
+                .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentReference> task) {
+                        if(task.isSuccessful()){
+                            Intent intent = new Intent(getActivity(), MessageActivity.class);
+                            intent.putExtra("conversationID", task.getResult().getId());
+                            startActivity(intent);
+                        }
+
+                    }
+                });
     }
 
 }

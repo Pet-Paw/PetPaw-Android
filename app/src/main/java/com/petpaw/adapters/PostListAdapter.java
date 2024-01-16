@@ -71,6 +71,10 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.PostVi
         Log.d("TAG", "- postId: " + postId);
         List<String> likes = postList.get(position).getLikes();
 
+//        -------------- String CommnunityId -------------
+        String communityId = postList.get(position).getCommunityId();
+        Log.d("TAG", "- communityId: " + communityId);
+
 //        ------------ isModified -------------------
         if (postList.get(position).isModified()) {
             holder.postCardViewIsModified.setVisibility(View.VISIBLE);
@@ -88,6 +92,7 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.PostVi
         holder.postCardViewEditImageView.setOnClickListener(view -> {
             Intent intent = new Intent(context, CreatePostActivity.class);
             intent.putExtra("postId", postId);
+            intent.putExtra("communityId", communityId);
             context.startActivity(intent);
         });
 

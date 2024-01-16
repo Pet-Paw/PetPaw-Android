@@ -1,6 +1,7 @@
 package com.petpaw.adapters;
 
 import android.annotation.SuppressLint;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,25 +9,29 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.petpaw.R;
 import com.petpaw.databinding.ItemConversationListBinding;
 import com.petpaw.interfaces.OnConversationClickListener;
 import com.petpaw.models.Conversation;
 import com.petpaw.models.User;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class ConversationListAdapter extends RecyclerView.Adapter<ConversationListAdapter.ViewHolder> {
-    private final FirebaseUser user;
     private List<Conversation> conversationList;
     private Map<String, User> userMap;
     private OnConversationClickListener onClickListener;
+    private FirebaseAuth mAuth;
 
-    public ConversationListAdapter(FirebaseUser user) {
-        this.user = user;
+    public ConversationListAdapter() {
+        mAuth = FirebaseAuth.getInstance();
         conversationList = new ArrayList<>();
         userMap = null;
     }
@@ -68,8 +73,59 @@ public class ConversationListAdapter extends RecyclerView.Adapter<ConversationLi
         }
 
         Conversation conversation = conversationList.get(position);
+        if (conversation.getMemberIdList().size() <= 2){
+            User user = new User();
+            for (String userId: conversation.getMemberIdList()) {
+                if (!Objects.equals(userId, mAuth.getCurrentUser().getUid())) {
+                    user = userMap.get(userId);
+                }
+            }
+            String preview = "";
+            if(conversation.getLastMessage().getSenderId().equals(mAuth.getCurrentUser().getUid())){
+                preview += "You: ";
+            }
+            preview += conversation.getLastMessage().getContent();
+            holder.mBinding.tvContent.setText(preview);
+            holder.mBinding.tvUser.setText(user.getName());
+            if(user.getImageURL() == null){
+                holder.mBinding.iv.setImageResource(R.drawable.default_avatar);
+            } else {
+                Picasso.get()
+                        .load(user.getImageURL())
+                        .tag(System.currentTimeMillis())
+                        .into(holder.mBinding.iv, new com.squareup.picasso.Callback() {
+                            @Override
+                            public void onSuccess() {
+                                Log.d("TAG", "Load image successfully");
+                            }
 
-        holder.mBinding.tvContent.setText(conversation.getLastMessage().getContent());
+                            @Override
+                            public void onError(Exception e) {
+                                Log.e("TAG", "Load image failed");
+                            }
+                        });
+            }
+
+        } else {
+            // TODO: handle group chat image + name + last message
+            holder.mBinding.iv.setImageResource(R.drawable.group_chat_image);
+            String names = "";
+            for (String userId: conversation.getMemberIdList()) {
+                if (!Objects.equals(userId, mAuth.getCurrentUser().getUid())) {
+                    names += userMap.get(userId).getName();
+                    if(conversation.getMemberIdList().indexOf(userMap.get(userId).getUid()) != (conversation.getMemberIdList().size() - 1)){
+                        names += ", ";
+                    }
+                }
+            }
+            String preview = "";
+            if(conversation.getLastMessage().getSenderId().equals(mAuth.getCurrentUser().getUid())){
+                preview += "You: ";
+            }
+            preview += conversation.getLastMessage().getContent();
+            holder.mBinding.tvContent.setText(preview);
+            holder.mBinding.tvUser.setText(names);
+        }
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override

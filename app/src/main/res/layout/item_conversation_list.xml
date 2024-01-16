@@ -50,6 +50,7 @@
                 android:text="fdsfsfvs sd fdsf sd dfs fas"
                 android:fontFamily="@font/regular"
                 android:textSize="12sp"
+                android:maxHeight="30dp"
                 />
         </LinearLayout>
 
