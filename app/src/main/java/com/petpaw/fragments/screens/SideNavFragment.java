@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -53,6 +54,7 @@ public class SideNavFragment extends Fragment implements NavigationView.OnNaviga
     private User currentUser;
 
     private UserCollection userCollection = UserCollection.newInstance();
+    boolean isNotified = false;
 
 
     public SideNavFragment() {
@@ -155,15 +157,30 @@ public class SideNavFragment extends Fragment implements NavigationView.OnNaviga
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         int itemId = item.getItemId();
+        FrameLayout defaultContainer = requireActivity().findViewById(R.id.fr);
+        defaultContainer.setVisibility(View.VISIBLE);
+
+
 
         if (itemId == R.id.homeFragment) {
             bottomNavigationView.setSelectedItemId(R.id.homeFragment);
+
         } else if (itemId == R.id.searchFragment) {
             bottomNavigationView.setSelectedItemId(R.id.searchFragment);
+
         } else if (itemId == R.id.notificationsFragment) {
-            bottomNavigationView.setSelectedItemId(R.id.notificationsFragment);
+            // get current bottom nav item id
+            FragmentTransaction fragmentTransaction = requireActivity().getSupportFragmentManager().beginTransaction();
+            fragmentTransaction.replace(R.id.overlay_notification_fragment, NotificationsFragment.newInstance("", ""))
+                    .addToBackStack(null)
+                    .commit();
+            FrameLayout notificationContainer = requireActivity().findViewById(R.id.overlay_notification_fragment);
+            defaultContainer.setVisibility(View.GONE);
+            notificationContainer.setVisibility(View.VISIBLE);
         } else if (itemId == R.id.messagesFragment) {
             bottomNavigationView.setSelectedItemId(R.id.messagesFragment);
+        } else if (itemId == R.id.communityFragment) {
+            bottomNavigationView.setSelectedItemId(R.id.communityFragment);
         } else if (itemId == R.id.profileFragment) {
             bottomNavigationView.setSelectedItemId(R.id.profileFragment);
         } else if (itemId == R.id.logout) {
@@ -176,4 +193,7 @@ public class SideNavFragment extends Fragment implements NavigationView.OnNaviga
         return true;
     }
 
+    private void popBackStack() {
+        requireActivity().getSupportFragmentManager().popBackStack();
+    }
 }
