@@ -23,7 +23,7 @@ public class Post {
     private List<String> comments;
     private List<String> tags;
     private List<String> petIdList;
-
+    private String communityId;
     private String postId;
 
     public Post() {
@@ -34,9 +34,10 @@ public class Post {
         this.tags = new ArrayList<>();
         this.petIdList = new ArrayList<>();
         this.postId = "";
+        this.communityId = "";
     }
 
-    public Post(String authorId, Date dateModified, String content,  boolean isModified, String imageURL, List<String> likes, List<String> comments, String postId, List<String> tags, List<String> petIdList){
+    public Post(String authorId, Date dateModified, String content,  boolean isModified, String imageURL, List<String> likes, List<String> comments, String postId, List<String> tags, List<String> petIdList, String communityId){
         this.authorId = authorId;
         this.dateModified = dateModified;
         this.isModified = isModified;
@@ -47,6 +48,7 @@ public class Post {
         this.postId = postId;
         this.tags = tags;
         this.petIdList = petIdList;
+        this.communityId = communityId;
     }
 
     public Post(String content, String author, String petId) {
@@ -148,6 +150,14 @@ public class Post {
 
     public void setPetIdList(List<String> petIdList) {
         this.petIdList = petIdList;
+    }
+
+    public String getCommunityId() {
+        return communityId;
+    }
+
+    public void setCommunityId(String communityId) {
+        this.communityId = communityId;
     }
 
     //    @Override

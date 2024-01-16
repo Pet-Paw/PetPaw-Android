@@ -121,7 +121,7 @@ public class PetListAdapter extends RecyclerView.Adapter<PetListAdapter.PetViewH
                             .commit();
 
                     ((FragmentActivity) context).findViewById(R.id.overlay_pet_fragment).setVisibility(View.VISIBLE);
-                    ((FragmentActivity) context).findViewById(R.id.profileLayout).setVisibility(View.GONE);
+                    ((FragmentActivity) context).findViewById(R.id.profileFragmentLayout).setVisibility(View.GONE);
                 }
             }
         });

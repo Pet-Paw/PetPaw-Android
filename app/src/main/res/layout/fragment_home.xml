@@ -29,13 +29,18 @@
                 android:gravity="center"
                 android:textStyle="bold"
                 android:layout_weight="1"/>
+            <Button
+                android:id="@+id/comBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Community"/>
 
-               <ImageView
-                   android:id="@+id/homeCreatePostImageView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                   android:padding="5dp"
-                    android:src="@drawable/createposticon"/>
+           <ImageView
+               android:id="@+id/homeCreatePostImageView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+               android:padding="5dp"
+                android:src="@drawable/createposticon"/>
         </LinearLayout>
 
         <androidx.recyclerview.widget.RecyclerView

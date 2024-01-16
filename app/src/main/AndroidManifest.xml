@@ -32,6 +32,9 @@
 
 
         <activity
+            android:name=".activities.CreateCommunityActivity"
+            android:exported="false" />
+        <activity
             android:name=".activities.EmptyActivity"
             android:exported="false" />
         <activity

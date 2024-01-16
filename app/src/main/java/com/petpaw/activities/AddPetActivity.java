@@ -49,6 +49,7 @@ public class AddPetActivity extends AppCompatActivity {
     private DocumentReference petDocRef;
     private String ownerId;
 
+    private Boolean defaultPic = true;
     ProgressDialog progressDialog;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     FirebaseAuth auth = FirebaseAuth.getInstance();
@@ -61,6 +62,7 @@ public class AddPetActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
         binding.backBtn.setOnClickListener(v -> finish());
         binding.selectImageBtn.setOnClickListener(v -> selectImage());
+        
 
         FirebaseUser currentUser = auth.getCurrentUser();
         if (currentUser != null) {
@@ -68,11 +70,8 @@ public class AddPetActivity extends AppCompatActivity {
         }
 
         binding.addPetBtn.setOnClickListener(v -> {
-            boolean isValid = true;
-            //check validation
-
-            if(isValid){
-                Pet pet = new Pet(ownerId, "", binding.petNameEditText.getText().toString(), Integer.parseInt(binding.petAgeEditText.getText().toString()), binding.petBreedEditText.getText().toString(), Integer.parseInt(binding.petWeightEditText.getText().toString()), "", new ArrayList<>());
+            if(binding.petNameEditText.getText().length() != 0 && binding.petBreedEditText.getText().length() != 0 && binding.petWeightEditText.getText().length() != 0 && binding.petAgeEditText.getText().length() != 0){
+                Pet pet = new Pet(ownerId, "", binding.petNameEditText.getText().toString(), Integer.parseInt(binding.petAgeEditText.getText().toString()), binding.petBreedEditText.getText().toString(), Integer.parseInt(binding.petWeightEditText.getText().toString()), "https://firebasestorage.googleapis.com/v0/b/petpaw-1d5a6.appspot.com/o/petImages%2Fdefault_pet_avatar.png?alt=media&token=d2be6754-a0e0-43a4-a4a1-c20ae8873c3f", new ArrayList<>());
 
                 Log.d("AddPetActivity", "Adding pet to Firestore");
                 db.collection("Pets")
@@ -83,13 +82,20 @@ public class AddPetActivity extends AppCompatActivity {
                             petDocRef.update("id", id);
                             db.collection("users").document(auth.getCurrentUser().getUid())
                                             .update("pets", FieldValue.arrayUnion(id));
-                            uploadImage(id, false);
+                            if(!defaultPic) {
+                                uploadImage(id, false);
+                            } else {
+                                finish();
+                            }
+
                             Toast.makeText(getBaseContext(), "Pet Successfully Added", Toast.LENGTH_SHORT).show();
 //
                         })
                         .addOnFailureListener(e -> {
                             Toast.makeText(getBaseContext(), "Error Adding Pet", Toast.LENGTH_SHORT).show();
                         });
+            } else {
+                Toast.makeText(this, "You must fill in all pet information!", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -101,6 +107,7 @@ public class AddPetActivity extends AppCompatActivity {
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
         startActivityForResult(intent,100);
+        defaultPic = false;
     }
 
     private void uploadImage(String petId, boolean isEditImage) {

@@ -1,7 +1,5 @@
 package com.petpaw.fragments.screens;
 
-import static android.content.ContentValues.TAG;
-
 import android.content.Context;
 import android.os.Bundle;
 
@@ -20,25 +18,24 @@ import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 //import com.google.firebase.firestore.auth.User;
+import com.petpaw.adapters.CommunityListAdapter;
 import com.petpaw.adapters.PostListAdapter;
 import com.petpaw.adapters.UserListAdapter;
 import com.petpaw.databinding.FragmentSearchBinding;
 
-import com.petpaw.R;
+import com.petpaw.models.Community;
 import com.petpaw.models.Post;
 import com.petpaw.models.User;
 
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -56,8 +53,9 @@ public class SearchFragment extends Fragment {
     private FragmentSearchBinding binding;
     private List<Post> postList = new ArrayList<>();
     private List<User> userList = new ArrayList<>();
+    private List<Community> communityList = new ArrayList<>();
 
-    private boolean isPost = true;
+    private int searchState = 0;
     private Context context;
 
     @Override
@@ -100,6 +98,7 @@ public class SearchFragment extends Fragment {
             public void onClick(View v) {
                 setUnderline(binding.searchFragmentPostTextView);
                 removeUnderline(binding.searchFragmentUserTextView);
+                removeUnderline(binding.searchFragmentCommunityTextView);
 
 //                binding.searchFragmentPostRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
 //                binding.searchFragmentPostRecyclerView.setAdapter(new PostListAdapter(requireContext(), postList));
@@ -107,6 +106,7 @@ public class SearchFragment extends Fragment {
 
                 //binding.searchFragmentUserRecyclerView.setAdapter(null);
                 binding.searchFragmentUserRecyclerView.setVisibility(View.GONE);
+                binding.searchFragmentCommunityRecyclerView.setVisibility(View.GONE);
 
                 getPosts("");
 
@@ -118,12 +118,31 @@ public class SearchFragment extends Fragment {
             public void onClick(View v) {
                 removeUnderline(binding.searchFragmentPostTextView);
                 setUnderline(binding.searchFragmentUserTextView);
+                removeUnderline(binding.searchFragmentCommunityTextView);
 
                 //binding.searchFragmentPostRecyclerView.setAdapter(null);
                 binding.searchFragmentPostRecyclerView.setVisibility(View.GONE);
 
                 binding.searchFragmentUserRecyclerView.setVisibility(View.VISIBLE);
+                binding.searchFragmentCommunityRecyclerView.setVisibility(View.GONE);
                 getUsers("");
+            }
+        });
+
+        binding.searchFragmentCommunityTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                removeUnderline(binding.searchFragmentPostTextView);
+                setUnderline(binding.searchFragmentCommunityTextView);
+                removeUnderline(binding.searchFragmentUserTextView);
+
+
+                //binding.searchFragmentPostRecyclerView.setAdapter(null);
+                binding.searchFragmentPostRecyclerView.setVisibility(View.GONE);
+
+                binding.searchFragmentCommunityRecyclerView.setVisibility(View.VISIBLE);
+                binding.searchFragmentUserRecyclerView.setVisibility(View.GONE);
+                getCommunities("");
             }
         });
 
@@ -131,10 +150,21 @@ public class SearchFragment extends Fragment {
             @Override
             public boolean onQueryTextSubmit(String s) {
                 //if user search for post
-                if(isPost){
-                    getPosts(s);
-                }else {
-                    getUsers(s);
+//                if(isPost){
+//                    getPosts(s);
+//                }else {
+//                    getUsers(s);
+//                }
+                switch (searchState){
+                    case 0:
+                        getPosts(s);
+                        break;
+                    case 1:
+                        getCommunities(s);
+                        break;
+                    case 2:
+                        getUsers(s);
+                        break;
                 }
                 return false;
             }
@@ -142,16 +172,32 @@ public class SearchFragment extends Fragment {
             @Override
             public boolean onQueryTextChange(String s) {
                 //if user search for post
-                if(isPost){
-                    if(s.isEmpty()){
-                        getPosts("");
-                    }
-                }else {
-                    if(s.isEmpty()){
-                        getUsers("");
-                    }
+//                if(isPost){
+//                    if(s.isEmpty()){
+//                        getPosts("");
+//                    }
+//                }else {
+//                    if(s.isEmpty()){
+//                        getUsers("");
+//                    }
+//                }
+                switch (searchState){
+                    case 0:
+                        if(s.isEmpty()){
+                            getPosts("");
+                        }
+                        break;
+                    case 1:
+                        if(s.isEmpty()) {
+                            getCommunities("");
+                        }
+                        break;
+                    case 2:
+                        if(s.isEmpty()){
+                            getUsers("");
+                        }
+                        break;
                 }
-
                 return false;
             }
         });
@@ -162,10 +208,21 @@ public class SearchFragment extends Fragment {
     public void setUnderline(TextView textView) {
         String text = textView.getText().toString();
         binding.searchFragmentSearchBar.setQuery("", false);
-        if(text.equals("POST")){
-            isPost = true;
-        } else {
-            isPost = false;
+//        if(text.equals("POST")){
+//            isPost = true;
+//        } else {
+//            isPost = false;
+//        }
+        switch(text){
+            case "POST":
+                searchState = 0;
+                break;
+            case "COMMUNITY":
+                searchState = 1;
+                break;
+            case "USER":
+                searchState = 2;
+                break;
         }
         SpannableString content = new SpannableString(textView.getText());
         content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
@@ -195,11 +252,11 @@ public class SearchFragment extends Fragment {
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         Post post = document.toObject(Post.class);
                         if(searchValue.equals("")){
-                            Post postTemp = new Post(post.getAuthorId(), post.getDateModified(), post.getContent(), post.isModified(), post.getImageURL(), post.getLikes(), post.getComments(), post.getPostId(), post.getTags(), post.getPetIdList());
+                            Post postTemp = new Post(post.getAuthorId(), post.getDateModified(), post.getContent(), post.isModified(), post.getImageURL(), post.getLikes(), post.getComments(), post.getPostId(), post.getTags(), post.getPetIdList(), post.getCommunityId());
                             postList.add(postTemp);
                         } else {
                             if(post.getContent().toLowerCase().contains(searchValue.toLowerCase())){
-                                Post postTemp = new Post(post.getAuthorId(), post.getDateModified(), post.getContent(), post.isModified(), post.getImageURL(), post.getLikes(), post.getComments(), post.getPostId(), post.getTags(), post.getPetIdList());
+                                Post postTemp = new Post(post.getAuthorId(), post.getDateModified(), post.getContent(), post.isModified(), post.getImageURL(), post.getLikes(), post.getComments(), post.getPostId(), post.getTags(), post.getPetIdList(), post.getCommunityId());
                                 postList.add(postTemp);
                             }
                         }
@@ -207,6 +264,35 @@ public class SearchFragment extends Fragment {
                     if (context != null) {
                         binding.searchFragmentPostRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
                         binding.searchFragmentPostRecyclerView.setAdapter(new PostListAdapter(requireContext(), postList));
+                    }
+                }
+            }
+        });
+    }
+
+    private void getCommunities(String searchValue) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        CollectionReference communitiesRef = db.collection("Communities");
+        Query query = communitiesRef.orderBy("name", Query.Direction.DESCENDING);
+
+        query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                communityList.clear();
+                if (task.isSuccessful()) {
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        Community community = document.toObject(Community.class);
+                        if(searchValue.equals("")){
+                            communityList.add(community);
+                        } else {
+                            if(community.getName().toLowerCase().contains(searchValue.toLowerCase())){
+                                communityList.add(community);
+                            }
+                        }
+                    }
+                    if (context != null) {
+                        binding.searchFragmentCommunityRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+                        binding.searchFragmentCommunityRecyclerView.setAdapter(new CommunityListAdapter(requireContext(), communityList, true, getFragmentManager()));
                     }
                 }
             }

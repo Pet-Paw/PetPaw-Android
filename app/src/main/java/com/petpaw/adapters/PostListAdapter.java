@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -35,6 +36,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.PostViewHolder> {
 
@@ -60,6 +62,8 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.PostVi
 
     @Override
     public void onBindViewHolder(@NonNull PostViewHolder holder, int position) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
         Log.d("TAG", "** post number: " + position);
         FirebaseAuth auth = FirebaseAuth.getInstance();
         String currentUserId = Objects.requireNonNull(auth.getCurrentUser()).getUid();
@@ -67,8 +71,14 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.PostVi
         Log.d("TAG", "- postId: " + postId);
         List<String> likes = postList.get(position).getLikes();
 
-//        holder.postCardViewUserNameTextView.setText(postList.get(position).getAuthorId());
-//        ----------- show edit icon ----------------
+//        ------------ isModified -------------------
+        if (postList.get(position).isModified()) {
+            holder.postCardViewIsModified.setVisibility(View.VISIBLE);
+        } else {
+            holder.postCardViewIsModified.setVisibility(View.GONE);
+        }
+
+//        ----------- Show edit icon ----------------
         if (currentUserId.equals(postList.get(position).getAuthorId())) {
             holder.postCardViewEditImageView.setVisibility(View.VISIBLE);
         } else {
@@ -81,10 +91,22 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.PostVi
             context.startActivity(intent);
         });
 
-//        -------------- Formate Date -------------
+//        -------------- Format Date -------------
         Date date = postList.get(position).getDateModified();
         SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy HH:mm");
         holder.postCardViewDate.setText(sdf.format(date));
+
+//        -------------- Show tags -------------
+        if (postList.get(position).getTags().size() == 0) {
+            holder.postCardViewTagsTextView.setVisibility(View.GONE);
+        } else {
+            holder.postCardViewTagsTextView.setVisibility(View.VISIBLE);
+            StringBuilder tagList = new StringBuilder();
+            for (String tag : postList.get(position).getTags()) {
+                tagList.append("#").append(tag).append(" ");
+            }
+            holder.postCardViewTagsTextView.setText(tagList.toString());
+        }
 
 //      ---------------  Update the like button start -----------
         if (likes.contains(currentUserId)) {
@@ -106,10 +128,34 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.PostVi
             }
         });
 
-//        ---------------  Load avatar start -----------
+//        -------------- Show pet name -------------
+        StringBuilder petNameList = new StringBuilder();
+        if(postList.get(position).getPetIdList().size() == 0){
+            holder.postCardViewPetNameLinearLayout.setVisibility(View.GONE);
+        }else{
+            for (String petId : postList.get(position).getPetIdList()) {
+                db.collection("Pets").document(petId).get().addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && task.getResult() != null) {
+                        DocumentSnapshot documentSnapshot = task.getResult();
+                        if (documentSnapshot.exists()) {
+                            String petName = documentSnapshot.getString("name");
+                            if(petNameList.length() == 0) {
+                                petNameList.append(petName + " ");
+                            }else{
+                                petNameList.append(", " + petName + " ");
+                            }
+                            holder.postCardViewPetNameTextView.setText(petNameList.toString());
+                        }
+                    } else {
+                        Log.e("PostListAdapter", "Error fetching pet data", task.getException());
+                    }
+                });
+            }
+        }
+
+//        ---------------  Load username and avatar start --------------
         Post post = postList.get(position);
         // Fetch the user's name and avatar URL from Firestore
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("users").document(post.getAuthorId()).get().addOnCompleteListener(task -> {
             if (task.isSuccessful() && task.getResult() != null) {
                 DocumentSnapshot documentSnapshot = task.getResult();
@@ -137,23 +183,27 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.PostVi
 
 //        ---------------  Load image start -----------
         String imageUrl = postList.get(position).getImageURL();
-        Picasso.get()
-                .load(imageUrl)
-                .tag(System.currentTimeMillis())
-                .into(holder.postCardImageView, new com.squareup.picasso.Callback() {
-                    @Override
-                    public void onSuccess() {
-                        //Log.d("TAG", "Load image successfully at " + System.currentTimeMillis());
-                    }
-                    @Override
-                    public void onError(Exception e) {
-                        Log.d("TAG", "Load image successfully");
-                    }
-                });
+        if(imageUrl == null || imageUrl.isEmpty()) {
+            holder.postCardImageView.setVisibility(View.GONE);
+        } else {
+            Picasso.get()
+                    .load(imageUrl)
+                    .tag(System.currentTimeMillis())
+                    .into(holder.postCardImageView, new com.squareup.picasso.Callback() {
+                        @Override
+                        public void onSuccess() {
+                            //Log.d("TAG", "Load image successfully at " + System.currentTimeMillis());
+                        }
+                        @Override
+                        public void onError(Exception e) {
+                            Log.d("TAG", "Load image successfully");
+                        }
+                    });
+        }
+
 
 //        --------------- add onClick like button -----------
         holder.postCardViewLikeImageView.setOnClickListener(view -> {
-            //FirebaseFirestore db = FirebaseFirestore.getInstance();
             DocumentReference postRef = db.collection("Posts").document(postId);
             if(!(likes.contains(currentUserId))) {
                 // User hasn't liked
@@ -186,8 +236,8 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.PostVi
     public class PostViewHolder extends RecyclerView.ViewHolder {
 
         ImageView postCardViewProfilePic, postCardImageView, postCardViewLikeImageView, postCardViewCommentImageView, postCardViewEditImageView;
-        TextView postCardViewUserNameTextView, postCardViewDate, postCardViewContentTextView, postCardViewLikeCountTextView, postCardViewCommentCountTextView;
-
+        TextView postCardViewIsModified, postCardViewUserNameTextView, postCardViewDate, postCardViewContentTextView, postCardViewLikeCountTextView, postCardViewCommentCountTextView, postCardViewTagsTextView, postCardViewPetNameTextView;
+        LinearLayout postCardViewPetNameLinearLayout;
         public PostViewHolder(@NonNull View itemView) {
             super(itemView);
 //            --------TextView----------
@@ -196,6 +246,9 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.PostVi
             postCardViewContentTextView = itemView.findViewById(R.id.postCardViewContentTextView);
             postCardViewLikeCountTextView = itemView.findViewById(R.id.postCardViewLikeCountTextView);
             postCardViewCommentCountTextView = itemView.findViewById(R.id.postCardViewCommentCountTextView);
+            postCardViewTagsTextView = itemView.findViewById(R.id.postCardViewTagsTextView);
+            postCardViewPetNameTextView = itemView.findViewById(R.id.postCardViewPetNameTextView);
+            postCardViewIsModified = itemView.findViewById(R.id.postCardViewIsModified);
 
 //          --------ImageView----------
             postCardImageView = itemView.findViewById(R.id.postCardImageView);
@@ -203,6 +256,9 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.PostVi
             postCardViewLikeImageView = itemView.findViewById(R.id.postCardViewLikeImageView);
             postCardViewCommentImageView = itemView.findViewById(R.id.postCardViewCommentImageView);
             postCardViewEditImageView = itemView.findViewById(R.id.postCardViewEditImageView);
+
+//            --------LinearLayout----------
+            postCardViewPetNameLinearLayout = itemView.findViewById(R.id.postCardViewPetNameLinearLayout);
 
             itemView.setOnClickListener(v -> {
                 Log.d("PostListAdapter", "onClick: " + getAdapterPosition());
