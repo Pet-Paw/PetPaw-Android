@@ -22,8 +22,11 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.MetadataChanges;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.petpaw.activities.MessageActivity;
@@ -124,19 +127,49 @@ public class MessagesFragment extends Fragment {
     }
 
     private void getConversationsFromDb() {
+//        mDb.collection(Conversation.CONVERSATIONS)
+//                .whereArrayContains("memberIdList", mAuth.getCurrentUser().getUid())
+//                .get()
+//                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+//                    @Override
+//                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+//                        mNumConversations = queryDocumentSnapshots.size();
+//                        Log.d("messages.java", "mNumConversations = " + mNumConversations);
+//                        mConversationList = new ArrayList<>();
+//
+//                        mUserIdList = new ArrayList<>();
+//
+//                        for (DocumentSnapshot doc: queryDocumentSnapshots) {
+//                            Conversation conversation = doc.toObject(Conversation.class);
+//                            assert conversation != null;
+//                            conversation.setUid(doc.getId());
+//
+//                            for (String userId: conversation.getMemberIdList()) {
+//                                if (!Objects.equals(userId, mAuth.getCurrentUser().getUid())) {
+//                                    mUserIdList.add(userId);
+//                                }
+//                            }
+//
+//                            getLastMessageFromDb(conversation);
+//                        }
+//
+//                        getUsersFromDb();
+//                    }
+//                });
+
         mDb.collection(Conversation.CONVERSATIONS)
                 .whereArrayContains("memberIdList", mAuth.getCurrentUser().getUid())
-                .get()
-                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                .addSnapshotListener(MetadataChanges.INCLUDE, new EventListener<QuerySnapshot>() {
                     @Override
-                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                        mNumConversations = queryDocumentSnapshots.size();
+                    public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                        assert value != null;
+                        mNumConversations = value.size();
                         Log.d("messages.java", "mNumConversations = " + mNumConversations);
                         mConversationList = new ArrayList<>();
 
                         mUserIdList = new ArrayList<>();
 
-                        for (DocumentSnapshot doc: queryDocumentSnapshots) {
+                        for (DocumentSnapshot doc: value) {
                             Conversation conversation = doc.toObject(Conversation.class);
                             assert conversation != null;
                             conversation.setUid(doc.getId());
@@ -153,6 +186,12 @@ public class MessagesFragment extends Fragment {
                         getUsersFromDb();
                     }
                 });
+//                .get()
+//                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+//                    @Override
+//                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+//                    }
+//                });
     }
 
     private void getLastMessageFromDb(Conversation conversation) {
