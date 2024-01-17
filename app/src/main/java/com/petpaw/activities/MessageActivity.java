@@ -58,35 +58,30 @@ public class MessageActivity extends AppCompatActivity {
         setupMessageRV();
         getConversation();
 
-        binding.sendMessageBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(binding.etSendMessage.getText().length() != 0){
-                    Message message = new Message();
-                    message.setContent(binding.etSendMessage.getText().toString());
-                    message.setSenderId(auth.getCurrentUser().getUid());
-                    message.setSentAt(new Date());
-                    db.collection(Conversation.CONVERSATIONS)
-                            .document(conversationID)
-                            .collection(Message.MESSAGES)
-                            .add(message.toDoc())
-                            .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
-                                @Override
-                                public void onComplete(@NonNull Task<DocumentReference> task) {
-                                    binding.etSendMessage.setText("");
-                                    getConversation();
-                                }
-                            });
-                }
-            }
-        });
 
-        binding.backBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+
+        binding.sendMessageBtn.setOnClickListener(v -> onBtnSendClick());
+        binding.backBtn.setOnClickListener(v -> finish());
+    }
+
+    private void onBtnSendClick() {
+        if(binding.etSendMessage.getText().length() != 0){
+            Message message = new Message();
+            message.setContent(binding.etSendMessage.getText().toString());
+            message.setSenderId(auth.getCurrentUser().getUid());
+            message.setSentAt(new Date());
+            db.collection(Conversation.CONVERSATIONS)
+                    .document(conversationID)
+                    .collection(Message.MESSAGES)
+                    .add(message.toDoc())
+                    .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+                        @Override
+                        public void onComplete(@NonNull Task<DocumentReference> task) {
+                            binding.etSendMessage.setText("");
+                            getConversation();
+                        }
+                    });
+        }
     }
 
     private void getConversation(){
