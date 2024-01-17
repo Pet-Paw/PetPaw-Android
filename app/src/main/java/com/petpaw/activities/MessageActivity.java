@@ -1,6 +1,7 @@
 package com.petpaw.activities;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
@@ -16,8 +17,11 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.MetadataChanges;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.petpaw.R;
@@ -59,7 +63,6 @@ public class MessageActivity extends AppCompatActivity {
         getConversation();
 
 
-
         binding.sendMessageBtn.setOnClickListener(v -> onBtnSendClick());
         binding.backBtn.setOnClickListener(v -> finish());
     }
@@ -87,20 +90,54 @@ public class MessageActivity extends AppCompatActivity {
     private void getConversation(){
         Intent intent = getIntent();
         conversationID = intent.getStringExtra("conversationID");
-        if(intent.hasExtra("conversationID")){
-            db.collection(Conversation.CONVERSATIONS)
-                    .document(conversationID)
-                    .get()
-                    .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                        @Override
-                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                            if(task.isSuccessful()){
-                                conversation = task.getResult().toObject(Conversation.class);
-                            }
-                            getMessages();
-                        }
-                    });
+
+        if(!intent.hasExtra("conversationID")) {
+            return;
         }
+
+//        db.collection(Conversation.CONVERSATIONS)
+//                .document(conversationID)
+//                .addSnapshotListener(new EventListener<DocumentSnapshot>() {
+//                    @Override
+//                    public void onEvent(@Nullable DocumentSnapshot snapshot,
+//                                        @Nullable FirebaseFirestoreException error) {
+//                        if (error != null) {
+//                            Log.w("messageAct.java", "Listen Failed", error);
+//                            return;
+//                        }
+//
+//                        if (snapshot != null && snapshot.exists()) {
+//                            Log.d("messageAct.java", "data: " + snapshot.getData());
+//                            conversation = snapshot.getData().to
+//                        } else {
+//                            Log.d("messageAct.java", "data: null");
+//                        }
+//                    }
+//                });
+
+//        db.collection(Conversation.CONVERSATIONS)
+//                .document(conversationID)
+//                .get()
+//                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+//                    @Override
+//                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+//                        if(task.isSuccessful()){
+//                            conversation = task.getResult().toObject(Conversation.class);
+//                        }
+//                        getMessages();
+//                    }
+//                });
+
+        db.collection(Conversation.CONVERSATIONS)
+                .document(conversationID)
+                .addSnapshotListener(MetadataChanges.INCLUDE, new EventListener<DocumentSnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable DocumentSnapshot value,
+                                        @Nullable FirebaseFirestoreException error) {
+                        conversation = value.toObject(Conversation.class);
+                        getMessages();
+                    }
+                });
     }
 
     private void getMessages(){
