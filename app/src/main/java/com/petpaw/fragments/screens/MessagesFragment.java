@@ -229,7 +229,11 @@ public class MessagesFragment extends Fragment {
     //create new conversation from userIdList
     private void createConversation(List<String> userIdList){
         userIdList.add(mAuth.getCurrentUser().getUid());
+
         // TODO: Check if 1v1 conversation is already created
+
+
+
         Conversation conversation = new Conversation();
         conversation.setMemberIdList(userIdList);
         mDb.collection("Conversations")

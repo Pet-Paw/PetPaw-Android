@@ -91,6 +91,8 @@ public class MessageActivity extends AppCompatActivity {
     }
 
     private void updateLatestMessageId(String latestMessageId) {
+        Log.d("MessageAct", "conversationID = " + conversationID);
+
         db.collection(Conversation.CONVERSATIONS)
                 .document(conversationID)
                 .update("latestMessageId", latestMessageId)
