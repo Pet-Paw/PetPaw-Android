@@ -44,13 +44,14 @@ import java.util.Objects;
 
 public class MessageActivity extends AppCompatActivity {
 
-    ActivityMessageBinding binding;
-    FirebaseFirestore db;
-    FirebaseAuth auth;
-    String conversationID;
-    Conversation conversation;
-    List<Message> messageList = new ArrayList<>();
-    MessageListAdapter messageListAdapter;
+    private ActivityMessageBinding binding;
+    private FirebaseFirestore db;
+    private FirebaseAuth auth;
+    private String conversationID;
+    private Conversation conversation;
+    private List<Message> messageList = new ArrayList<>();
+    private MessageListAdapter messageListAdapter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,6 +74,7 @@ public class MessageActivity extends AppCompatActivity {
             message.setContent(binding.etSendMessage.getText().toString());
             message.setSenderId(auth.getCurrentUser().getUid());
             message.setSentAt(new Date());
+
             db.collection(Conversation.CONVERSATIONS)
                     .document(conversationID)
                     .collection(Message.MESSAGES)
@@ -81,10 +83,23 @@ public class MessageActivity extends AppCompatActivity {
                         @Override
                         public void onComplete(@NonNull Task<DocumentReference> task) {
                             binding.etSendMessage.setText("");
+                            updateLatestMessageId(task.getResult().getId());
                             getConversation();
                         }
                     });
         }
+    }
+
+    private void updateLatestMessageId(String latestMessageId) {
+        db.collection(Conversation.CONVERSATIONS)
+                .document(conversationID)
+                .update("latestMessageId", latestMessageId)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void unused) {
+                        Log.d("MessageAct", "update message " + latestMessageId);
+                    }
+                });
     }
 
     private void getConversation(){
