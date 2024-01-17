@@ -76,7 +76,10 @@ public class CommunityListAdapter extends RecyclerView.Adapter<CommunityListAdap
                 .placeholder(R.drawable.default_avatar)
                 .into(holder.communityCardViewPic);
         if(isSearch){
-            if(communityList.get(position).getMembers().contains(currentUserId)){
+            if(communityList.get(position).getOwner().equals(currentUserId)){
+                holder.joinCommunityBtn.setVisibility(View.GONE);
+                holder.joinedTextView.setVisibility(View.GONE);
+            }else if(communityList.get(position).getMembers().contains(currentUserId)){
                 holder.joinCommunityBtn.setVisibility(View.GONE);
                 holder.joinedTextView.setVisibility(View.VISIBLE);
             }
