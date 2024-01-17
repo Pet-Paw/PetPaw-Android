@@ -57,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
                         userCollection.updateDeviceToken(firebaseUser.getUid(), token);
 
                         // Log and toast
-                        Toast.makeText(MainActivity.this, token, Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(MainActivity.this, token, Toast.LENGTH_SHORT).show();
                         Log.d(TAG, "token: "+  token);
                     }
                 });

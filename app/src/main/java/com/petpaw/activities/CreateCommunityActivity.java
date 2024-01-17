@@ -177,6 +177,11 @@ public class CreateCommunityActivity extends AppCompatActivity {
                             Log.e("CreateCommunityActivity", "Error uploading image", e);
                         }
                     });
+        }else{
+            if (progressDialog.isShowing())
+                progressDialog.dismiss();
+            finish();
+            Log.e("CreateCommunityActivity", "No image selected");
         }
     }
 
