@@ -252,11 +252,12 @@ public class SearchFragment extends Fragment {
                     postList.clear();
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         Post post = document.toObject(Post.class);
+                        String descriptionTemp = combineContentAndTag(post.getContent(), post.getTags());
                         if(searchValue.equals("")){
                             Post postTemp = new Post(post.getAuthorId(), post.getDateModified(), post.getContent(), post.isModified(), post.getImageURL(), post.getLikes(), post.getComments(), post.getPostId(), post.getTags(), post.getPetIdList(), post.getCommunityId());
                             postList.add(postTemp);
                         } else {
-                            if(post.getContent().toLowerCase().contains(searchValue.toLowerCase())){
+                            if(descriptionTemp.toLowerCase().contains(searchValue.toLowerCase())){
                                 Post postTemp = new Post(post.getAuthorId(), post.getDateModified(), post.getContent(), post.isModified(), post.getImageURL(), post.getLikes(), post.getComments(), post.getPostId(), post.getTags(), post.getPetIdList(), post.getCommunityId());
                                 postList.add(postTemp);
                             }
@@ -329,5 +330,12 @@ public class SearchFragment extends Fragment {
                 }
             }
         });
+    }
+
+    private String combineContentAndTag(String description, List<String> tags) {
+        for(int i=0; i<tags.size(); i++) {
+            description += "#" + tags.get(i) + " ";
+        }
+        return description;
     }
 }
