@@ -48,7 +48,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
     public void onBindViewHolder(@NonNull NotificationViewHolder holder, int position) {
         NotificationPetPaw notification = notifications.get(position);
 
-        String userId = notification.getTo();
+        String userId = notification.getFrom();
         UserCollection userCollection = UserCollection.newInstance();
         userCollection.getUser(userId, new UserCollection.Callback() {
             @Override
