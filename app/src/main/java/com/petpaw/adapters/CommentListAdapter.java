@@ -67,20 +67,25 @@ public class CommentListAdapter extends RecyclerView.Adapter<CommentListAdapter.
                                         if(task.isSuccessful()){
                                             DocumentSnapshot doc = task.getResult();
                                             holder.commentUsernameTextView.setText(doc.get("name").toString());
-                                            String imageUrl = doc.get("imageURL").toString();
-                                            Picasso.get()
-                                                    .load(imageUrl)
-                                                    .tag(System.currentTimeMillis())
-                                                    .into(holder.commentUserProfilePic, new com.squareup.picasso.Callback() {
-                                                        @Override
-                                                        public void onSuccess() {
-                                                            Log.d("TAG", "Load image successfully");
-                                                        }
-                                                        @Override
-                                                        public void onError(Exception e) {
-                                                            Log.e("TAG", "Load image failed");
-                                                        }
-                                                    });
+                                            if(doc.get("imageURL") != null){
+                                                String imageUrl = doc.get("imageURL").toString();
+                                                Picasso.get()
+                                                        .load(imageUrl)
+                                                        .tag(System.currentTimeMillis())
+                                                        .into(holder.commentUserProfilePic, new com.squareup.picasso.Callback() {
+                                                            @Override
+                                                            public void onSuccess() {
+                                                                Log.d("TAG", "Load image successfully");
+                                                            }
+                                                            @Override
+                                                            public void onError(Exception e) {
+                                                                Log.e("TAG", "Load image failed");
+                                                            }
+                                                        });
+                                            }else{
+                                                holder.commentUserProfilePic.setImageResource(R.drawable.default_avatar);
+                                            }
+
                                         }
                                     }
                                 });

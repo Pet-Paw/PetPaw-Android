@@ -19,6 +19,7 @@ import android.widget.ImageView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
@@ -45,9 +46,12 @@ public class HomeFragment extends Fragment {
 
     private List<Post> postList = new ArrayList<>();
     private RecyclerView recyclerView;
+    private RecyclerView recyclerViewRandom;
+
     private Context context;
     private String mParam1;
     private String mParam2;
+    private String uid;
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -82,8 +86,10 @@ public class HomeFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         recyclerView = view.findViewById(R.id.homePostRecyclerView);
+        recyclerViewRandom = view.findViewById(R.id.homePostRandomRecyclerView);
 //        getPosts();
-
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        uid = auth.getCurrentUser().getUid();
         ImageView createPostBtn = view.findViewById(R.id.homeCreatePostImageView);
         Button comBtn = view.findViewById(R.id.comBtn);
         createPostBtn.setOnClickListener(new View.OnClickListener() {
@@ -115,27 +121,123 @@ public class HomeFragment extends Fragment {
 
     private void getPosts() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        CollectionReference postsRef = db.collection("Posts"); // Get a reference to the Posts collection
-        Query query = postsRef.whereEqualTo("communityId", null).orderBy("communityId").orderBy("dateModified", Query.Direction.DESCENDING); // Order documents by dateModified in ascending order
-        query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+        List<String> followingList = new ArrayList<>();
+
+        CollectionReference followingRef = db.collection("follows");
+        Query followingQuery = followingRef.whereEqualTo("followerUid", uid);
+        followingQuery.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
+//                Log.d("TAG", "onComplete: " + task.getResult().getDocuments());
                 if (task.isSuccessful()) {
-                    postList.clear();
                     for (QueryDocumentSnapshot document : task.getResult()) {
-                        Post post = document.toObject(Post.class);
-                        Post postTemp = new Post(post.getAuthorId(), post.getDateModified(), post.getContent(), post.isModified(), post.getImageURL(), post.getLikes(), post.getComments(), post.getPostId(), post.getTags(), post.getPetIdList(), post.getCommunityId());
-                        postList.add(postTemp);
+                        followingList.add(document.getString("followingUid"));
                     }
-                    if (context != null) {
-                        recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-                        recyclerView.setAdapter(new PostListAdapter(requireContext(), postList));
+                    followingList.add(uid); //add your own posts to the feed
+
+//                    ----------------- if the user is not following anyone -----------------
+                    if (followingList.size() == 0) {
+//                        all posts displayed in the home fragment in DESCENDING order
+                        CollectionReference postsRef = db.collection("Posts"); // Get a reference to the Posts collection
+                        Query query = postsRef.whereEqualTo("communityId", null).orderBy("communityId").orderBy("dateModified", Query.Direction.DESCENDING); // Order documents by dateModified in ascending order
+                        query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<QuerySnapshot> task) { // Get all documents in the Posts collection
+                                if (task.isSuccessful()) {
+                                    postList.clear();
+                                    for (QueryDocumentSnapshot document : task.getResult()) {
+                                        Post post = document.toObject(Post.class);
+                                        Post postTemp = new Post(post.getAuthorId(), post.getDateModified(), post.getContent(), post.isModified(), post.getImageURL(), post.getLikes(), post.getComments(), post.getPostId(), post.getTags(), post.getPetIdList(), post.getCommunityId());
+                                        postList.add(postTemp);
+                                    }
+                                    if (context != null) {
+                                        recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+                                        recyclerView.setAdapter(new PostListAdapter(requireContext(), postList));
+                                    }
+                                    Log.d("TAG", "onComplete: " + postList);
+                                }else{
+                                    Log.d("TAG", "ERROR: " + task.getException());
+                                }
+                            }
+                        });
+                    }else{
+                        CollectionReference postsRef = db.collection("Posts"); // Get a reference to the Posts collection
+                        Query query = postsRef.whereIn("authorId", followingList).whereEqualTo("communityId", null).orderBy("dateModified", Query.Direction.DESCENDING); // Order documents by dateModified in ascending order
+                        query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<QuerySnapshot> task) { // Get all documents in the Posts collection
+                                if (task.isSuccessful()) {
+                                    postList.clear();
+                                    for (QueryDocumentSnapshot document : task.getResult()) {
+                                        Post post = document.toObject(Post.class);
+                                        Post postTemp = new Post(post.getAuthorId(), post.getDateModified(), post.getContent(), post.isModified(), post.getImageURL(), post.getLikes(), post.getComments(), post.getPostId(), post.getTags(), post.getPetIdList(), post.getCommunityId());
+                                        postList.add(postTemp);
+                                    }
+                                    if (context != null) {
+                                        recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+                                        recyclerView.setAdapter(new PostListAdapter(requireContext(), postList));
+                                    }
+                                    Log.d("TAG", "postList: " + postList);
+                                }else{
+                                    Log.d("TAG", "ERROR: " + task.getException());
+                                }
+                            }
+                        });
+
+                        List<Post> randomPostList = new ArrayList<>();
+                        Query queryRandom = postsRef.whereNotIn("authorId", followingList).whereEqualTo("communityId", null).orderBy("authorId")
+                                .orderBy("dateModified", Query.Direction.DESCENDING); // Order documents by dateModified in ascending order
+                        queryRandom.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<QuerySnapshot> task) { // Get all documents in the Posts collection
+                                if (task.isSuccessful()) {
+                                    for (QueryDocumentSnapshot document : task.getResult()) {
+                                        Post post = document.toObject(Post.class);
+                                        Post postTemp = new Post(post.getAuthorId(), post.getDateModified(), post.getContent(), post.isModified(), post.getImageURL(), post.getLikes(), post.getComments(), post.getPostId(), post.getTags(), post.getPetIdList(), post.getCommunityId());
+                                        randomPostList.add(postTemp);
+                                    }
+                                    if (context != null) {
+                                        recyclerViewRandom.setLayoutManager(new LinearLayoutManager(requireContext()));
+                                        recyclerViewRandom.setAdapter(new PostListAdapter(requireContext(), randomPostList));
+                                    }
+                                    Log.d("randomPostList", "randomPostList: " + randomPostList);
+                                }else{
+                                    Log.d("TAG", "ERROR: " + task.getException());
+                                }
+                            }
+                        });
                     }
-                    Log.d("TAG", "onComplete: " + postList);
-                }else{
+
+                } else {
                     Log.d("TAG", "ERROR: " + task.getException());
                 }
             }
-        });
+            });
+
+
+
+
+//        CollectionReference postsRef = db.collection("Posts"); // Get a reference to the Posts collection
+//        Query query = postsRef.whereEqualTo("communityId", null).orderBy("communityId").orderBy("dateModified", Query.Direction.DESCENDING); // Order documents by dateModified in ascending order
+//        query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+//            @Override
+//            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+//                if (task.isSuccessful()) {
+//                    postList.clear();
+//                    for (QueryDocumentSnapshot document : task.getResult()) {
+//                        Post post = document.toObject(Post.class);
+//                        Post postTemp = new Post(post.getAuthorId(), post.getDateModified(), post.getContent(), post.isModified(), post.getImageURL(), post.getLikes(), post.getComments(), post.getPostId(), post.getTags(), post.getPetIdList(), post.getCommunityId());
+//                        postList.add(postTemp);
+//                    }
+//                    if (context != null) {
+//                        recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+//                        recyclerView.setAdapter(new PostListAdapter(requireContext(), postList));
+//                    }
+//                    Log.d("TAG", "onComplete: " + postList);
+//                }else{
+//                    Log.d("TAG", "ERROR: " + task.getException());
+//                }
+//            }
+//        });
     }
 }
