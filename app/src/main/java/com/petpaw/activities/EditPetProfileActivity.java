@@ -9,15 +9,22 @@ import android.content.Intent;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.View;
+import android.widget.TextView;
 
+import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.petpaw.R;
+import com.petpaw.database.NotificationCollection;
 import com.petpaw.databinding.ActivityEditPetProfileBinding;
 import com.petpaw.databinding.ActivityPetProfileBinding;
+import com.petpaw.models.NotificationPetPaw;
 import com.squareup.picasso.Picasso;
+
+import java.util.List;
 
 public class EditPetProfileActivity extends AppCompatActivity {
     private ActivityEditPetProfileBinding binding;

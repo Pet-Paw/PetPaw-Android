@@ -3,7 +3,9 @@ package com.petpaw.adapters;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.PorterDuff;
+import android.graphics.Typeface;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +17,7 @@ import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -28,6 +31,9 @@ import com.petpaw.activities.PostCommentActivity;
 
 import com.petpaw.activities.CreatePostActivity;
 
+import com.petpaw.clients.NotiSender;
+import com.petpaw.database.NotificationCollection;
+import com.petpaw.models.NotificationPetPaw;
 import com.petpaw.models.Post;
 import com.petpaw.models.User;
 import com.squareup.picasso.Picasso;
@@ -42,6 +48,7 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.PostVi
 
     Context context;
     List<Post> postList;
+    private NotificationCollection notificationCollection = NotificationCollection.newInstance();
 
     public PostListAdapter(Context context, List<Post> postList) {
         this.context = context;
@@ -210,6 +217,8 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.PostVi
 //        --------------- add onClick like button -----------
         holder.postCardViewLikeImageView.setOnClickListener(view -> {
             DocumentReference postRef = db.collection("Posts").document(postId);
+
+
             if(!(likes.contains(currentUserId))) {
                 // User hasn't liked
                 likes.add(currentUserId);
@@ -219,6 +228,21 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.PostVi
                             holder.postCardViewLikeImageView.setColorFilter(ContextCompat.getColor(context, R.color.primary), PorterDuff.Mode.SRC_IN);
                             holder.postCardViewLikeCountTextView.setText(String.valueOf(postList.get(position).getLikes().size()));
                         });
+
+
+
+                NavigationView mNavigationView = view.findViewById(R.id.nav_view);
+                TextView notificationCount = mNavigationView.getMenu().findItem(R.id.notificationsFragment).getActionView().findViewById(R.id.notificationsFragment);
+                notificationCollection.getTotalNewNotification(currentUserId, new NotificationCollection.Callback() {
+                    @Override
+                    public void onCallback(List<NotificationPetPaw> notifications) {
+                        if (notifications.size() > 0) {
+                            notificationCount.setText(String.valueOf(notifications.size()));
+                        } else {
+                            notificationCount.setText("0");
+                        }
+                    }
+                });
             } else {
                 // User has already liked
                 Log.d("TAG", "You unlike this post ");
@@ -228,6 +252,7 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.PostVi
                             holder.postCardViewLikeImageView.clearColorFilter();
                             holder.postCardViewLikeCountTextView.setText(String.valueOf(postList.get(position).getLikes().size()));
                         });
+
             }
 
         });
@@ -268,8 +293,11 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.PostVi
             itemView.setOnClickListener(v -> {
                 Log.d("PostListAdapter", "onClick: " + getAdapterPosition());
             });
+
+
         }
     }
+
 }
 
 //class PostViewHolder extends RecyclerView.ViewHolder {

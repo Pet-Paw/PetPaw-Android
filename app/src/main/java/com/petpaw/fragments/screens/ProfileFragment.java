@@ -64,6 +64,7 @@ import com.petpaw.adapters.UserListAdapter;
 import com.petpaw.clients.NotiSender;
 import com.petpaw.database.FollowCollection;
 import com.petpaw.database.NotificationCollection;
+import com.petpaw.database.UserCollection;
 import com.petpaw.databinding.FragmentMessagesBinding;
 import com.petpaw.databinding.FragmentProfileBinding;
 import com.petpaw.models.FollowRecord;
@@ -106,6 +107,8 @@ public class ProfileFragment extends Fragment {
     private List<User> userFollowingList = new ArrayList<>();
     private List<User> userFollowerList = new ArrayList<>();
     private FollowCollection followCollection = FollowCollection.newInstance();
+
+    private UserCollection userCollection = UserCollection.newInstance();
 
     private String token;
 
@@ -237,8 +240,8 @@ public class ProfileFragment extends Fragment {
             public void onClick(View v) {
 //                if (isAdded()) {
 //                    FrameLayout overlayContainer = getActivity().findViewById(R.id.overlay_profile_fragment);
-                    BottomNavigationView bottomNav = getActivity().findViewById(R.id.bottomNav);
-                    int selectedItemId = bottomNav.getSelectedItemId();
+                BottomNavigationView bottomNav = getActivity().findViewById(R.id.bottomNav);
+                int selectedItemId = bottomNav.getSelectedItemId();
 //
 //                    overlayContainer.setVisibility(View.GONE);
 //
@@ -248,29 +251,29 @@ public class ProfileFragment extends Fragment {
 //                    } else if (selectedItemId == R.id.profileFragment) {
 //                        getActivity().findViewById(R.id.userFollowingFragment).setVisibility(View.VISIBLE);
 //                    }
-                    FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
-                    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
-                    assert getArguments() != null;
-                    int previousFragment = getArguments().getInt(PREVIOUS_FRAGMENT);
-                    Log.d("ProfileFragment", "previousFragment = " + previousFragment);
-                    String owner_uid = getArguments().getString(OWNER_UID);
-                    if (previousFragment == R.id.userFollowingFragment) {
-                        Toast.makeText(requireContext(), "previousFragment = " + previousFragment, Toast.LENGTH_SHORT).show();
-                        fragmentTransaction.replace(R.id.profileFragmentLayout, UserFollowingFragment.newInstance(owner_uid)).commitNow();
-                    } else if (previousFragment == R.id.useFollowerFragment) {
-                        fragmentTransaction.replace(R.id.profileFragmentLayout, UserFollowersFragment.newInstance(owner_uid)).commitNow();
-                    } else if (previousFragment == R.id.searchFragment || selectedItemId == R.id.searchFragment) {
+                assert getArguments() != null;
+                int previousFragment = getArguments().getInt(PREVIOUS_FRAGMENT);
+                Log.d("ProfileFragment", "previousFragment = " + previousFragment);
+                String owner_uid = getArguments().getString(OWNER_UID);
+                if (previousFragment == R.id.userFollowingFragment) {
+                    Toast.makeText(requireContext(), "previousFragment = " + previousFragment, Toast.LENGTH_SHORT).show();
+                    fragmentTransaction.replace(R.id.profileFragmentLayout, UserFollowingFragment.newInstance(owner_uid)).commitNow();
+                } else if (previousFragment == R.id.useFollowerFragment) {
+                    fragmentTransaction.replace(R.id.profileFragmentLayout, UserFollowersFragment.newInstance(owner_uid)).commitNow();
+                } else if (previousFragment == R.id.searchFragment || selectedItemId == R.id.searchFragment) {
 //                        fragmentTransaction.replace(R.id.sear, new SearchFragment()).commitNow();
-                        getActivity().onBackPressed();
+                    getActivity().onBackPressed();
 
-                    } else {
-                        fragmentTransaction.replace(R.id.profileFragmentLayout, new ProfileFragment()).commitNow();
-
-                    }
-
+                } else {
+                    fragmentTransaction.replace(R.id.profileFragmentLayout, new ProfileFragment()).commitNow();
 
                 }
+
+
+            }
 
 //            }
         });
@@ -318,21 +321,36 @@ public class ProfileFragment extends Fragment {
             @SuppressLint("SetTextI18n")
             @Override
             public void onClick(View v) {
-                followCollection.addFollowing(currentUser.getUid(), uid);
-                NotiSender notiSender = new NotiSender(token, currentUser.getUid());
-                notiSender.sendNotificationToDifferentAccount(uid,"Followed you");
-                try {
-                    notiSender.sendNotificationOnCurrentAccount("You followed " + user.getName());
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+                String currentUserUid = currentUser.getUid();
 
-                updateNotificationBadge(currentUser.getUid());
+                userCollection.getUser(currentUserUid, new UserCollection.Callback() {
+                    @Override
+                    public void onCallback(List<User> users) {
 
-                int followersNum = Integer.parseInt(binding.followerNum.getText().toString());
-                binding.followerNum.setText((followersNum + 1) + "");
-                binding.followBtn.setVisibility(View.GONE);
-                binding.unFollowBtn.setVisibility(View.VISIBLE);
+                    }
+
+                    @Override
+                    public void onCallBack(User currentUser) {
+                        followCollection.addFollowing(currentUserUid, uid);
+                        NotiSender notiSender = new NotiSender(token, currentUserUid);
+
+
+
+                        notiSender.sendNotificationToDifferentAccount(uid, currentUser.getName(), "Followed you");
+                        try {
+                            notiSender.sendNotificationOnCurrentAccount("You followed " + user.getName());
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+
+                        updateNotificationBadge(currentUser.getUid());
+
+                        int followersNum = Integer.parseInt(binding.followerNum.getText().toString());
+                        binding.followerNum.setText((followersNum + 1) + "");
+                        binding.followBtn.setVisibility(View.GONE);
+                        binding.unFollowBtn.setVisibility(View.VISIBLE);
+                    }
+                });
             }
         });
 
