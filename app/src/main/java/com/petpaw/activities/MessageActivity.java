@@ -1,6 +1,7 @@
 package com.petpaw.activities;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
@@ -16,8 +17,11 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.MetadataChanges;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.petpaw.R;
@@ -40,13 +44,14 @@ import java.util.Objects;
 
 public class MessageActivity extends AppCompatActivity {
 
-    ActivityMessageBinding binding;
-    FirebaseFirestore db;
-    FirebaseAuth auth;
-    String conversationID;
-    Conversation conversation;
-    List<Message> messageList = new ArrayList<>();
-    MessageListAdapter messageListAdapter;
+    private ActivityMessageBinding binding;
+    private FirebaseFirestore db;
+    private FirebaseAuth auth;
+    private String conversationID;
+    private Conversation conversation;
+    private List<Message> messageList = new ArrayList<>();
+    private MessageListAdapter messageListAdapter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,54 +63,98 @@ public class MessageActivity extends AppCompatActivity {
         setupMessageRV();
         getConversation();
 
-        binding.sendMessageBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(binding.etSendMessage.getText().length() != 0){
-                    Message message = new Message();
-                    message.setContent(binding.etSendMessage.getText().toString());
-                    message.setSenderId(auth.getCurrentUser().getUid());
-                    message.setSentAt(new Date());
-                    db.collection(Conversation.CONVERSATIONS)
-                            .document(conversationID)
-                            .collection(Message.MESSAGES)
-                            .add(message.toDoc())
-                            .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
-                                @Override
-                                public void onComplete(@NonNull Task<DocumentReference> task) {
-                                    binding.etSendMessage.setText("");
-                                    getConversation();
-                                }
-                            });
-                }
-            }
-        });
 
-        binding.backBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+        binding.sendMessageBtn.setOnClickListener(v -> onBtnSendClick());
+        binding.backBtn.setOnClickListener(v -> finish());
+    }
+
+    private void onBtnSendClick() {
+        if(binding.etSendMessage.getText().length() != 0){
+            Message message = new Message();
+            message.setContent(binding.etSendMessage.getText().toString());
+            message.setSenderId(auth.getCurrentUser().getUid());
+            message.setSentAt(new Date());
+
+            db.collection(Conversation.CONVERSATIONS)
+                    .document(conversationID)
+                    .collection(Message.MESSAGES)
+                    .add(message.toDoc())
+                    .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+                        @Override
+                        public void onComplete(@NonNull Task<DocumentReference> task) {
+                            binding.etSendMessage.setText("");
+                            updateLatestMessageId(task.getResult().getId());
+                            getConversation();
+                        }
+                    });
+        }
+    }
+
+    private void updateLatestMessageId(String latestMessageId) {
+        Log.d("MessageAct", "conversationID = " + conversationID);
+
+        db.collection(Conversation.CONVERSATIONS)
+                .document(conversationID)
+                .update("latestMessageId", latestMessageId)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void unused) {
+                        Log.d("MessageAct", "update message " + latestMessageId);
+                    }
+                });
     }
 
     private void getConversation(){
         Intent intent = getIntent();
         conversationID = intent.getStringExtra("conversationID");
-        if(intent.hasExtra("conversationID")){
-            db.collection(Conversation.CONVERSATIONS)
-                    .document(conversationID)
-                    .get()
-                    .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                        @Override
-                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                            if(task.isSuccessful()){
-                                conversation = task.getResult().toObject(Conversation.class);
-                            }
-                            getMessages();
-                        }
-                    });
+
+        if(!intent.hasExtra("conversationID")) {
+            return;
         }
+
+//        db.collection(Conversation.CONVERSATIONS)
+//                .document(conversationID)
+//                .addSnapshotListener(new EventListener<DocumentSnapshot>() {
+//                    @Override
+//                    public void onEvent(@Nullable DocumentSnapshot snapshot,
+//                                        @Nullable FirebaseFirestoreException error) {
+//                        if (error != null) {
+//                            Log.w("messageAct.java", "Listen Failed", error);
+//                            return;
+//                        }
+//
+//                        if (snapshot != null && snapshot.exists()) {
+//                            Log.d("messageAct.java", "data: " + snapshot.getData());
+//                            conversation = snapshot.getData().to
+//                        } else {
+//                            Log.d("messageAct.java", "data: null");
+//                        }
+//                    }
+//                });
+
+//        db.collection(Conversation.CONVERSATIONS)
+//                .document(conversationID)
+//                .get()
+//                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+//                    @Override
+//                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+//                        if(task.isSuccessful()){
+//                            conversation = task.getResult().toObject(Conversation.class);
+//                        }
+//                        getMessages();
+//                    }
+//                });
+
+        db.collection(Conversation.CONVERSATIONS)
+                .document(conversationID)
+                .addSnapshotListener(MetadataChanges.INCLUDE, new EventListener<DocumentSnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable DocumentSnapshot value,
+                                        @Nullable FirebaseFirestoreException error) {
+                        conversation = value.toObject(Conversation.class);
+                        getMessages();
+                    }
+                });
     }
 
     private void getMessages(){
