@@ -33,11 +33,14 @@ import com.petpaw.activities.CreatePostActivity;
 
 import com.petpaw.clients.NotiSender;
 import com.petpaw.database.NotificationCollection;
+import com.petpaw.database.UserCollection;
+import com.petpaw.fragments.screens.SideNavFragment;
 import com.petpaw.models.NotificationPetPaw;
 import com.petpaw.models.Post;
 import com.petpaw.models.User;
 import com.squareup.picasso.Picasso;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -49,6 +52,8 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.PostVi
     Context context;
     List<Post> postList;
     private NotificationCollection notificationCollection = NotificationCollection.newInstance();
+
+    private UserCollection userCollection = UserCollection.newInstance();
 
     public PostListAdapter(Context context, List<Post> postList) {
         this.context = context;
@@ -229,18 +234,35 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.PostVi
                             holder.postCardViewLikeCountTextView.setText(String.valueOf(postList.get(position).getLikes().size()));
                         });
 
-
-
-                NavigationView mNavigationView = view.findViewById(R.id.nav_view);
-                TextView notificationCount = mNavigationView.getMenu().findItem(R.id.notificationsFragment).getActionView().findViewById(R.id.notificationsFragment);
-                notificationCollection.getTotalNewNotification(currentUserId, new NotificationCollection.Callback() {
+                // Send notification to the post's author
+                String authorId = postList.get(position).getAuthorId();
+                userCollection.getUser(authorId, new UserCollection.Callback() {
                     @Override
-                    public void onCallback(List<NotificationPetPaw> notifications) {
-                        if (notifications.size() > 0) {
-                            notificationCount.setText(String.valueOf(notifications.size()));
-                        } else {
-                            notificationCount.setText("0");
-                        }
+                    public void onCallback(List<User> users) {
+
+                    }
+                    @Override
+                    public void onCallBack(User author) {
+                        userCollection.getUser(currentUserId, new UserCollection.Callback() {
+                            @Override
+                            public void onCallback(List<User> users) {
+
+                            }
+
+                            @Override
+                            public void onCallBack(User currentUser) {
+                                String title = currentUser.getName();
+                                NotiSender notiSender = new NotiSender(currentUserId);
+                                if (!Objects.equals(currentUser.getUid(), authorId)) {
+                                    notiSender.sendNotificationToDifferentAccount(authorId, title, "liked your post");
+                                }
+                                try {
+                                    notiSender.sendNotificationOnCurrentAccount("You liked " + author.getName() + "'s post");
+                                } catch (IOException e) {
+                                    throw new RuntimeException(e);
+                                }
+                            }
+                        });
                     }
                 });
             } else {
@@ -298,21 +320,19 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.PostVi
         }
     }
 
-}
+    private void updateNotificationBadge(String currentUserId, View view) {
+        NavigationView mNavigationView = SideNavFragment.mNavigationView;
+        TextView notificationCount = mNavigationView.getMenu().findItem(R.id.notificationsFragment).getActionView().findViewById(R.id.notificationsFragment);
+        notificationCollection.getTotalNewNotification(currentUserId, new NotificationCollection.Callback() {
+            @Override
+            public void onCallback(List<NotificationPetPaw> notifications) {
+                if (notifications.size() > 0) {
+                    notificationCount.setText(String.valueOf(notifications.size()));
+                } else {
+                    notificationCount.setText("0");
+                }
+            }
+        });
+    }
 
-//class PostViewHolder extends RecyclerView.ViewHolder {
-//
-//    ImageView postCardViewProfilePic, postCardImageView;
-//    TextView postCardViewUserNameTextView, postCardViewDate, postCardViewLikeCountTextView, postCardViewCommentCountTextView;
-//
-//    public PostViewHolder(@NonNull View itemView) {
-//        super(itemView);
-//        postCardViewProfilePic = itemView.findViewById(R.id.postCardViewProfilePic);
-//        postCardImageView = itemView.findViewById(R.id.postCardImageView);
-//        postCardViewUserNameTextView = itemView.findViewById(R.id.postCardViewUserNameTextView);
-//        postCardViewDate = itemView.findViewById(R.id.postCardViewDate);
-//        postCardViewLikeCountTextView = itemView.findViewById(R.id.postCardViewLikeCountTextView);
-//        postCardViewCommentCountTextView = itemView.findViewById(R.id.postCardViewCommentCountTextView);
-//
-//    }
-//}
+}

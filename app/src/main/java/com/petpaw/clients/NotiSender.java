@@ -50,8 +50,7 @@ public class NotiSender {
     NotificationCollection notificationCollection = NotificationCollection.newInstance();
 
 
-    public NotiSender(String token, String currentUserId) {
-        this.token = token;
+    public NotiSender(String currentUserId) {
         this.currentUserId = currentUserId;
     }
 

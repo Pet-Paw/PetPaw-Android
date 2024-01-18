@@ -332,7 +332,7 @@ public class ProfileFragment extends Fragment {
                     @Override
                     public void onCallBack(User currentUser) {
                         followCollection.addFollowing(currentUserUid, uid);
-                        NotiSender notiSender = new NotiSender(token, currentUserUid);
+                        NotiSender notiSender = new NotiSender(currentUserUid);
 
 
 
@@ -343,7 +343,7 @@ public class ProfileFragment extends Fragment {
                             throw new RuntimeException(e);
                         }
 
-                        updateNotificationBadge(currentUser.getUid());
+//                        updateNotificationBadge(currentUser.getUid());
 
                         int followersNum = Integer.parseInt(binding.followerNum.getText().toString());
                         binding.followerNum.setText((followersNum + 1) + "");
@@ -359,12 +359,11 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 try {
-                    NotiSender notiSender = new NotiSender(token, currentUser.getUid());
+                    NotiSender notiSender = new NotiSender(currentUser.getUid());
                     notiSender.sendNotificationOnCurrentAccount("You unfollowed " + user.getName());
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
-                updateNotificationBadge(currentUser.getUid());
 
                 followCollection.removeFollowing(currentUser.getUid(), uid);
                 int followersNum = Integer.parseInt(binding.followerNum.getText().toString());
@@ -373,8 +372,6 @@ public class ProfileFragment extends Fragment {
                 binding.unFollowBtn.setVisibility(View.GONE);
             }
         });
-
-
 
         return binding.getRoot();
     }
@@ -494,37 +491,6 @@ public class ProfileFragment extends Fragment {
                 }
             }
         });
-        /*
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        FirebaseAuth auth = FirebaseAuth.getInstance();
-        db.collection("users").document(auth.getCurrentUser().getUid())
-                        .get()
-                        .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                            @Override
-                            public void onSuccess(DocumentSnapshot doc) {
-                                db.collection("Pets")
-                                        .whereIn(FieldPath.documentId(), (List<String>) doc.get("pets"))
-                                        .get()
-                                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                            @Override
-                                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                                if (task.isSuccessful()) {
-                                                    userPetList.clear();
-                                                    for (QueryDocumentSnapshot document : task.getResult()) {
-                                                        Log.d("ProfileFragment", document.getId() + " => " + document.getData());
-                                                        userPetList.add(document.toObject(Pet.class));
-                                                        binding.petsRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-                                                        binding.petsRecyclerView.setAdapter(new PetListAdapter(requireContext(), userPetList));
-                                                    }
-                                                } else {
-                                                    Log.d("ProfileFragment", "Error getting documents: ", task.getException());
-                                                }
-                                            }
-                                        });
-                            }
-                        });
-
-         */
     }
 
     private void getUserFollowers() {
@@ -580,29 +546,6 @@ public class ProfileFragment extends Fragment {
                 } else {
                     Log.e("ProfileFragment", "Error getting user followers: ", task.getException());
                 }
-            }
-        });
-    }
-
-    private void updateNotificationBadge(String currentUserId) {
-        NavigationView mNavigationView = requireActivity().findViewById(R.id.nav_view);
-        TextView notificationCount = mNavigationView.getMenu().findItem(R.id.notificationsFragment).getActionView().findViewById(R.id.notificationsFragment);
-        notificationCount.setGravity(Gravity.CENTER_VERTICAL);
-        notificationCount.setTypeface(null, Typeface.BOLD);
-        notificationCount.setTextColor(getResources().getColor(R.color.primary));
-        notificationCollection.getTotalNewNotification(currentUserId, new NotificationCollection.Callback() {
-            @Override
-            public void onCallback(List<NotificationPetPaw> notifications) {
-                requireActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (notifications.size() > 0) {
-                            notificationCount.setText(String.valueOf(notifications.size()));
-                        } else {
-                            notificationCount.setText("0");
-                        }
-                    }
-                });
             }
         });
     }
