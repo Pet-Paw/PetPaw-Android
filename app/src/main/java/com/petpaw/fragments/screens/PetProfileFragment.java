@@ -26,7 +26,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.petpaw.R;
 import com.petpaw.activities.EditPetProfileActivity;
-import com.petpaw.activities.MessageActivity;
+import com.petpaw.activities.EmptyActivity;
 import com.petpaw.adapters.PetGridAdapter;
 import com.petpaw.databinding.FragmentPetProfileBinding;
 import com.petpaw.databinding.FragmentProfileBinding;
@@ -186,7 +186,7 @@ public class PetProfileFragment extends Fragment {
                     if (isAdded() && getActivity() != null) {
                         getActivity().findViewById(R.id.overlay_pet_fragment).setVisibility(View.GONE);
                         getActivity().findViewById(R.id.profileLayout).setVisibility(View.VISIBLE);
-                        Intent intent = new Intent(requireContext(), MessageActivity.class);
+                        Intent intent = new Intent(requireContext(), EmptyActivity.class);
                         startActivity(intent);
                     }
                 })

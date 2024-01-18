@@ -435,7 +435,11 @@ public class ProfileFragment extends Fragment {
     private void getUserPosts() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         CollectionReference postsRef = db.collection("Posts"); // Get a reference to the Posts collection
-        Query query = postsRef.whereEqualTo("authorId", uid);
+        Query query = postsRef.whereEqualTo("authorId", uid)
+                .whereEqualTo("communityId", null)
+                .orderBy("communityId")
+                .orderBy("dateModified", Query.Direction.DESCENDING);
+
         query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
