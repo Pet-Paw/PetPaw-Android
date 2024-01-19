@@ -77,8 +77,7 @@ public class MessageActivity extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
 
-        binding.btnVoiceCall.setIsVideoCall(false);
-        binding.btnVideoCall.setIsVideoCall(true);
+        binding.btnVoiceCall.setIsVideoCall(true);
 
         setupMessageRV();
         getConversation();
