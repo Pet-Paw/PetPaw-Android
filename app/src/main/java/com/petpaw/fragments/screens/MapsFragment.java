@@ -41,7 +41,6 @@ import java.util.List;
 
 public class MapsFragment extends Fragment {
     FragmentMapsBinding binding;
-    FusedLocationProviderClient client;
     GoogleMap mMap;
     FirebaseFirestore db;
     FirebaseAuth auth;
@@ -60,6 +59,7 @@ public class MapsFragment extends Fragment {
          */
         @Override
         public void onMapReady(GoogleMap googleMap) {
+            mMap = googleMap;
             String conversationID = requireArguments().getString("conversationID").toString();
             db.collection("Conversations")
                     .document(conversationID)
@@ -86,14 +86,16 @@ public class MapsFragment extends Fragment {
                                                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 12));
                                             }
                                             MarkerOptions markerOptions = new MarkerOptions().position(latLng);
-                                            markerList.add(mMap.addMarker(markerOptions));
+                                            Marker marker = mMap.addMarker(markerOptions);
+                                            marker.setTitle(doc.getId());
+                                            markerList.add(marker);
+
                                         }
                                     }
                                 }
                             }
                         }
                     });
-            mMap = googleMap;
         }
     };
 
