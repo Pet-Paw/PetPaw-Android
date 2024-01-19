@@ -56,6 +56,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import timber.log.Timber;
+
 public class MessageActivity extends AppCompatActivity {
 
     private ActivityMessageBinding binding;
@@ -67,7 +69,6 @@ public class MessageActivity extends AppCompatActivity {
     private MessageListAdapter messageListAdapter;
     private Map<String, User> userMap;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,6 +77,9 @@ public class MessageActivity extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
 
+        binding.btnVoiceCall.setIsVideoCall(false);
+        binding.btnVideoCall.setIsVideoCall(true);
+
         setupMessageRV();
         getConversation();
 
@@ -83,8 +87,6 @@ public class MessageActivity extends AppCompatActivity {
 
         binding.sendMessageBtn.setOnClickListener(v -> onBtnSendClick());
         binding.backBtn.setOnClickListener(v -> finish());
-
-
     }
 
     private void onBtnSendClick() {
@@ -123,7 +125,7 @@ public class MessageActivity extends AppCompatActivity {
                 });
     }
 
-    private void getConversation(){
+    private void getConversation() {
         Intent intent = getIntent();
         conversationID = intent.getStringExtra("conversationID");
 
@@ -258,8 +260,7 @@ public class MessageActivity extends AppCompatActivity {
 
                         messageListAdapter.setUserMap(userMap);
 
-                        Log.d("MessageActivity.java", conversation == null ? "Null" : "No null");
-
+                        Timber.tag("MessageActivity.java").d(conversation == null ? "Null" : "No null");
 
                         setupVoiceCallBtn();
                         setupVideoCallBtn();
@@ -303,7 +304,7 @@ public class MessageActivity extends AppCompatActivity {
         long appID = 834069049;   // yourAppID
         String appSign = "73a133c6d11d9eb82624798a9d3db20b2e9d24aeb253c14b9fecc56f57181250";  // yourAppSign
         String userID = auth.getCurrentUser().getUid(); // yourUserID, userID should only contain numbers, English characters, and '_'.
-        String userName = "";   // yourUserName
+        String userName = "Reciever";
 
         ZegoUIKitPrebuiltCallInvitationConfig callInvitationConfig = new ZegoUIKitPrebuiltCallInvitationConfig();
 
@@ -364,7 +365,23 @@ public class MessageActivity extends AppCompatActivity {
     }
 
     private void setupVideoCallBtn() {
+        String currentUserId = auth.getCurrentUser().getUid();
+        String targetUserId = null;
 
+        if (conversation.getMemberIdList().size() > 2) {
+            return;
+        }
+
+        for (String userId: conversation.getMemberIdList()) {
+            if (!userId.equals(currentUserId)) {
+                targetUserId = userId;
+                break;
+            }
+        }
+
+        binding.btnVoiceCall.setIsVideoCall(true);
+        binding.btnVoiceCall.setResourceID("zego_uikit_call");
+        binding.btnVoiceCall.setInvitees(Collections.singletonList(new ZegoUIKitUser(targetUserId)));
     }
 
     @Override
