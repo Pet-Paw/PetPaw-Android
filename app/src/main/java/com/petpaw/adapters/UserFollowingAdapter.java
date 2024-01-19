@@ -5,6 +5,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageView;
@@ -31,16 +32,20 @@ public class UserFollowingAdapter extends RecyclerView.Adapter<UserFollowingAdap
 
     private boolean isFollowing;
 
+    private
+
     public class UserFollowingViewHolder extends RecyclerView.ViewHolder {
         public TextView username;
         public TextView country;
         public ImageView profilePic;
+        public Button btnMessage;
 
         public UserFollowingViewHolder(View itemView) {
             super(itemView);
             username = itemView.findViewById(R.id.username);
             country = itemView.findViewById(R.id.country);
             profilePic = itemView.findViewById(R.id.profilePic);
+            btnMessage = itemView.findViewById(R.id.btnMessage);
         }
     }
 
