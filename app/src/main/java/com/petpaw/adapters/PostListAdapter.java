@@ -3,7 +3,9 @@ package com.petpaw.adapters;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.PorterDuff;
+import android.graphics.Typeface;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +17,7 @@ import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -28,10 +31,16 @@ import com.petpaw.activities.PostCommentActivity;
 
 import com.petpaw.activities.CreatePostActivity;
 
+import com.petpaw.clients.NotiSender;
+import com.petpaw.database.NotificationCollection;
+import com.petpaw.database.UserCollection;
+import com.petpaw.fragments.screens.SideNavFragment;
+import com.petpaw.models.NotificationPetPaw;
 import com.petpaw.models.Post;
 import com.petpaw.models.User;
 import com.squareup.picasso.Picasso;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -42,6 +51,9 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.PostVi
 
     Context context;
     List<Post> postList;
+    private NotificationCollection notificationCollection = NotificationCollection.newInstance();
+
+    private UserCollection userCollection = UserCollection.newInstance();
 
     public PostListAdapter(Context context, List<Post> postList) {
         this.context = context;
@@ -210,6 +222,8 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.PostVi
 //        --------------- add onClick like button -----------
         holder.postCardViewLikeImageView.setOnClickListener(view -> {
             DocumentReference postRef = db.collection("Posts").document(postId);
+
+
             if(!(likes.contains(currentUserId))) {
                 // User hasn't liked
                 likes.add(currentUserId);
@@ -219,6 +233,38 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.PostVi
                             holder.postCardViewLikeImageView.setColorFilter(ContextCompat.getColor(context, R.color.primary), PorterDuff.Mode.SRC_IN);
                             holder.postCardViewLikeCountTextView.setText(String.valueOf(postList.get(position).getLikes().size()));
                         });
+
+                // Send notification to the post's author
+                String authorId = postList.get(position).getAuthorId();
+                userCollection.getUser(authorId, new UserCollection.Callback() {
+                    @Override
+                    public void onCallback(List<User> users) {
+
+                    }
+                    @Override
+                    public void onCallBack(User author) {
+                        userCollection.getUser(currentUserId, new UserCollection.Callback() {
+                            @Override
+                            public void onCallback(List<User> users) {
+
+                            }
+
+                            @Override
+                            public void onCallBack(User currentUser) {
+                                String title = currentUser.getName();
+                                NotiSender notiSender = new NotiSender(currentUserId);
+                                if (!Objects.equals(currentUser.getUid(), authorId)) {
+                                    notiSender.sendNotificationToDifferentAccount(authorId, title, "liked your post");
+                                }
+                                try {
+                                    notiSender.sendNotificationOnCurrentAccount("You liked " + author.getName() + "'s post");
+                                } catch (IOException e) {
+                                    throw new RuntimeException(e);
+                                }
+                            }
+                        });
+                    }
+                });
             } else {
                 // User has already liked
                 Log.d("TAG", "You unlike this post ");
@@ -228,6 +274,7 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.PostVi
                             holder.postCardViewLikeImageView.clearColorFilter();
                             holder.postCardViewLikeCountTextView.setText(String.valueOf(postList.get(position).getLikes().size()));
                         });
+
             }
 
         });
@@ -268,23 +315,24 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.PostVi
             itemView.setOnClickListener(v -> {
                 Log.d("PostListAdapter", "onClick: " + getAdapterPosition());
             });
+
+
         }
     }
-}
 
-//class PostViewHolder extends RecyclerView.ViewHolder {
-//
-//    ImageView postCardViewProfilePic, postCardImageView;
-//    TextView postCardViewUserNameTextView, postCardViewDate, postCardViewLikeCountTextView, postCardViewCommentCountTextView;
-//
-//    public PostViewHolder(@NonNull View itemView) {
-//        super(itemView);
-//        postCardViewProfilePic = itemView.findViewById(R.id.postCardViewProfilePic);
-//        postCardImageView = itemView.findViewById(R.id.postCardImageView);
-//        postCardViewUserNameTextView = itemView.findViewById(R.id.postCardViewUserNameTextView);
-//        postCardViewDate = itemView.findViewById(R.id.postCardViewDate);
-//        postCardViewLikeCountTextView = itemView.findViewById(R.id.postCardViewLikeCountTextView);
-//        postCardViewCommentCountTextView = itemView.findViewById(R.id.postCardViewCommentCountTextView);
-//
-//    }
-//}
+    private void updateNotificationBadge(String currentUserId, View view) {
+        NavigationView mNavigationView = SideNavFragment.mNavigationView;
+        TextView notificationCount = mNavigationView.getMenu().findItem(R.id.notificationsFragment).getActionView().findViewById(R.id.notificationsFragment);
+        notificationCollection.getTotalNewNotification(currentUserId, new NotificationCollection.Callback() {
+            @Override
+            public void onCallback(List<NotificationPetPaw> notifications) {
+                if (notifications.size() > 0) {
+                    notificationCount.setText(String.valueOf(notifications.size()));
+                } else {
+                    notificationCount.setText("0");
+                }
+            }
+        });
+    }
+
+}

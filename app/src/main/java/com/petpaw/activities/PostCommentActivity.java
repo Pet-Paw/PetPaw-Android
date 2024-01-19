@@ -8,12 +8,16 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -24,16 +28,25 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.petpaw.R;
 import com.petpaw.adapters.CommentListAdapter;
+import com.petpaw.clients.NotiSender;
+import com.petpaw.database.NotificationCollection;
+import com.petpaw.database.UserCollection;
 import com.petpaw.databinding.ActivityPostCommentBinding;
 import com.petpaw.databinding.FragmentProfileBinding;
+import com.petpaw.databinding.FragmentSideNavBinding;
+import com.petpaw.fragments.screens.SideNavFragment;
 import com.petpaw.models.Comment;
+import com.petpaw.models.NotificationPetPaw;
 import com.petpaw.models.Post;
+import com.petpaw.models.User;
 import com.squareup.picasso.Picasso;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 public class PostCommentActivity extends AppCompatActivity {
 
@@ -41,6 +54,9 @@ public class PostCommentActivity extends AppCompatActivity {
     FirebaseFirestore db;
     FirebaseAuth auth;
     String postId;
+
+    UserCollection userCollection = UserCollection.newInstance();
+    NotificationCollection notificationCollection = NotificationCollection.newInstance();
 
     List<String> commentIDList;
     @Override
@@ -54,6 +70,9 @@ public class PostCommentActivity extends AppCompatActivity {
 
     @Override
     protected void onStart() {
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
+                .permitAll().build();
+        StrictMode.setThreadPolicy(policy);
         // Inflate the layout for this fragment
         Intent intent = getIntent();
         if (intent.hasExtra("postID")){
@@ -88,6 +107,28 @@ public class PostCommentActivity extends AppCompatActivity {
                                                                 });
                                                     }
                                                 });
+
+                                        String currentUserUid = auth.getCurrentUser().getUid();
+                                        userCollection.getUser(currentUserUid, new UserCollection.Callback() {
+                                            @Override
+                                            public void onCallback(List<User> users) {
+
+                                            }
+
+                                            @Override
+                                            public void onCallBack(User currentUser) {
+                                                NotiSender notiSender = new NotiSender(currentUser.getUid());
+
+                                                if (!Objects.equals(currentUser.getUid(), currentUserUid)) {
+                                                    notiSender.sendNotificationToDifferentAccount(cmt.getAuthor(), currentUser.getName(), " has commented: " + cmt.getContent());
+                                                }
+                                                try {
+                                                    notiSender.sendNotificationOnCurrentAccount("You have commented: " + cmt.getContent());
+                                                } catch (IOException e) {
+                                                    throw new RuntimeException(e);
+                                                }
+                                            }
+                                        });
                                     }
                                 }
                             });

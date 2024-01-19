@@ -49,7 +49,7 @@ public class SideNavFragment extends Fragment implements NavigationView.OnNaviga
 
     DrawerLayout mDrawerLayout;
 
-    public NavigationView mNavigationView;
+    static public NavigationView mNavigationView;
     BottomNavigationView bottomNavigationView;
 
     NotificationCollection notificationCollection = NotificationCollection.newInstance();
@@ -112,6 +112,8 @@ public class SideNavFragment extends Fragment implements NavigationView.OnNaviga
                 super.onDrawerOpened(drawerView);
                 // set layout params to match parent with transition
                 mDrawerLayout.bringToFront();
+
+                initializeCountDrawer();
 
             }
 
@@ -227,4 +229,6 @@ public class SideNavFragment extends Fragment implements NavigationView.OnNaviga
             }
         });
     }
+
+
 }

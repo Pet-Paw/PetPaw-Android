@@ -101,9 +101,6 @@ public class NotificationsFragment extends Fragment {
         });
 
 
-
-
-
         return binding.getRoot();
     }
 }

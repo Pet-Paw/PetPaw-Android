@@ -50,8 +50,7 @@ public class NotiSender {
     NotificationCollection notificationCollection = NotificationCollection.newInstance();
 
 
-    public NotiSender(String token, String currentUserId) {
-        this.token = token;
+    public NotiSender(String currentUserId) {
         this.currentUserId = currentUserId;
     }
 
@@ -90,6 +89,7 @@ public class NotiSender {
                     public void onCallBack(User user) {
                         String title = "You";
                         String token = user.getPhysicalDeviceToken();
+                        Log.d("NotiSender", "token: " + token);
                         NotificationPetPaw notification = new NotificationPetPaw(
                                 title,
                                 body,
@@ -119,7 +119,7 @@ public class NotiSender {
         sendNotiThread.start();
     }
     @Background
-    public void sendNotificationToDifferentAccount(String toUserId, String body) {
+    public void sendNotificationToDifferentAccount(String toUserId, String fromUserName, String body) {
         Thread sendNotiThread = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -132,7 +132,7 @@ public class NotiSender {
 
                     @Override
                     public void onCallBack(User user) {
-                        String title = user.getName();
+                        String title = fromUserName;
                         String token = user.getPhysicalDeviceToken();
                         NotificationPetPaw notification = new NotificationPetPaw(
                                 title,

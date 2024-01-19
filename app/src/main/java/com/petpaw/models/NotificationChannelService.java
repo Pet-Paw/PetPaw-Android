@@ -36,6 +36,7 @@ public class NotificationChannelService extends FirebaseMessagingService {
             Log.d(TAG, "Message data payload: " + message.getData());
 
 
+
             // sending message to current user
             if (message.getNotification() != null) {
                 String notificationBody = message.getNotification().getBody();

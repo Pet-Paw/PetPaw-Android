@@ -42,7 +42,7 @@ import java.io.IOException;
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     private UserCollection userCollection = UserCollection.newInstance();
-    ActivityMainBinding mBinding;
+    private ActivityMainBinding mBinding;
     FirebaseUser firebaseUser;
     ListenerRegistration listener;
 

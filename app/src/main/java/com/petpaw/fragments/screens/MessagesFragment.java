@@ -39,6 +39,7 @@ import com.petpaw.models.User;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -89,12 +90,6 @@ public class MessagesFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mBinding = FragmentMessagesBinding.inflate(inflater, container, false);
-        mBinding.newChatBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                createConversation(new ArrayList<>());
-            }
-        });
         return mBinding.getRoot();
     }
 
@@ -211,7 +206,6 @@ public class MessagesFragment extends Fragment {
 
                             message.setUid(doc.getId());
                             conversation.setLastMessage(message);
-
                             mConversationList.add(conversation);
                         }
 
@@ -266,28 +260,25 @@ public class MessagesFragment extends Fragment {
     }
 
     //create new conversation from userIdList
-    private void createConversation(List<String> userIdList){
-        userIdList.add(mAuth.getCurrentUser().getUid());
-
-        // TODO: Check if 1v1 conversation is already created
-
-
-
-        Conversation conversation = new Conversation();
-        conversation.setMemberIdList(userIdList);
-        mDb.collection("Conversations")
-                .add(conversation.toDoc())
-                .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentReference> task) {
-                        if(task.isSuccessful()){
-                            Intent intent = new Intent(getActivity(), MessageActivity.class);
-                            intent.putExtra("conversationID", task.getResult().getId());
-                            startActivity(intent);
-                        }
-
-                    }
-                });
+    private void createConversation(HashSet<String> userIdSet){
+//        userIdSet.add(mAuth.getCurrentUser().getUid());
+//
+//        // Create new conversation
+//        Conversation conversation = new Conversation();
+//        conversation.setMemberIdList(userIdList);
+//        mDb.collection("Conversations")
+//                .add(conversation.toDoc())
+//                .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+//                    @Override
+//                    public void onComplete(@NonNull Task<DocumentReference> task) {
+//                        if(task.isSuccessful()){
+//                            Intent intent = new Intent(getActivity(), MessageActivity.class);
+//                            intent.putExtra("conversationID", task.getResult().getId());
+//                            startActivity(intent);
+//                        }
+//
+//                    }
+//                });
     }
 
 }
