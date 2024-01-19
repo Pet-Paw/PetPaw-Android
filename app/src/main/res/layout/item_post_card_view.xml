@@ -97,6 +97,15 @@
                         android:src="@drawable/baseline_edit_24"
                         android:layout_gravity="center"
                         android:layout_marginLeft="10dp"/>
+
+                    <ImageView
+                        android:id="@+id/postCardViewReportImageView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/baseline_report_24"
+                        android:layout_gravity="center"
+                        android:layout_marginLeft="10dp"/>
+
                 </LinearLayout>
                 <TextView
                     android:id="@+id/postCardViewContentTextView"

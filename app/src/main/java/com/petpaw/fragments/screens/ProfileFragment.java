@@ -46,6 +46,7 @@ import com.google.android.material.tabs.TabLayoutMediator;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FieldValue;
@@ -185,7 +186,7 @@ public class ProfileFragment extends Fragment {
             // Current user's profile
             binding.editBtn.setVisibility(View.VISIBLE);
             binding.addPetBtn.setVisibility(View.VISIBLE);
-            binding.settingsBtn.setVisibility(View.VISIBLE);
+            binding.reportBtn.setVisibility(View.INVISIBLE);
             binding.backBtn.setVisibility(View.INVISIBLE);
             binding.followBtn.setVisibility(View.GONE);
             binding.messageBtn.setVisibility(View.GONE);
@@ -196,8 +197,29 @@ public class ProfileFragment extends Fragment {
             binding.followBtn.setVisibility(View.VISIBLE);
             binding.messageBtn.setVisibility(View.VISIBLE);
             binding.backBtn.setVisibility(View.VISIBLE);
-            binding.settingsBtn.setVisibility(View.INVISIBLE);
+            binding.reportBtn.setVisibility(View.VISIBLE);
         }
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        binding.reportBtn.setOnClickListener(view -> {
+            DocumentReference postRef = db.collection("Admin").document("nolD8tefH4w9mwE9efzM");
+            postRef.get().addOnCompleteListener(task -> {
+                if (task.isSuccessful() && task.getResult() != null) {
+                    DocumentSnapshot documentSnapshot = task.getResult();
+                    if (documentSnapshot.exists()) {
+                        //add to the "notifications" list a text "post reported"
+                        if(documentSnapshot.get("notifications") != null){
+                            List<String> notifications = (List<String>) documentSnapshot.get("notifications");
+                            notifications.add("USER REPORT: User " + currentUser.getUid() + " has reported user " + uid);
+                            documentSnapshot.getReference().update("notifications", notifications);
+                        }
+                    }
+                } else {
+                    Log.e("PostListAdapter", "Error fetching admin data", task.getException());
+                }
+            });
+        });
+
         binding.displayPosts.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

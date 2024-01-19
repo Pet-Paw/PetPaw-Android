@@ -218,6 +218,26 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.PostVi
                     });
         }
 
+//        ----------------- report post ------------------------
+        holder.postCardViewReportImageView.setOnClickListener(view -> {
+            DocumentReference postRef = db.collection("Admin").document("nolD8tefH4w9mwE9efzM");
+            postRef.get().addOnCompleteListener(task -> {
+                if (task.isSuccessful() && task.getResult() != null) {
+                    DocumentSnapshot documentSnapshot = task.getResult();
+                    if (documentSnapshot.exists()) {
+                        //add to the "notifications" list a text "post reported"
+                        if(documentSnapshot.get("notifications") != null){
+                            List<String> notifications = (List<String>) documentSnapshot.get("notifications");
+                            notifications.add("POST REPORT: User " + currentUserId + " has reported post " + postId);
+                            documentSnapshot.getReference().update("notifications", notifications);
+                        }
+                    }
+                } else {
+                    Log.e("PostListAdapter", "Error fetching admin data", task.getException());
+                }
+            });
+        });
+
 
 //        --------------- add onClick like button -----------
         holder.postCardViewLikeImageView.setOnClickListener(view -> {
@@ -287,7 +307,7 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.PostVi
     }
     public class PostViewHolder extends RecyclerView.ViewHolder {
 
-        ImageView postCardViewProfilePic, postCardImageView, postCardViewLikeImageView, postCardViewCommentImageView, postCardViewEditImageView;
+        ImageView postCardViewProfilePic, postCardImageView, postCardViewLikeImageView, postCardViewCommentImageView, postCardViewEditImageView, postCardViewReportImageView;
         TextView postCardViewIsModified, postCardViewUserNameTextView, postCardViewDate, postCardViewContentTextView, postCardViewLikeCountTextView, postCardViewCommentCountTextView, postCardViewTagsTextView, postCardViewPetNameTextView;
         LinearLayout postCardViewPetNameLinearLayout;
         public PostViewHolder(@NonNull View itemView) {
@@ -308,6 +328,7 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.PostVi
             postCardViewLikeImageView = itemView.findViewById(R.id.postCardViewLikeImageView);
             postCardViewCommentImageView = itemView.findViewById(R.id.postCardViewCommentImageView);
             postCardViewEditImageView = itemView.findViewById(R.id.postCardViewEditImageView);
+            postCardViewReportImageView = itemView.findViewById(R.id.postCardViewReportImageView);
 
 //            --------LinearLayout----------
             postCardViewPetNameLinearLayout = itemView.findViewById(R.id.postCardViewPetNameLinearLayout);
