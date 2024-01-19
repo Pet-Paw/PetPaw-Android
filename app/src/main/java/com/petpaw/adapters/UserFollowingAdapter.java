@@ -55,6 +55,10 @@ public class UserFollowingAdapter extends RecyclerView.Adapter<UserFollowingAdap
         this.currentUserId = currentUserId;
     }
 
+    public void setOnBtnMessageClick(OnBtnMessageClickListener onBtnMessageClick) {
+        this.onBtnMessageClick = onBtnMessageClick;
+    }
+
     @NonNull
     @Override
     public UserFollowingAdapter.UserFollowingViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
