@@ -15,6 +15,7 @@ import android.widget.Toast;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.petpaw.R;
 import com.petpaw.fragments.screens.ProfileFragment;
+import com.petpaw.interfaces.OnBtnMessageClickListener;
 import com.petpaw.models.User;
 import com.petpaw.utils.ImageHelper;
 
@@ -32,7 +33,7 @@ public class UserFollowingAdapter extends RecyclerView.Adapter<UserFollowingAdap
 
     private boolean isFollowing;
 
-    private
+    private OnBtnMessageClickListener onBtnMessageClick;
 
     public class UserFollowingViewHolder extends RecyclerView.ViewHolder {
         public TextView username;
@@ -69,6 +70,15 @@ public class UserFollowingAdapter extends RecyclerView.Adapter<UserFollowingAdap
         String imageUrl = user.getImageURL();
 
         ImageHelper.loadImage(imageUrl, holder.profilePic);
+
+        holder.btnMessage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (onBtnMessageClick != null) {
+                    onBtnMessageClick.onClick(user);
+                }
+            }
+        });
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
