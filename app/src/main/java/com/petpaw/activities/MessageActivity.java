@@ -17,11 +17,15 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.model.LatLng;
@@ -67,8 +71,10 @@ public class MessageActivity extends AppCompatActivity {
     private List<Message> messageList = new ArrayList<>();
     private MessageListAdapter messageListAdapter;
     private FusedLocationProviderClient client;
+    private LocationCallback locationCallback;
+    private LocationRequest locationRequest;
+    private Boolean isSharing = false;
 
-    private GeoPoint curLocation =  new GeoPoint(0,0);
     private final ActivityResultLauncher<String> requestPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
                 if (isGranted) {
@@ -86,18 +92,56 @@ public class MessageActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
         db = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
+        setupLocationSharing();
         setupMessageRV();
         getConversation();
 
 
         binding.sendMessageBtn.setOnClickListener(v -> onBtnSendClick());
         binding.backBtn.setOnClickListener(v -> finish());
-        binding.shareLocationBtn.setOnClickListener(v -> getLocation());
+        binding.shareLocationBtn.setOnClickListener(v -> {
+            if (askLocationPermission()){
+                client = LocationServices.getFusedLocationProviderClient(this);
+                if (isSharing) {
+                    isSharing = false;
+                    binding.shareLocationBtn.setText("Share Location");
+                    stopLocationUpdates();
+                } else {
+                    isSharing = true;
+                    binding.shareLocationBtn.setText("Stop Sharing");
+                    startLocationUpdates();
+                }
+            }
+        });
 
     }
 
+    protected void setupLocationSharing() {
+        locationRequest = new LocationRequest.Builder(1000)
+                .build();
+        locationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                if (locationResult == null) {
+                    return;
+                }
+                for (Location location : locationResult.getLocations()) {
+                    GeoPoint curLoc = new GeoPoint(location.getLatitude(), location.getLongitude());
+                    Map<String, Object> doc = new HashMap<>();
+                    doc.put("location", curLoc);
+                    doc.put("isSharing", true);
+                    db.collection("Conversations")
+                            .document(conversationID)
+                            .collection("locations")
+                            .document(auth.getCurrentUser().getUid())
+                            .update(doc);
+                }
+            }
+        };
+    }
+
     private void onBtnSendClick() {
-        if(binding.etSendMessage.getText().length() != 0){
+        if (binding.etSendMessage.getText().length() != 0) {
             Message message = new Message();
             message.setContent(binding.etSendMessage.getText().toString());
             message.setSenderId(auth.getCurrentUser().getUid());
@@ -132,11 +176,11 @@ public class MessageActivity extends AppCompatActivity {
                 });
     }
 
-    private void getConversation(){
+    private void getConversation() {
         Intent intent = getIntent();
         conversationID = intent.getStringExtra("conversationID");
 
-        if(!intent.hasExtra("conversationID")) {
+        if (!intent.hasExtra("conversationID")) {
             return;
         }
 
@@ -185,7 +229,7 @@ public class MessageActivity extends AppCompatActivity {
                 });
     }
 
-    private void getMessages(){
+    private void getMessages() {
         db.collection(Conversation.CONVERSATIONS)
                 .document(conversationID)
                 .collection(Message.MESSAGES)
@@ -203,7 +247,8 @@ public class MessageActivity extends AppCompatActivity {
                     }
                 });
     }
-    private void getUsers(){
+
+    private void getUsers() {
         db.collection(User.USERS)
                 .whereIn(FieldPath.documentId(), conversation.getMemberIdList())
                 .get()
@@ -212,17 +257,17 @@ public class MessageActivity extends AppCompatActivity {
                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                         Map<String, User> userMap = new HashMap<>();
 
-                        for (DocumentSnapshot doc: queryDocumentSnapshots) {
+                        for (DocumentSnapshot doc : queryDocumentSnapshots) {
                             User user = doc.toObject(User.class);
                             userMap.put(user.getUid(), user);
                         }
                         Log.d("TAG", "User Map: " + userMap);
-                        if(conversation.getMemberIdList().size() <= 2){
-                            for (String userId: conversation.getMemberIdList()) {
+                        if (conversation.getMemberIdList().size() <= 2) {
+                            for (String userId : conversation.getMemberIdList()) {
                                 if (!Objects.equals(userId, auth.getCurrentUser().getUid())) {
                                     User user = userMap.get(userId);
                                     binding.tvName.setText(user.getName());
-                                    if(user.getImageURL() == null){
+                                    if (user.getImageURL() == null) {
                                         binding.ivUserPic.setImageResource(R.drawable.default_avatar);
                                     } else {
                                         Picasso.get()
@@ -245,10 +290,10 @@ public class MessageActivity extends AppCompatActivity {
                         } else {
                             binding.ivUserPic.setImageResource(R.drawable.group_chat_image);
                             String names = "";
-                            for (String userId: conversation.getMemberIdList()) {
+                            for (String userId : conversation.getMemberIdList()) {
                                 if (!Objects.equals(userId, auth.getCurrentUser().getUid())) {
                                     names += userMap.get(userId).getName();
-                                    if(conversation.getMemberIdList().indexOf(userMap.get(userId).getUid()) != (conversation.getMemberIdList().size() - 1)){
+                                    if (conversation.getMemberIdList().indexOf(userMap.get(userId).getUid()) != (conversation.getMemberIdList().size() - 1)) {
                                         names += ", ";
                                     }
                                 }
@@ -262,7 +307,7 @@ public class MessageActivity extends AppCompatActivity {
     }
 
 
-    private void setupMessageRV(){
+    private void setupMessageRV() {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getBaseContext(), LinearLayoutManager.VERTICAL, false);
         linearLayoutManager.setReverseLayout(true);
         binding.rvMessageList.setLayoutManager(linearLayoutManager);
@@ -271,56 +316,42 @@ public class MessageActivity extends AppCompatActivity {
 
     }
 
-    private boolean getLocation(){
-        if (ActivityCompat.checkSelfPermission(getBaseContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getBaseContext(), android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            askLocationPermission();
-            return false;
-        } else {
-            client = LocationServices.getFusedLocationProviderClient(MessageActivity.this);
-            client.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
-                @Override
-                public void onSuccess(Location location) {
-                    if (location == null){
-                        Log.d("TAG", "No location");
-                    } else {
-                        curLocation = new GeoPoint(location.getLatitude(), location.getLongitude());
-                    }
-                }
-            });
-            return true;
-        }
 
-    }
-
-    private void askLocationPermission() {
+    private boolean askLocationPermission() {
         // This is only necessary for API Level > 33 (TIRAMISU)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if ((ContextCompat.checkSelfPermission(MessageActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) ==
-                    PackageManager.PERMISSION_GRANTED) &&  (ContextCompat.checkSelfPermission(MessageActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) ==
-                    PackageManager.PERMISSION_GRANTED)){
-                    Message message = new Message();
-                    message.setContent(curLocation.toString());
-                    message.setSenderId(auth.getCurrentUser().getUid());
-                    message.setSentAt(new Date());
-                    Map<String, Object> map = message.toDoc();
-                    map.put("location", curLocation);
-
-                    db.collection(Conversation.CONVERSATIONS)
-                            .document(conversationID)
-                            .collection(Message.MESSAGES)
-                            .add(map)
-                            .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
-                                @Override
-                                public void onComplete(@NonNull Task<DocumentReference> task) {
-                                    updateLatestMessageId(task.getResult().getId());
-                                    getConversation();
-                                }
-                            });
+                    PackageManager.PERMISSION_GRANTED) && (ContextCompat.checkSelfPermission(MessageActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) ==
+                    PackageManager.PERMISSION_GRANTED)) {
+                return true;
             } else {
                 // Directly ask for the permission
                 requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION);
                 requestPermissionLauncher.launch(Manifest.permission.ACCESS_COARSE_LOCATION);
+                return false;
             }
         }
+        return true;
+    }
+
+    private void startLocationUpdates() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            askLocationPermission();
+            return;
+        }
+        client.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper());
+    }
+
+    private void stopLocationUpdates(){
+        GeoPoint loc = new GeoPoint(0, 0);
+        Map<String, Object> doc = new HashMap<>();
+        doc.put("location", loc);
+        doc.put("isSharing", false);
+        db.collection("Conversations")
+                .document(conversationID)
+                .collection("locations")
+                .document(auth.getCurrentUser().getUid())
+                .update(doc);
+        client.removeLocationUpdates(locationCallback);
     }
 }
