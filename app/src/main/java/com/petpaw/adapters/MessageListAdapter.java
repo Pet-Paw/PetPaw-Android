@@ -75,6 +75,7 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
         Message message = messageList.get(position);
 
         holder.mBinding.tvContent.setText(message.getContent());
+
         if(message.getSenderId().equals(auth.getCurrentUser().getUid())){
             holder.mBinding.llMessageBox.setBackgroundTintList(context.getColorStateList(R.color.primary));
             holder.mBinding.tvContent.setTextColor(context.getColor(R.color.white));

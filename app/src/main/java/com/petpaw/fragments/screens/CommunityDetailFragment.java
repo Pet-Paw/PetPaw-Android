@@ -140,10 +140,12 @@ public class CommunityDetailFragment extends Fragment {
                                 binding.deleteCommunityBtn.setVisibility(View.VISIBLE);
                                 binding.leaveCommunityBtn.setVisibility(View.GONE);
                                 binding.createPostCommunityBtn.setVisibility(View.VISIBLE);
+                                binding.chatBtn.setVisibility(View.VISIBLE);
                             } else if(membersList.contains(userId)){
                                 binding.deleteCommunityBtn.setVisibility(View.GONE);
                                 binding.leaveCommunityBtn.setVisibility(View.VISIBLE);
                                 binding.createPostCommunityBtn.setVisibility(View.VISIBLE);
+                                binding.chatBtn.setVisibility(View.VISIBLE);
                             }
                             else {
                                 binding.deleteCommunityBtn.setVisibility(View.GONE);

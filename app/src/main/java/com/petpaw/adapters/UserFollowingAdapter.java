@@ -5,6 +5,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageView;
@@ -14,6 +15,7 @@ import android.widget.Toast;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.petpaw.R;
 import com.petpaw.fragments.screens.ProfileFragment;
+import com.petpaw.interfaces.OnBtnMessageClickListener;
 import com.petpaw.models.User;
 import com.petpaw.utils.ImageHelper;
 
@@ -31,22 +33,30 @@ public class UserFollowingAdapter extends RecyclerView.Adapter<UserFollowingAdap
 
     private boolean isFollowing;
 
+    private OnBtnMessageClickListener onBtnMessageClick;
+
     public class UserFollowingViewHolder extends RecyclerView.ViewHolder {
         public TextView username;
         public TextView country;
         public ImageView profilePic;
+        public Button btnMessage;
 
         public UserFollowingViewHolder(View itemView) {
             super(itemView);
             username = itemView.findViewById(R.id.username);
             country = itemView.findViewById(R.id.country);
             profilePic = itemView.findViewById(R.id.profilePic);
+            btnMessage = itemView.findViewById(R.id.btnMessage);
         }
     }
 
     public UserFollowingAdapter(boolean isFollowing, String currentUserId) {
         this.isFollowing = isFollowing;
         this.currentUserId = currentUserId;
+    }
+
+    public void setOnBtnMessageClick(OnBtnMessageClickListener onBtnMessageClick) {
+        this.onBtnMessageClick = onBtnMessageClick;
     }
 
     @NonNull
@@ -64,6 +74,15 @@ public class UserFollowingAdapter extends RecyclerView.Adapter<UserFollowingAdap
         String imageUrl = user.getImageURL();
 
         ImageHelper.loadImage(imageUrl, holder.profilePic);
+
+        holder.btnMessage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (onBtnMessageClick != null) {
+                    onBtnMessageClick.onClick(user);
+                }
+            }
+        });
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override

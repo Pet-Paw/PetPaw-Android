@@ -22,8 +22,11 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.MetadataChanges;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.petpaw.activities.MessageActivity;
@@ -36,6 +39,7 @@ import com.petpaw.models.User;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -86,12 +90,6 @@ public class MessagesFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mBinding = FragmentMessagesBinding.inflate(inflater, container, false);
-        mBinding.newChatBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                createConversation(new ArrayList<>());
-            }
-        });
         return mBinding.getRoot();
     }
 
@@ -124,19 +122,49 @@ public class MessagesFragment extends Fragment {
     }
 
     private void getConversationsFromDb() {
+//        mDb.collection(Conversation.CONVERSATIONS)
+//                .whereArrayContains("memberIdList", mAuth.getCurrentUser().getUid())
+//                .get()
+//                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+//                    @Override
+//                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+//                        mNumConversations = queryDocumentSnapshots.size();
+//                        Log.d("messages.java", "mNumConversations = " + mNumConversations);
+//                        mConversationList = new ArrayList<>();
+//
+//                        mUserIdList = new ArrayList<>();
+//
+//                        for (DocumentSnapshot doc: queryDocumentSnapshots) {
+//                            Conversation conversation = doc.toObject(Conversation.class);
+//                            assert conversation != null;
+//                            conversation.setUid(doc.getId());
+//
+//                            for (String userId: conversation.getMemberIdList()) {
+//                                if (!Objects.equals(userId, mAuth.getCurrentUser().getUid())) {
+//                                    mUserIdList.add(userId);
+//                                }
+//                            }
+//
+//                            getLastMessageFromDb(conversation);
+//                        }
+//
+//                        getUsersFromDb();
+//                    }
+//                });
+
         mDb.collection(Conversation.CONVERSATIONS)
                 .whereArrayContains("memberIdList", mAuth.getCurrentUser().getUid())
-                .get()
-                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                .addSnapshotListener(MetadataChanges.INCLUDE, new EventListener<QuerySnapshot>() {
                     @Override
-                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                        mNumConversations = queryDocumentSnapshots.size();
+                    public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                        assert value != null;
+                        mNumConversations = value.size();
                         Log.d("messages.java", "mNumConversations = " + mNumConversations);
                         mConversationList = new ArrayList<>();
 
                         mUserIdList = new ArrayList<>();
 
-                        for (DocumentSnapshot doc: queryDocumentSnapshots) {
+                        for (DocumentSnapshot doc: value) {
                             Conversation conversation = doc.toObject(Conversation.class);
                             assert conversation != null;
                             conversation.setUid(doc.getId());
@@ -153,6 +181,12 @@ public class MessagesFragment extends Fragment {
                         getUsersFromDb();
                     }
                 });
+//                .get()
+//                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+//                    @Override
+//                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+//                    }
+//                });
     }
 
     private void getLastMessageFromDb(Conversation conversation) {
@@ -227,24 +261,25 @@ public class MessagesFragment extends Fragment {
     }
 
     //create new conversation from userIdList
-    private void createConversation(List<String> userIdList){
-        userIdList.add(mAuth.getCurrentUser().getUid());
-        // TODO: Check if 1v1 conversation is already created
-        Conversation conversation = new Conversation();
-        conversation.setMemberIdList(userIdList);
-        mDb.collection("Conversations")
-                .add(conversation.toDoc())
-                .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentReference> task) {
-                        if(task.isSuccessful()){
-                            Intent intent = new Intent(getActivity(), MessageActivity.class);
-                            intent.putExtra("conversationID", task.getResult().getId());
-                            startActivity(intent);
-                        }
-
-                    }
-                });
+    private void createConversation(HashSet<String> userIdSet){
+//        userIdSet.add(mAuth.getCurrentUser().getUid());
+//
+//        // Create new conversation
+//        Conversation conversation = new Conversation();
+//        conversation.setMemberIdList(userIdList);
+//        mDb.collection("Conversations")
+//                .add(conversation.toDoc())
+//                .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+//                    @Override
+//                    public void onComplete(@NonNull Task<DocumentReference> task) {
+//                        if(task.isSuccessful()){
+//                            Intent intent = new Intent(getActivity(), MessageActivity.class);
+//                            intent.putExtra("conversationID", task.getResult().getId());
+//                            startActivity(intent);
+//                        }
+//
+//                    }
+//                });
     }
 
 }

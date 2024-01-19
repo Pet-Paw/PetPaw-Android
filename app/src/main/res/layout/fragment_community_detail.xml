@@ -87,6 +87,18 @@
                     app:cornerRadius="20dp" />
 
                 <Button
+                    android:id="@+id/chatBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="5dp"
+                    android:text="Chat"
+                    android:textAllCaps="false"
+                    android:textColor="@color/black"
+                    app:cornerRadius="20dp"
+                    android:visibility="gone"
+                    />
+
+                <Button
                     android:id="@+id/leaveCommunityBtn"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
