@@ -22,6 +22,7 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
@@ -36,6 +37,7 @@ import com.petpaw.activities.CreatePostActivity;
 import com.petpaw.activities.EmptyActivity;
 import com.petpaw.adapters.PostListAdapter;
 import com.petpaw.databinding.FragmentCommunityDetailBinding;
+import com.petpaw.models.Community;
 import com.petpaw.models.Post;
 
 import java.util.ArrayList;
@@ -58,7 +60,8 @@ public class CommunityDetailFragment extends Fragment {
     private Context context;
     private List<Post> postList = new ArrayList<>();
     private RecyclerView recyclerView;
-    private String mParam2;
+
+    private Community mCommunity;
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -93,7 +96,6 @@ public class CommunityDetailFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             communityId = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
         }
     }
 
@@ -125,6 +127,8 @@ public class CommunityDetailFragment extends Fragment {
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                         if(task.isSuccessful()) {
                             DocumentSnapshot document = task.getResult();
+
+                            mCommunity = document.toObject(Community.class);
 //                            ----------------- bind Name and Description -----------------
                             binding.communityDetailName.setText(document.get("name").toString());
                             binding.communityDetailDescription.setText(document.get("description").toString());
@@ -213,6 +217,9 @@ public class CommunityDetailFragment extends Fragment {
             }
         });
 
+//        ----------------------- Chat Button --------------------------
+        binding.chatBtn.setOnClickListener(v -> onChatBtnClick());
+
 //        ----------------------- Back Button --------------------------
         binding.backBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -256,5 +263,17 @@ public class CommunityDetailFragment extends Fragment {
                 }
             }
         });
+    }
+
+    private void onChatBtnClick() {
+        if (mCommunity.getMembers().size() <= 1) {
+            Snackbar.make(binding.chatBtn, "Please add more member to chat", Snackbar.LENGTH_SHORT)
+                    .show();
+            return;
+        }
+
+        if (mCommunity.getConversationId() != null) {
+            
+        }
     }
 }
