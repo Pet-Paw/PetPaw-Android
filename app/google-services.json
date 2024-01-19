@@ -8,9 +8,47 @@
   "client": [
     {
       "client_info": {
+        "mobilesdk_app_id": "1:262951920597:android:89c731a4701801dc04535c",
+        "android_client_info": {
+          "package_name": "com.example.petpawadmin"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD8uH6wb6mMn5ifakAKhe-OURUAThXPwsk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:262951920597:android:0ba3f57aa272b91504535c",
         "android_client_info": {
           "package_name": "com.petpaw"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD8uH6wb6mMn5ifakAKhe-OURUAThXPwsk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:262951920597:android:908f915b24a8f76304535c",
+        "android_client_info": {
+          "package_name": "com.petpawf"
         }
       },
       "oauth_client": [],

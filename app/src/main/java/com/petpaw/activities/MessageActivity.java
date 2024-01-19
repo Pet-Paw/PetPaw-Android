@@ -41,6 +41,7 @@ import com.petpaw.models.Message;
 import com.petpaw.models.User;
 import com.petpaw.utils.ImageHelper;
 import com.squareup.picasso.Picasso;
+import com.zegocloud.uikit.prebuilt.call.config.ZegoNotificationConfig;
 import com.zegocloud.uikit.prebuilt.call.invite.ZegoUIKitPrebuiltCallInvitationConfig;
 import com.zegocloud.uikit.prebuilt.call.invite.ZegoUIKitPrebuiltCallInvitationService;
 import com.zegocloud.uikit.prebuilt.call.invite.widget.ZegoSendCallInvitationButton;
@@ -78,9 +79,12 @@ public class MessageActivity extends AppCompatActivity {
         setupMessageRV();
         getConversation();
 
+        requestCallPermissions();
+
         binding.sendMessageBtn.setOnClickListener(v -> onBtnSendClick());
         binding.backBtn.setOnClickListener(v -> finish());
-        binding.btnCall.setOnClickListener(v -> onBtnCallClick());
+
+
     }
 
     private void onBtnSendClick() {
@@ -253,6 +257,12 @@ public class MessageActivity extends AppCompatActivity {
                         }
 
                         messageListAdapter.setUserMap(userMap);
+
+                        Log.d("MessageActivity.java", conversation == null ? "Null" : "No null");
+
+
+                        setupVoiceCallBtn();
+                        setupVideoCallBtn();
                     }
                 });
     }
@@ -268,7 +278,6 @@ public class MessageActivity extends AppCompatActivity {
     }
 
     private void onBtnCallClick() {
-        requestCallPermissions();
     }
 
     private void requestCallPermissions() {
@@ -285,42 +294,83 @@ public class MessageActivity extends AppCompatActivity {
                     @Override
                     public void onResult(boolean allGranted, @NonNull List<String> grantedList, @NonNull List<String> deniedList) {
                         initCallInvitationService();
-
-                        String currentUserId = auth.getCurrentUser().getUid();
-                        String targetUserId = null;
-
-                        if (conversation.getMemberIdList().size() > 2) {
-                            return;
-                        }
-
-                        for (String userId: conversation.getMemberIdList()) {
-                            if (!userId.equals(currentUserId)) {
-                                targetUserId = userId;
-                                break;
-                            }
-                        }
-
-                        Log.d("messageActivity.java", "Chuan bi call");
-
-                        String targetUserName = userMap.get(targetUserId).getName();
-                        Context context = MessageActivity.this;
-
-                        ZegoSendCallInvitationButton callButton = new ZegoSendCallInvitationButton(context);
-                        callButton.setIsVideoCall(false);
-                        callButton.setResourceID("zego_uikit_call"); // Please fill in the resource ID name that has been configured in the ZEGOCLOUD's console here.
-                        callButton.setInvitees(Collections.singletonList(new ZegoUIKitUser(targetUserId,targetUserName)));
+//                        onlineCall();
                     }
                 });
     }
 
     private void initCallInvitationService() {
-        Application application = MessageActivity.this.getApplication();
         long appID = 834069049;   // yourAppID
         String appSign = "73a133c6d11d9eb82624798a9d3db20b2e9d24aeb253c14b9fecc56f57181250";  // yourAppSign
         String userID = auth.getCurrentUser().getUid(); // yourUserID, userID should only contain numbers, English characters, and '_'.
         String userName = "";   // yourUserName
 
         ZegoUIKitPrebuiltCallInvitationConfig callInvitationConfig = new ZegoUIKitPrebuiltCallInvitationConfig();
+
+        ZegoNotificationConfig notificationConfig = new ZegoNotificationConfig();
+        notificationConfig.sound = "zego_uikit_sound_call";
+        notificationConfig.channelID = "CallInvitation";
+        notificationConfig.channelName = "CallInvitation";
+
         ZegoUIKitPrebuiltCallInvitationService.init(getApplication(), appID, appSign, userID, userName,callInvitationConfig);
     }
+
+//    private void onlineCall() {
+//        String currentUserId = auth.getCurrentUser().getUid();
+//        String targetUserId = null;
+//
+//        if (conversation.getMemberIdList().size() > 2) {
+//            return;
+//        }
+//
+//        for (String userId: conversation.getMemberIdList()) {
+//            if (!userId.equals(currentUserId)) {
+//                targetUserId = userId;
+//                break;
+//            }
+//        }
+//
+//        Log.d("messageActivity.java", "Chuan bi call");
+//
+//        String targetUserName = "Receiver";
+//        Context context = MessageActivity.this;
+//
+//        ZegoSendCallInvitationButton callButton = new ZegoSendCallInvitationButton(context);
+//        callButton.setIsVideoCall(false);
+//        callButton.setResourceID("Pet Paw"); // Please fill in the resource ID name that has been configured in the ZEGOCLOUD's console here.
+//        callButton.setInvitees(Collections.singletonList(new ZegoUIKitUser(targetUserId,targetUserName)));
+//
+//        Log.d("messageActivity.java", "Xong cai cal");
+//    }
+
+    private void setupVoiceCallBtn() {
+        String currentUserId = auth.getCurrentUser().getUid();
+        String targetUserId = null;
+
+        if (conversation.getMemberIdList().size() > 2) {
+            return;
+        }
+
+        for (String userId: conversation.getMemberIdList()) {
+            if (!userId.equals(currentUserId)) {
+                targetUserId = userId;
+                break;
+            }
+        }
+
+        binding.btnVoiceCall.setIsVideoCall(false);
+        binding.btnVoiceCall.setResourceID("zego_uikit_call");
+        binding.btnVoiceCall.setInvitees(Collections.singletonList(new ZegoUIKitUser(targetUserId)));
+    }
+
+    private void setupVideoCallBtn() {
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        ZegoUIKitPrebuiltCallInvitationService.unInit();
+    }
+
 }

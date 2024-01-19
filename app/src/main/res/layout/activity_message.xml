@@ -46,11 +46,17 @@
             android:gravity="center_vertical"
             />
 
-        <ImageButton
-            android:id="@+id/btnCall"
+        <com.zegocloud.uikit.prebuilt.call.invite.widget.ZegoSendCallInvitationButton
+            android:id="@+id/btnVoiceCall"
             android:layout_width="36dp"
             android:layout_height="36dp"
-            android:src="@drawable/baseline_android_24"
+            android:backgroundTint="@color/white"
+            app:tint="@color/primary" />
+
+        <com.zegocloud.uikit.prebuilt.call.invite.widget.ZegoSendCallInvitationButton
+            android:id="@+id/btnVideoCall"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
             android:backgroundTint="@color/white"
             app:tint="@color/primary" />
 
