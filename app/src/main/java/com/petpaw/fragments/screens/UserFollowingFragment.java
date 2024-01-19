@@ -134,6 +134,50 @@ public class UserFollowingFragment extends Fragment {
                             if (followingUsers.size() == 0) {
                                 msgNoFollowing.setVisibility(TextView.VISIBLE);
                             }
+
+                            userFollowingAdapter.setOnBtnMessageClick(new OnBtnMessageClickListener() {
+                                @Override
+                                public void onClick(User user) {
+                                    String currentUserId = auth.getCurrentUser().getUid();
+                                    String userId = user.getUid();
+
+                                    mDb.collection(Conversation.CONVERSATIONS)
+                                            .whereArrayContains("memberIdList", currentUserId)
+                                            .get()
+                                            .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                                                @Override
+                                                public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                                    String conversationId = null;
+
+                                                    for (DocumentSnapshot doc: queryDocumentSnapshots) {
+                                                        Conversation conversation = doc.toObject(Conversation.class);
+                                                        assert conversation != null;
+                                                        List<String> memberIdList = conversation.getMemberIdList();
+
+                                                        if (memberIdList.size() == 2
+                                                                && memberIdList.contains(currentUserId)
+                                                                && memberIdList.contains(userId)) {
+                                                            conversationId = doc.getId();
+                                                            break;
+                                                        }
+                                                    }
+
+                                                    if (conversationId != null) {
+                                                        moveToMessageActivity(conversationId);
+                                                        return;
+                                                    }
+
+                                                    List<String> memberIdList = new ArrayList<>();
+                                                    memberIdList.add(userId);
+                                                    memberIdList.add(currentUserId);
+                                                    createConversation(memberIdList);
+                                                }
+                                            });
+                                }
+                            });
+
+
+
                         }
                     });
 
@@ -168,46 +212,6 @@ public class UserFollowingFragment extends Fragment {
             }
         });
 
-        userFollowingAdapter.setOnBtnMessageClick(new OnBtnMessageClickListener() {
-            @Override
-            public void onClick(User user) {
-                String currentUserId = auth.getCurrentUser().getUid();
-                String userId = user.getUid();
-
-                mDb.collection(Conversation.CONVERSATIONS)
-                        .whereArrayContains("memberIdList", currentUserId)
-                        .get()
-                        .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                            @Override
-                            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                                String conversationId = null;
-
-                                for (DocumentSnapshot doc: queryDocumentSnapshots) {
-                                    Conversation conversation = doc.toObject(Conversation.class);
-                                    assert conversation != null;
-                                    List<String> memberIdList = conversation.getMemberIdList();
-
-                                    if (memberIdList.size() == 2
-                                            && memberIdList.contains(currentUserId)
-                                            && memberIdList.contains(userId)) {
-                                        conversationId = doc.getId();
-                                        break;
-                                    }
-                                }
-
-                                if (conversationId != null) {
-                                    moveToMessageActivity(conversationId);
-                                    return;
-                                }
-
-                                List<String> memberIdList = new ArrayList<>();
-                                memberIdList.add(userId);
-                                memberIdList.add(currentUserId);
-                                createConversation(memberIdList);
-                            }
-                        });
-            }
-        });
 
         // Inflate the layout for this fragment
         return userFollowingBinding.getRoot();
