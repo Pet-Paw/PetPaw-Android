@@ -206,7 +206,6 @@ public class MessagesFragment extends Fragment {
 
                             message.setUid(doc.getId());
                             conversation.setLastMessage(message);
-
                             mConversationList.add(conversation);
                         }
 
