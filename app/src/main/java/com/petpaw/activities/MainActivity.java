@@ -23,6 +23,13 @@ import com.google.android.material.navigation.NavigationBarView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.petpaw.R;
 import com.petpaw.clients.NotiSender;
@@ -37,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
     private UserCollection userCollection = UserCollection.newInstance();
     ActivityMainBinding mBinding;
     FirebaseUser firebaseUser;
+    ListenerRegistration listener;
 
     @Override
     protected void onStart() {
@@ -78,9 +86,15 @@ public class MainActivity extends AppCompatActivity {
         setupUI();
     }
 
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        listener.remove();
+    }
+
     private void setupUI() {
         setupBottomNav();
-
     }
 
     @SuppressLint("NonConstantResourceId")
@@ -198,6 +212,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPostResume() {
         super.onPostResume();
+        startBanListener();
     }
 
     @Override
@@ -206,5 +221,34 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    private void startBanListener(){
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        String uid = currentUser.getUid();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        CollectionReference usersRef = db.collection("users");
+        DocumentReference docRef = usersRef.document(uid);
+
+        listener = docRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+            @Override
+            public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
+                if (error != null) {
+                    Log.d(TAG, "get failed with " + error);
+                    return;
+                }
+
+                if (value != null && value.exists()) {
+                    String banReason = (String) value.get("banReason");
+
+                    if (!(banReason == null || banReason.isEmpty())) {
+                        // banReason is null
+                        Intent intent = new Intent(MainActivity.this, BanActivity.class);
+                        startActivity(intent);
+                        //finish();
+                    }
+                }
+            }
+        });
+    }
 
 }
