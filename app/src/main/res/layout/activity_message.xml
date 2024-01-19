@@ -37,6 +37,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="20dp"
             android:layout_marginStart="20dp"
+            android:layout_marginRight="20dp"
             android:layout_weight="1"
             android:text="Name"
             android:textColor="@color/black"
@@ -45,6 +46,13 @@
             android:gravity="center_vertical"
             />
 
+        <ImageButton
+            android:id="@+id/btnCall"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:src="@drawable/baseline_android_24"
+            android:backgroundTint="@color/white"
+            app:tint="@color/primary" />
 
     </LinearLayout>
 

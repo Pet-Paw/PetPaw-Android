@@ -5,6 +5,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import android.Manifest;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -24,6 +25,10 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.MetadataChanges;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.permissionx.guolindev.PermissionX;
+import com.permissionx.guolindev.callback.ExplainReasonCallback;
+import com.permissionx.guolindev.callback.RequestCallback;
+import com.permissionx.guolindev.request.ExplainScope;
 import com.petpaw.R;
 import com.petpaw.adapters.ConversationListAdapter;
 import com.petpaw.adapters.MessageListAdapter;
@@ -35,6 +40,7 @@ import com.petpaw.models.User;
 import com.petpaw.utils.ImageHelper;
 import com.squareup.picasso.Picasso;
 
+import java.security.Permission;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -63,9 +69,9 @@ public class MessageActivity extends AppCompatActivity {
         setupMessageRV();
         getConversation();
 
-
         binding.sendMessageBtn.setOnClickListener(v -> onBtnSendClick());
         binding.backBtn.setOnClickListener(v -> finish());
+        binding.btnCall.setOnClickListener(v -> onBtnCallClick());
     }
 
     private void onBtnSendClick() {
@@ -216,16 +222,24 @@ public class MessageActivity extends AppCompatActivity {
                             }
                         } else {
                             binding.ivUserPic.setImageResource(R.drawable.group_chat_image);
-                            String names = "";
+                            StringBuilder names = new StringBuilder();
+                            int cnt = 0;
                             for (String userId: conversation.getMemberIdList()) {
                                 if (!Objects.equals(userId, auth.getCurrentUser().getUid())) {
-                                    names += userMap.get(userId).getName();
+                                    names.append(userMap.get(userId).getName());
+                                    cnt++;
+
+                                    if (cnt == 3) {
+                                        break;
+                                    }
+
                                     if(conversation.getMemberIdList().indexOf(userMap.get(userId).getUid()) != (conversation.getMemberIdList().size() - 1)){
-                                        names += ", ";
+                                        names.append(", ");
                                     }
                                 }
                             }
-                            binding.tvName.setText(names);
+
+                            binding.tvName.setText(names.toString());
                         }
 
                         messageListAdapter.setUserMap(userMap);
@@ -241,5 +255,27 @@ public class MessageActivity extends AppCompatActivity {
         messageListAdapter = new MessageListAdapter(getBaseContext());
         binding.rvMessageList.setAdapter(messageListAdapter);
 
+    }
+
+    private void onBtnCallClick() {
+        requestCallPermissions();
+    }
+
+    private void requestCallPermissions() {
+        PermissionX.init(MessageActivity.this)
+                .permissions(Manifest.permission.SYSTEM_ALERT_WINDOW)
+                .onExplainRequestReason(new ExplainReasonCallback() {
+                    @Override
+                    public void onExplainReason(@NonNull ExplainScope scope, @NonNull List<String> deniedList) {
+                        String message = "We need your consent for the following permissions in order to use the offline call function properly";
+                        scope.showRequestReasonDialog(deniedList, message, "Allow", "Deny");
+                    }
+                })
+                .request(new RequestCallback() {
+                    @Override
+                    public void onResult(boolean allGranted, @NonNull List<String> grantedList, @NonNull List<String> deniedList) {
+
+                    }
+                });
     }
 }
