@@ -5,6 +5,9 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import android.Manifest;
+import android.app.Application;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -24,6 +27,10 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.MetadataChanges;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.permissionx.guolindev.PermissionX;
+import com.permissionx.guolindev.callback.ExplainReasonCallback;
+import com.permissionx.guolindev.callback.RequestCallback;
+import com.permissionx.guolindev.request.ExplainScope;
 import com.petpaw.R;
 import com.petpaw.adapters.ConversationListAdapter;
 import com.petpaw.adapters.MessageListAdapter;
@@ -34,13 +41,22 @@ import com.petpaw.models.Message;
 import com.petpaw.models.User;
 import com.petpaw.utils.ImageHelper;
 import com.squareup.picasso.Picasso;
+import com.zegocloud.uikit.prebuilt.call.config.ZegoNotificationConfig;
+import com.zegocloud.uikit.prebuilt.call.invite.ZegoUIKitPrebuiltCallInvitationConfig;
+import com.zegocloud.uikit.prebuilt.call.invite.ZegoUIKitPrebuiltCallInvitationService;
+import com.zegocloud.uikit.prebuilt.call.invite.widget.ZegoSendCallInvitationButton;
+import com.zegocloud.uikit.service.defines.ZegoUIKitUser;
 
+import java.security.Permission;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+
+import timber.log.Timber;
 
 public class MessageActivity extends AppCompatActivity {
 
@@ -51,7 +67,7 @@ public class MessageActivity extends AppCompatActivity {
     private Conversation conversation;
     private List<Message> messageList = new ArrayList<>();
     private MessageListAdapter messageListAdapter;
-
+    private Map<String, User> userMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,9 +76,14 @@ public class MessageActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
         db = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
+
+        binding.btnVoiceCall.setIsVideoCall(false);
+        binding.btnVideoCall.setIsVideoCall(true);
+
         setupMessageRV();
         getConversation();
 
+        requestCallPermissions();
 
         binding.sendMessageBtn.setOnClickListener(v -> onBtnSendClick());
         binding.backBtn.setOnClickListener(v -> finish());
@@ -104,7 +125,7 @@ public class MessageActivity extends AppCompatActivity {
                 });
     }
 
-    private void getConversation(){
+    private void getConversation() {
         Intent intent = getIntent();
         conversationID = intent.getStringExtra("conversationID");
 
@@ -182,12 +203,13 @@ public class MessageActivity extends AppCompatActivity {
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                        Map<String, User> userMap = new HashMap<>();
+                        userMap = new HashMap<>();
 
                         for (DocumentSnapshot doc: queryDocumentSnapshots) {
                             User user = doc.toObject(User.class);
                             userMap.put(user.getUid(), user);
                         }
+
                         Log.d("TAG", "User Map: " + userMap);
                         if(conversation.getMemberIdList().size() <= 2){
                             for (String userId: conversation.getMemberIdList()) {
@@ -216,19 +238,32 @@ public class MessageActivity extends AppCompatActivity {
                             }
                         } else {
                             binding.ivUserPic.setImageResource(R.drawable.group_chat_image);
-                            String names = "";
+                            StringBuilder names = new StringBuilder();
+                            int cnt = 0;
                             for (String userId: conversation.getMemberIdList()) {
                                 if (!Objects.equals(userId, auth.getCurrentUser().getUid())) {
-                                    names += userMap.get(userId).getName();
+                                    names.append(userMap.get(userId).getName());
+                                    cnt++;
+
+                                    if (cnt == 3) {
+                                        break;
+                                    }
+
                                     if(conversation.getMemberIdList().indexOf(userMap.get(userId).getUid()) != (conversation.getMemberIdList().size() - 1)){
-                                        names += ", ";
+                                        names.append(", ");
                                     }
                                 }
                             }
-                            binding.tvName.setText(names);
+
+                            binding.tvName.setText(names.toString());
                         }
 
                         messageListAdapter.setUserMap(userMap);
+
+                        Timber.tag("MessageActivity.java").d(conversation == null ? "Null" : "No null");
+
+                        setupVoiceCallBtn();
+                        setupVideoCallBtn();
                     }
                 });
     }
@@ -242,4 +277,117 @@ public class MessageActivity extends AppCompatActivity {
         binding.rvMessageList.setAdapter(messageListAdapter);
 
     }
+
+    private void onBtnCallClick() {
+    }
+
+    private void requestCallPermissions() {
+        PermissionX.init(MessageActivity.this)
+                .permissions(Manifest.permission.SYSTEM_ALERT_WINDOW)
+                .onExplainRequestReason(new ExplainReasonCallback() {
+                    @Override
+                    public void onExplainReason(@NonNull ExplainScope scope, @NonNull List<String> deniedList) {
+                        String message = "We need your consent for the following permissions in order to use the offline call function properly";
+                        scope.showRequestReasonDialog(deniedList, message, "Allow", "Deny");
+                    }
+                })
+                .request(new RequestCallback() {
+                    @Override
+                    public void onResult(boolean allGranted, @NonNull List<String> grantedList, @NonNull List<String> deniedList) {
+                        initCallInvitationService();
+//                        onlineCall();
+                    }
+                });
+    }
+
+    private void initCallInvitationService() {
+        long appID = 834069049;   // yourAppID
+        String appSign = "73a133c6d11d9eb82624798a9d3db20b2e9d24aeb253c14b9fecc56f57181250";  // yourAppSign
+        String userID = auth.getCurrentUser().getUid(); // yourUserID, userID should only contain numbers, English characters, and '_'.
+        String userName = "Reciever";
+
+        ZegoUIKitPrebuiltCallInvitationConfig callInvitationConfig = new ZegoUIKitPrebuiltCallInvitationConfig();
+
+        ZegoNotificationConfig notificationConfig = new ZegoNotificationConfig();
+        notificationConfig.sound = "zego_uikit_sound_call";
+        notificationConfig.channelID = "CallInvitation";
+        notificationConfig.channelName = "CallInvitation";
+
+        ZegoUIKitPrebuiltCallInvitationService.init(getApplication(), appID, appSign, userID, userName,callInvitationConfig);
+    }
+
+//    private void onlineCall() {
+//        String currentUserId = auth.getCurrentUser().getUid();
+//        String targetUserId = null;
+//
+//        if (conversation.getMemberIdList().size() > 2) {
+//            return;
+//        }
+//
+//        for (String userId: conversation.getMemberIdList()) {
+//            if (!userId.equals(currentUserId)) {
+//                targetUserId = userId;
+//                break;
+//            }
+//        }
+//
+//        Log.d("messageActivity.java", "Chuan bi call");
+//
+//        String targetUserName = "Receiver";
+//        Context context = MessageActivity.this;
+//
+//        ZegoSendCallInvitationButton callButton = new ZegoSendCallInvitationButton(context);
+//        callButton.setIsVideoCall(false);
+//        callButton.setResourceID("Pet Paw"); // Please fill in the resource ID name that has been configured in the ZEGOCLOUD's console here.
+//        callButton.setInvitees(Collections.singletonList(new ZegoUIKitUser(targetUserId,targetUserName)));
+//
+//        Log.d("messageActivity.java", "Xong cai cal");
+//    }
+
+    private void setupVoiceCallBtn() {
+        String currentUserId = auth.getCurrentUser().getUid();
+        String targetUserId = null;
+
+        if (conversation.getMemberIdList().size() > 2) {
+            return;
+        }
+
+        for (String userId: conversation.getMemberIdList()) {
+            if (!userId.equals(currentUserId)) {
+                targetUserId = userId;
+                break;
+            }
+        }
+
+        binding.btnVoiceCall.setIsVideoCall(false);
+        binding.btnVoiceCall.setResourceID("zego_uikit_call");
+        binding.btnVoiceCall.setInvitees(Collections.singletonList(new ZegoUIKitUser(targetUserId)));
+    }
+
+    private void setupVideoCallBtn() {
+        String currentUserId = auth.getCurrentUser().getUid();
+        String targetUserId = null;
+
+        if (conversation.getMemberIdList().size() > 2) {
+            return;
+        }
+
+        for (String userId: conversation.getMemberIdList()) {
+            if (!userId.equals(currentUserId)) {
+                targetUserId = userId;
+                break;
+            }
+        }
+
+        binding.btnVoiceCall.setIsVideoCall(true);
+        binding.btnVoiceCall.setResourceID("zego_uikit_call");
+        binding.btnVoiceCall.setInvitees(Collections.singletonList(new ZegoUIKitUser(targetUserId)));
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        ZegoUIKitPrebuiltCallInvitationService.unInit();
+    }
+
 }
