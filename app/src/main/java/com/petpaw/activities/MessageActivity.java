@@ -1,16 +1,30 @@
 package com.petpaw.activities;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -21,6 +35,7 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.MetadataChanges;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -51,6 +66,17 @@ public class MessageActivity extends AppCompatActivity {
     private Conversation conversation;
     private List<Message> messageList = new ArrayList<>();
     private MessageListAdapter messageListAdapter;
+    private FusedLocationProviderClient client;
+
+    private GeoPoint curLocation =  new GeoPoint(0,0);
+    private final ActivityResultLauncher<String> requestPermissionLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+                if (isGranted) {
+                    Toast.makeText(this, "Permission granted", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(this, "FCM can't post notifications  without POST_NOTIFICATION permission", Toast.LENGTH_LONG).show();
+                }
+            });
 
 
     @Override
@@ -66,6 +92,8 @@ public class MessageActivity extends AppCompatActivity {
 
         binding.sendMessageBtn.setOnClickListener(v -> onBtnSendClick());
         binding.backBtn.setOnClickListener(v -> finish());
+        binding.shareLocationBtn.setOnClickListener(v -> getLocation());
+
     }
 
     private void onBtnSendClick() {
@@ -241,5 +269,58 @@ public class MessageActivity extends AppCompatActivity {
         messageListAdapter = new MessageListAdapter(getBaseContext());
         binding.rvMessageList.setAdapter(messageListAdapter);
 
+    }
+
+    private boolean getLocation(){
+        if (ActivityCompat.checkSelfPermission(getBaseContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getBaseContext(), android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            askLocationPermission();
+            return false;
+        } else {
+            client = LocationServices.getFusedLocationProviderClient(MessageActivity.this);
+            client.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
+                @Override
+                public void onSuccess(Location location) {
+                    if (location == null){
+                        Log.d("TAG", "No location");
+                    } else {
+                        curLocation = new GeoPoint(location.getLatitude(), location.getLongitude());
+                    }
+                }
+            });
+            return true;
+        }
+
+    }
+
+    private void askLocationPermission() {
+        // This is only necessary for API Level > 33 (TIRAMISU)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if ((ContextCompat.checkSelfPermission(MessageActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) ==
+                    PackageManager.PERMISSION_GRANTED) &&  (ContextCompat.checkSelfPermission(MessageActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) ==
+                    PackageManager.PERMISSION_GRANTED)){
+                    Message message = new Message();
+                    message.setContent(curLocation.toString());
+                    message.setSenderId(auth.getCurrentUser().getUid());
+                    message.setSentAt(new Date());
+                    Map<String, Object> map = message.toDoc();
+                    map.put("location", curLocation);
+
+                    db.collection(Conversation.CONVERSATIONS)
+                            .document(conversationID)
+                            .collection(Message.MESSAGES)
+                            .add(map)
+                            .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+                                @Override
+                                public void onComplete(@NonNull Task<DocumentReference> task) {
+                                    updateLatestMessageId(task.getResult().getId());
+                                    getConversation();
+                                }
+                            });
+            } else {
+                // Directly ask for the permission
+                requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION);
+                requestPermissionLauncher.launch(Manifest.permission.ACCESS_COARSE_LOCATION);
+            }
+        }
     }
 }

@@ -45,6 +45,12 @@
             android:gravity="center_vertical"
             />
 
+        <Button
+            android:id="@+id/shareLocationBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Share Location"/>
+
 
     </LinearLayout>
 
@@ -87,5 +93,11 @@
             app:tint="@color/primary"
             />
     </LinearLayout>
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/mapFragmentCtn"
+        android:layout_width="wrap_content"
+        android:layout_height="250dp"
+        android:visibility="gone"/>
 
 </LinearLayout>
