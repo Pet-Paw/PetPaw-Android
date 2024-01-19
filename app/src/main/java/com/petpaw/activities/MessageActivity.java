@@ -359,7 +359,7 @@ public class MessageActivity extends AppCompatActivity {
             }
         }
 
-        binding.btnVoiceCall.setIsVideoCall(false);
+        binding.btnVoiceCall.setIsVideoCall(true);
         binding.btnVoiceCall.setResourceID("zego_uikit_call");
         binding.btnVoiceCall.setInvitees(Collections.singletonList(new ZegoUIKitUser(targetUserId)));
     }
