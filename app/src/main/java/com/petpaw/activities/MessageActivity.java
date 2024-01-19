@@ -6,6 +6,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.Manifest;
+import android.app.Application;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -39,9 +41,14 @@ import com.petpaw.models.Message;
 import com.petpaw.models.User;
 import com.petpaw.utils.ImageHelper;
 import com.squareup.picasso.Picasso;
+import com.zegocloud.uikit.prebuilt.call.invite.ZegoUIKitPrebuiltCallInvitationConfig;
+import com.zegocloud.uikit.prebuilt.call.invite.ZegoUIKitPrebuiltCallInvitationService;
+import com.zegocloud.uikit.prebuilt.call.invite.widget.ZegoSendCallInvitationButton;
+import com.zegocloud.uikit.service.defines.ZegoUIKitUser;
 
 import java.security.Permission;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -57,6 +64,7 @@ public class MessageActivity extends AppCompatActivity {
     private Conversation conversation;
     private List<Message> messageList = new ArrayList<>();
     private MessageListAdapter messageListAdapter;
+    private Map<String, User> userMap;
 
 
     @Override
@@ -66,6 +74,7 @@ public class MessageActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
         db = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
+
         setupMessageRV();
         getConversation();
 
@@ -188,12 +197,13 @@ public class MessageActivity extends AppCompatActivity {
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                        Map<String, User> userMap = new HashMap<>();
+                        userMap = new HashMap<>();
 
                         for (DocumentSnapshot doc: queryDocumentSnapshots) {
                             User user = doc.toObject(User.class);
                             userMap.put(user.getUid(), user);
                         }
+
                         Log.d("TAG", "User Map: " + userMap);
                         if(conversation.getMemberIdList().size() <= 2){
                             for (String userId: conversation.getMemberIdList()) {
@@ -274,8 +284,43 @@ public class MessageActivity extends AppCompatActivity {
                 .request(new RequestCallback() {
                     @Override
                     public void onResult(boolean allGranted, @NonNull List<String> grantedList, @NonNull List<String> deniedList) {
+                        initCallInvitationService();
 
+                        String currentUserId = auth.getCurrentUser().getUid();
+                        String targetUserId = null;
+
+                        if (conversation.getMemberIdList().size() > 2) {
+                            return;
+                        }
+
+                        for (String userId: conversation.getMemberIdList()) {
+                            if (!userId.equals(currentUserId)) {
+                                targetUserId = userId;
+                                break;
+                            }
+                        }
+
+                        Log.d("messageActivity.java", "Chuan bi call");
+
+                        String targetUserName = userMap.get(targetUserId).getName();
+                        Context context = MessageActivity.this;
+
+                        ZegoSendCallInvitationButton callButton = new ZegoSendCallInvitationButton(context);
+                        callButton.setIsVideoCall(false);
+                        callButton.setResourceID("zego_uikit_call"); // Please fill in the resource ID name that has been configured in the ZEGOCLOUD's console here.
+                        callButton.setInvitees(Collections.singletonList(new ZegoUIKitUser(targetUserId,targetUserName)));
                     }
                 });
+    }
+
+    private void initCallInvitationService() {
+        Application application = MessageActivity.this.getApplication();
+        long appID = 834069049;   // yourAppID
+        String appSign = "73a133c6d11d9eb82624798a9d3db20b2e9d24aeb253c14b9fecc56f57181250";  // yourAppSign
+        String userID = auth.getCurrentUser().getUid(); // yourUserID, userID should only contain numbers, English characters, and '_'.
+        String userName = "";   // yourUserName
+
+        ZegoUIKitPrebuiltCallInvitationConfig callInvitationConfig = new ZegoUIKitPrebuiltCallInvitationConfig();
+        ZegoUIKitPrebuiltCallInvitationService.init(getApplication(), appID, appSign, userID, userName,callInvitationConfig);
     }
 }
