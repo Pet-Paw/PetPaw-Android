@@ -19,6 +19,7 @@ public class User implements FirebaseDoc {
     private LatLng location;
 
     private String country;
+    private String banReason;
 
     public LatLng getLocation() {
         return location;
@@ -49,6 +50,7 @@ public class User implements FirebaseDoc {
         this.address = address;
         this.imageURL = imageURL;
         this.physicalDeviceToken = physicalDeviceToken;
+        this.banReason = null;
     }
 
     public User(String uid, String username, String email, String phoneNumber, String address, String physicalDeviceToken) {
@@ -58,7 +60,7 @@ public class User implements FirebaseDoc {
         this.phone = phoneNumber;
         this.address = address;
         this.physicalDeviceToken = physicalDeviceToken;
-
+        this.banReason = null;
     }
 
 
@@ -119,6 +121,14 @@ public class User implements FirebaseDoc {
         this.address = address;
     }
 
+    public String getBanReason() {
+        return banReason;
+    }
+
+    public void setBanReason(String banReason) {
+        this.banReason = banReason;
+    }
+
     @Override
     public Map<String, Object> toDoc() {
         Map<String, Object> doc = new HashMap<>();
@@ -126,4 +136,6 @@ public class User implements FirebaseDoc {
         doc.put("imageURL", imageURL);
         return doc;
     }
+
+
 }

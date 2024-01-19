@@ -19,6 +19,9 @@
         android:theme="@style/Theme.PetPaw"
         tools:targetApi="31">
         <activity
+            android:name=".activities.BanActivity"
+            android:exported="false" />
+        <activity
             android:name=".activities.EmptyActivity"
             android:exported="false" />
         <activity
