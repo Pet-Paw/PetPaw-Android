@@ -14,21 +14,38 @@ import android.view.ViewGroup;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.zzad;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.GeoPoint;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.petpaw.R;
 import com.petpaw.databinding.FragmentMapsBinding;
+
+import org.checkerframework.checker.units.qual.C;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MapsFragment extends Fragment {
     FragmentMapsBinding binding;
     FusedLocationProviderClient client;
-    LatLng curLocation;
     GoogleMap mMap;
+    FirebaseFirestore db;
+    FirebaseAuth auth;
+    List<Marker> markerList = new ArrayList<>();
 
     private OnMapReadyCallback callback = new OnMapReadyCallback() {
 
@@ -43,7 +60,39 @@ public class MapsFragment extends Fragment {
          */
         @Override
         public void onMapReady(GoogleMap googleMap) {
-            client = LocationServices.getFusedLocationProviderClient(getActivity());
+            String conversationID = requireArguments().getString("conversationID").toString();
+            db.collection("Conversations")
+                    .document(conversationID)
+                    .collection("locations")
+                    .whereEqualTo("isSharing", true)
+                    .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                        @Override
+                        public void onEvent(@Nullable QuerySnapshot query, @Nullable FirebaseFirestoreException error) {
+                            for (Marker marker : markerList){
+                                marker.remove();
+                            }
+                            markerList.clear();
+                            if(query != null){
+                                for (DocumentSnapshot doc: query){
+                                    if ((boolean) doc.get("isSharing")){
+                                        GeoPoint geo = (GeoPoint) doc.get("location");
+                                        if(!(geo.getLatitude() == 0 && geo.getLongitude() == 0)){
+                                            LatLng latLng = new LatLng(geo.getLatitude(), geo.getLongitude());
+                                            if(query.size() > 1){
+                                                if(doc.getId() != auth.getCurrentUser().getUid()){
+                                                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 12));
+                                                }
+                                            } else {
+                                                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 12));
+                                            }
+                                            MarkerOptions markerOptions = new MarkerOptions().position(latLng);
+                                            markerList.add(mMap.addMarker(markerOptions));
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
             mMap = googleMap;
         }
     };
@@ -54,6 +103,8 @@ public class MapsFragment extends Fragment {
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         binding = FragmentMapsBinding.inflate(inflater, container, false);
+        db = FirebaseFirestore.getInstance();
+        auth = FirebaseAuth.getInstance();
         return binding.getRoot();
     }
 

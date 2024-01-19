@@ -47,6 +47,7 @@ import com.petpaw.R;
 import com.petpaw.adapters.ConversationListAdapter;
 import com.petpaw.adapters.MessageListAdapter;
 import com.petpaw.databinding.ActivityMessageBinding;
+import com.petpaw.fragments.screens.MapsFragment;
 import com.petpaw.interfaces.OnConversationClickListener;
 import com.petpaw.models.Conversation;
 import com.petpaw.models.Message;
@@ -92,23 +93,30 @@ public class MessageActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
         db = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
+        getConversation();
+        setupMapFragment();
         setupLocationSharing();
         setupMessageRV();
-        getConversation();
+
 
 
         binding.sendMessageBtn.setOnClickListener(v -> onBtnSendClick());
-        binding.backBtn.setOnClickListener(v -> finish());
+        binding.backBtn.setOnClickListener(v -> {
+            stopLocationUpdates();
+            finish();
+        });
         binding.shareLocationBtn.setOnClickListener(v -> {
             if (askLocationPermission()){
                 client = LocationServices.getFusedLocationProviderClient(this);
                 if (isSharing) {
                     isSharing = false;
                     binding.shareLocationBtn.setText("Share Location");
+                    binding.mapFragmentCtn.setVisibility(View.GONE);
                     stopLocationUpdates();
                 } else {
                     isSharing = true;
                     binding.shareLocationBtn.setText("Stop Sharing");
+                    binding.mapFragmentCtn.setVisibility(View.VISIBLE);
                     startLocationUpdates();
                 }
             }
@@ -313,7 +321,6 @@ public class MessageActivity extends AppCompatActivity {
         binding.rvMessageList.setLayoutManager(linearLayoutManager);
         messageListAdapter = new MessageListAdapter(getBaseContext());
         binding.rvMessageList.setAdapter(messageListAdapter);
-
     }
 
 
@@ -353,5 +360,15 @@ public class MessageActivity extends AppCompatActivity {
                 .document(auth.getCurrentUser().getUid())
                 .update(doc);
         client.removeLocationUpdates(locationCallback);
+    }
+
+    private void setupMapFragment(){
+        Bundle bundle = new Bundle();
+        bundle.putString("conversationID", conversationID);
+
+        getSupportFragmentManager().beginTransaction()
+                .setReorderingAllowed(true)
+                .add(binding.mapFragmentCtn.getId(), MapsFragment.class, bundle)
+                .commit();
     }
 }
