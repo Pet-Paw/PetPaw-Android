@@ -147,7 +147,6 @@ public class MainActivity extends AppCompatActivity {
                         .findFragmentById(R.id.toolbarFragment);
 
                 if (sideNavFragment != null) {
-
                     NavigationView sideNav = sideNavFragment.mNavigationView;
                     sideNav.setCheckedItem(item.getItemId());
                 }

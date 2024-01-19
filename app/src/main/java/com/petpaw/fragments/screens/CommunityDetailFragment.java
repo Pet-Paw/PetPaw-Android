@@ -20,11 +20,14 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -34,8 +37,11 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.petpaw.R;
 import com.petpaw.activities.CreatePostActivity;
 import com.petpaw.activities.EmptyActivity;
+import com.petpaw.activities.MessageActivity;
 import com.petpaw.adapters.PostListAdapter;
 import com.petpaw.databinding.FragmentCommunityDetailBinding;
+import com.petpaw.models.Community;
+import com.petpaw.models.Conversation;
 import com.petpaw.models.Post;
 
 import java.util.ArrayList;
@@ -51,14 +57,17 @@ public class CommunityDetailFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     FragmentCommunityDetailBinding binding;
+
+    private FirebaseFirestore mDb;
+
     private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
 
     private String communityId;
     private Context context;
     private List<Post> postList = new ArrayList<>();
     private RecyclerView recyclerView;
-    private String mParam2;
+
+    private Community mCommunity;
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -93,8 +102,9 @@ public class CommunityDetailFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             communityId = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
         }
+
+        mDb = FirebaseFirestore.getInstance();
     }
 
     @Override
@@ -125,6 +135,8 @@ public class CommunityDetailFragment extends Fragment {
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                         if(task.isSuccessful()) {
                             DocumentSnapshot document = task.getResult();
+
+                            mCommunity = document.toObject(Community.class);
 //                            ----------------- bind Name and Description -----------------
                             binding.communityDetailName.setText(document.get("name").toString());
                             binding.communityDetailDescription.setText(document.get("description").toString());
@@ -140,10 +152,12 @@ public class CommunityDetailFragment extends Fragment {
                                 binding.deleteCommunityBtn.setVisibility(View.VISIBLE);
                                 binding.leaveCommunityBtn.setVisibility(View.GONE);
                                 binding.createPostCommunityBtn.setVisibility(View.VISIBLE);
+                                binding.chatBtn.setVisibility(View.VISIBLE);
                             } else if(membersList.contains(userId)){
                                 binding.deleteCommunityBtn.setVisibility(View.GONE);
                                 binding.leaveCommunityBtn.setVisibility(View.VISIBLE);
                                 binding.createPostCommunityBtn.setVisibility(View.VISIBLE);
+                                binding.chatBtn.setVisibility(View.VISIBLE);
                             }
                             else {
                                 binding.deleteCommunityBtn.setVisibility(View.GONE);
@@ -211,6 +225,9 @@ public class CommunityDetailFragment extends Fragment {
             }
         });
 
+//        ----------------------- Chat Button --------------------------
+        binding.chatBtn.setOnClickListener(v -> onChatBtnClick());
+
 //        ----------------------- Back Button --------------------------
         binding.backBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -254,5 +271,61 @@ public class CommunityDetailFragment extends Fragment {
                 }
             }
         });
+    }
+
+    private void onChatBtnClick() {
+        if (mCommunity.getMembers().size() <= 1) {
+            Snackbar.make(binding.chatBtn, "Please add more member to chat", Snackbar.LENGTH_SHORT)
+                    .show();
+            return;
+        }
+
+        if (mCommunity.getConversationId() != null) {
+            moveToMessageActivity(mCommunity.getConversationId());
+            return;
+        }
+
+        List<String> memberIdList = new ArrayList<>();
+
+        memberIdList.add(mCommunity.getOwner());
+        memberIdList.addAll(mCommunity.getMembers());
+
+        createConversation(memberIdList);
+    }
+
+    private void moveToMessageActivity(String conversationId) {
+        Intent intent = new Intent(requireActivity(), MessageActivity.class);
+        intent.putExtra("conversationID", conversationId);
+        startActivity(intent);
+    }
+
+    private void createConversation(List<String> userIdList){
+        // Create new conversation
+        Conversation conversation = new Conversation();
+        conversation.setMemberIdList(userIdList);
+        mDb.collection("Conversations")
+                .add(conversation.toDoc())
+                .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentReference> task) {
+                        if(task.isSuccessful()){
+                            String conversationId = task.getResult().getId();
+                            updateConversationId(conversationId);
+                            moveToMessageActivity(conversationId);
+                        }
+                    }
+                });
+    }
+
+    private void updateConversationId(String conversationId) {
+        mDb.collection("Communities")
+                .document(communityId)
+                .update("conversationId", conversationId)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void unused) {
+                        Log.d("CommunityDetail.java", "Update conversation id success");
+                    }
+                });
     }
 }
