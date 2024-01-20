@@ -58,7 +58,7 @@ public class MessagesFragment extends Fragment {
     private int mNumConversations;
     private List<Conversation> mConversationList = new ArrayList<>();;
 
-    private List<String> mUserIdList = new ArrayList<>();;
+    private List<String> mUserIdList = new ArrayList<>();
 
 
 
@@ -104,7 +104,6 @@ public class MessagesFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-
         setupRvConversationList();
         if(mAuth.getCurrentUser() != null){
             getConversationsFromDb();
@@ -115,6 +114,7 @@ public class MessagesFragment extends Fragment {
 
     @Override
     public void onResume() {
+        Log.d("ON RESUME", "ON RESUME CALLED");
         if(mAuth.getCurrentUser() != null){
             mConversationListAdapter.setConversationList(mConversationList);
         }
@@ -149,7 +149,6 @@ public class MessagesFragment extends Fragment {
                         mNumConversations = value.size();
                         Log.d("messages.java", "mNumConversations = " + mNumConversations);
                         mConversationList.clear();
-
                         mUserIdList.clear();
 
                         for (DocumentSnapshot doc: value) {
@@ -164,10 +163,8 @@ public class MessagesFragment extends Fragment {
                                     }
                                 }
                             }
-
                             getLastMessageFromDb(conversation);
                         }
-
                         getUsersFromDb();
                     }
                 });
@@ -193,18 +190,21 @@ public class MessagesFragment extends Fragment {
                         for (DocumentSnapshot doc: queryDocumentSnapshots) {
                             Message message = doc.toObject(Message.class);
                             assert message != null;
-
+                            Log.d("MESSAGE", message.getContent());
                             message.setUid(doc.getId());
                             conversation.setLastMessage(message);
+                            Log.d("ADD", "ADDED");
                             mConversationList.add(conversation);
-                        }
 
+                        }
                         Log.d("messages.java", "Conversation list sz: " + mConversationList.size());
+//                        if (mConversationList.size() == mNumConversations) {
+//                            Log.d("messages.java", "setup conversation list");
+//                            for (Conversation con : mConversationList){
+//                                Log.d("CONVERSATION LIST", con.getUid());
+//                            }
+//                        }
 
-                        if (mConversationList.size() == mNumConversations) {
-                            Log.d("messages.java", "setup conversation list");
-                            mConversationListAdapter.setConversationList(mConversationList);
-                        }
                     }
                 });
     }
@@ -227,7 +227,6 @@ public class MessagesFragment extends Fragment {
                         }
                         Log.d("TAG", "User Map: " + userMap);
                         mConversationListAdapter.setUserMap(userMap);
-
                     }
                 });
     }
