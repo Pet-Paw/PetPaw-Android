@@ -69,11 +69,11 @@ public class MessageActivity extends AppCompatActivity {
     private MessageListAdapter messageListAdapter;
     private Map<String, User> userMap;
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        auth = FirebaseAuth.getInstance();
-    }
+//    @Override
+//    protected void onStart() {
+//        super.onStart();
+//        auth = FirebaseAuth.getInstance();
+//    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,6 +81,8 @@ public class MessageActivity extends AppCompatActivity {
         binding = ActivityMessageBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         db = FirebaseFirestore.getInstance();
+        auth = FirebaseAuth.getInstance();
+
 
         binding.btnVoiceCall.setIsVideoCall(true);
 
