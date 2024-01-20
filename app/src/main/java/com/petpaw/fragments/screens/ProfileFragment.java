@@ -225,7 +225,7 @@ public class ProfileFragment extends Fragment {
         binding.editBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(requireContext(), EditProfileActivity.class);
+                Intent intent = new Intent(getContext(), EditProfileActivity.class);
                 intent.putExtra("avatarURL", user.getImageURL());
                 intent.putExtra("name", user.getName());
                 intent.putExtra("email", user.getEmail());
@@ -259,7 +259,7 @@ public class ProfileFragment extends Fragment {
                 Log.d("ProfileFragment", "previousFragment = " + previousFragment);
                 String owner_uid = getArguments().getString(OWNER_UID);
                 if (previousFragment == R.id.userFollowingFragment) {
-                    Toast.makeText(requireContext(), "previousFragment = " + previousFragment, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "previousFragment = " + previousFragment, Toast.LENGTH_SHORT).show();
                     fragmentTransaction.replace(R.id.profileFragmentLayout, UserFollowingFragment.newInstance(owner_uid)).commitNow();
                 } else if (previousFragment == R.id.useFollowerFragment) {
                     fragmentTransaction.replace(R.id.profileFragmentLayout, UserFollowersFragment.newInstance(owner_uid)).commitNow();
@@ -281,7 +281,7 @@ public class ProfileFragment extends Fragment {
         binding.addPetBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(requireContext(), AddPetActivity.class);
+                Intent intent = new Intent(getContext(), AddPetActivity.class);
                 startActivity(intent);
             }
         });
@@ -454,8 +454,8 @@ public class ProfileFragment extends Fragment {
 
                     binding.postNum.setText(userPostList.size() + "");
                     if(context != null) {
-                        binding.postsRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-                        binding.postsRecyclerView.setAdapter(new PostListAdapter(requireContext(), userPostList));
+                        binding.postsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+                        binding.postsRecyclerView.setAdapter(new PostListAdapter(getContext(), userPostList));
                     }
                 } else {
                     Log.e("ProfileFragment", "Error getting user posts: ", task.getException());
@@ -483,8 +483,8 @@ public class ProfileFragment extends Fragment {
                         Log.d("ProfileFragment", "No pets found for the user.");
                     }
                     if(context != null) {
-                        binding.petsRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-                        binding.petsRecyclerView.setAdapter(new PetListAdapter(requireContext(), userPetList));
+                        binding.petsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+                        binding.petsRecyclerView.setAdapter(new PetListAdapter(getContext(), userPetList));
                     }
                 } else {
                     Log.e("ProfileFragment", "Error getting user pets: ", task.getException());

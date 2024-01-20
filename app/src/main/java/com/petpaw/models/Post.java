@@ -2,6 +2,8 @@ package com.petpaw.models;
 
 
 
+import com.petpaw.interfaces.FirebaseDoc;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -9,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-public class Post {
+public class Post implements FirebaseDoc {
 //    private String title;
     private String content;
     private String authorId;
@@ -25,6 +27,7 @@ public class Post {
     private List<String> petIdList;
     private String communityId;
     private String postId;
+
 
     public Post() {
         this.dateModified = new Date();
@@ -50,6 +53,7 @@ public class Post {
         this.petIdList = petIdList;
         this.communityId = communityId;
     }
+
 
     public Post(String content, String author, String petId) {
         this.content = content;
@@ -158,6 +162,11 @@ public class Post {
 
     public void setCommunityId(String communityId) {
         this.communityId = communityId;
+    }
+
+    @Override
+    public Map<String, Object> toDoc() {
+        return null;
     }
 
     //    @Override

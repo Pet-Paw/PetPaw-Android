@@ -19,17 +19,20 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.petpaw.R;
 import com.petpaw.adapters.CommentListAdapter;
 import com.petpaw.clients.NotiSender;
 import com.petpaw.database.NotificationCollection;
+import com.petpaw.database.PostCollection;
 import com.petpaw.database.UserCollection;
 import com.petpaw.databinding.ActivityPostCommentBinding;
 import com.petpaw.databinding.FragmentProfileBinding;
@@ -108,24 +111,51 @@ public class PostCommentActivity extends AppCompatActivity {
                                                     }
                                                 });
 
-                                        String currentUserUid = auth.getCurrentUser().getUid();
-                                        userCollection.getUser(currentUserUid, new UserCollection.Callback() {
+                                        CollectionReference postsRef = db.collection("Posts"); // Get a reference to the Posts collection
+                                        Query query = postsRef.whereEqualTo(FieldPath.documentId(), postId); // Create a query against the collection.
+                                        query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                                             @Override
-                                            public void onCallback(List<User> users) {
+                                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                                if (task.isSuccessful()) {
+                                                    for (QueryDocumentSnapshot document: task.getResult()) {
+                                                        Post post = document.toObject(Post.class);
+                                                        Post postTemp = new Post(post.getAuthorId(), post.getDateModified(), post.getContent(), post.isModified(), post.getImageURL(), post.getLikes(), post.getComments(), post.getPostId(), post.getTags(), post.getPetIdList(), post.getCommunityId());
+                                                        String postAuthorId = postTemp.getAuthorId();
+                                                        String currentUserUid = auth.getCurrentUser().getUid();
 
-                                            }
+                                                        userCollection.getUser(postAuthorId, new UserCollection.Callback() {
+                                                            @Override
+                                                            public void onCallback(List<User> users) {
 
-                                            @Override
-                                            public void onCallBack(User currentUser) {
-                                                NotiSender notiSender = new NotiSender(currentUser.getUid());
+                                                            }
 
-                                                if (!Objects.equals(currentUser.getUid(), currentUserUid)) {
-                                                    notiSender.sendNotificationToDifferentAccount(cmt.getAuthor(), currentUser.getName(), " has commented: " + cmt.getContent());
-                                                }
-                                                try {
-                                                    notiSender.sendNotificationOnCurrentAccount("You have commented: " + cmt.getContent());
-                                                } catch (IOException e) {
-                                                    throw new RuntimeException(e);
+                                                            @Override
+                                                            public void onCallBack(User postAuthor) {
+                                                                NotiSender notiSender = new NotiSender(currentUserUid);
+
+                                                                if (!Objects.equals(postAuthor.getUid(), currentUserUid)) {
+                                                                    userCollection.getUser(currentUserUid, new UserCollection.Callback() {
+                                                                        @Override
+                                                                        public void onCallback(List<User> users) {
+
+                                                                        }
+
+                                                                        @Override
+                                                                        public void onCallBack(User user) {
+                                                                            String currentUserName = user.getName();
+                                                                            notiSender.sendNotificationToDifferentAccount(postAuthor.getUid(), currentUserName, " has commented: " + cmt.getContent());
+                                                                        }
+                                                                    });
+                                                                }
+                                                                try {
+                                                                    notiSender.sendNotificationOnCurrentAccount("You have commented: " + cmt.getContent());
+                                                                } catch (IOException e) {
+                                                                    throw new RuntimeException(e);
+                                                                }
+                                                            }
+                                                        });
+
+                                                    }
                                                 }
                                             }
                                         });

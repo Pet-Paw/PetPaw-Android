@@ -159,11 +159,11 @@ public class SignUpActivity extends AppCompatActivity {
                 }
             });
         } else {
-            phoneInSignUpByPhone = emailOrPhone;
+            phoneInSignUpByPhone = "+84" + emailOrPhone;
             usernameInSignUpByPhone = username;
 
 
-            startPhoneNumberVerification(emailOrPhone);
+            startPhoneNumberVerification(phoneInSignUpByPhone);
 
         }
     }
