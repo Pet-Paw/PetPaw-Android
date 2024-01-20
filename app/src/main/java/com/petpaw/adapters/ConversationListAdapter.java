@@ -71,6 +71,9 @@ public class ConversationListAdapter extends RecyclerView.Adapter<ConversationLi
         if (userMap == null) {
             return;
         }
+        if (mAuth.getCurrentUser() == null){
+            return;
+        }
 
         Conversation conversation = conversationList.get(position);
         if (conversation.getMemberIdList().size() <= 2){

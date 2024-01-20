@@ -54,9 +54,9 @@ public class MessagesFragment extends Fragment {
 
 
     private int mNumConversations;
-    private List<Conversation> mConversationList;
+    private List<Conversation> mConversationList = new ArrayList<>();;
 
-    private List<String> mUserIdList;
+    private List<String> mUserIdList = new ArrayList<>();;
 
     private ConversationListAdapter mConversationListAdapter;
 
@@ -81,8 +81,7 @@ public class MessagesFragment extends Fragment {
         if (getArguments() != null) {
         }
 
-        mAuth = FirebaseAuth.getInstance();
-        mDb = FirebaseFirestore.getInstance();
+
 
     }
 
@@ -90,18 +89,29 @@ public class MessagesFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mBinding = FragmentMessagesBinding.inflate(inflater, container, false);
+        mAuth = FirebaseAuth.getInstance();
+        mDb = FirebaseFirestore.getInstance();
         return mBinding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         setupRvConversationList();
-        getConversationsFromDb();
+        if(mAuth.getCurrentUser() != null){
+            getConversationsFromDb();
+        }
 
 
 //        setupFirebaseUser();
     }
 
+    @Override
+    public void onResume() {
+        if(mAuth.getCurrentUser() != null){
+            mConversationListAdapter.setConversationList(mConversationList);
+        }
+        super.onResume();
+    }
 
     private void setupFirebaseUser() {
 //        mAuth.signInWithEmailAndPassword("u01@qq.com", "Binh1234")
@@ -160,9 +170,9 @@ public class MessagesFragment extends Fragment {
                         assert value != null;
                         mNumConversations = value.size();
                         Log.d("messages.java", "mNumConversations = " + mNumConversations);
-                        mConversationList = new ArrayList<>();
+                        mConversationList.clear();
 
-                        mUserIdList = new ArrayList<>();
+                        mUserIdList.clear();
 
                         for (DocumentSnapshot doc: value) {
                             Conversation conversation = doc.toObject(Conversation.class);
@@ -170,8 +180,10 @@ public class MessagesFragment extends Fragment {
                             conversation.setUid(doc.getId());
 
                             for (String userId: conversation.getMemberIdList()) {
-                                if (!Objects.equals(userId, mAuth.getCurrentUser().getUid())) {
-                                    mUserIdList.add(userId);
+                                if(mAuth.getCurrentUser() != null){
+                                    if (!Objects.equals(userId, mAuth.getCurrentUser().getUid())) {
+                                        mUserIdList.add(userId);
+                                    }
                                 }
                             }
 
