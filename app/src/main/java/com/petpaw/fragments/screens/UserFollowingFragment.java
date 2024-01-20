@@ -27,6 +27,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.petpaw.R;
 import com.petpaw.activities.MainActivity;
@@ -41,8 +42,10 @@ import com.petpaw.models.FollowRecord;
 import com.petpaw.models.User;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -226,6 +229,15 @@ public class UserFollowingFragment extends Fragment {
                 .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
                     @Override
                     public void onComplete(@NonNull Task<DocumentReference> task) {
+                        DocumentReference docRef = task.getResult();
+                        for (String user: userIdList){
+                            Map<String, Object> map = new HashMap<>();
+                            map.put("isSharing", false);
+                            map.put("location", new GeoPoint(0,0));
+                            docRef.collection("locations")
+                                    .document(user)
+                                    .set(map);
+                        }
                         if(task.isSuccessful()){
                             moveToMessageActivity(task.getResult().getId());
                         }

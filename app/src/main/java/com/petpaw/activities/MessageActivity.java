@@ -12,11 +12,9 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.Manifest;
-<<<<<<< HEAD
-=======
+
 import android.app.Application;
 import android.content.Context;
->>>>>>> main
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
