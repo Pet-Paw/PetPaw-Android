@@ -50,8 +50,10 @@ public class PostCollection {
     public void getPostById(String postId, Callback callback) {
         postsCollectionReference.document(postId).get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
+                String tId = postId;
                 Post post = task.getResult().toObject(Post.class);
-                callback.onCallback(post);
+                Post postTemp = new Post(post.getAuthorId(), post.getDateModified(), post.getContent(), post.isModified(), post.getImageURL(), post.getLikes(), post.getComments(), post.getPostId(), post.getTags(), post.getPetIdList(), post.getCommunityId());
+                callback.onCallback(postTemp);
             } else {
                 System.out.println("Error getting documents: " + task.getException());
                 throw new RuntimeException(task.getException());
