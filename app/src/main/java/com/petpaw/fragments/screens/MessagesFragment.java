@@ -29,7 +29,9 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.MetadataChanges;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.petpaw.activities.MainActivity;
 import com.petpaw.activities.MessageActivity;
+import com.petpaw.activities.StartActivity;
 import com.petpaw.adapters.ConversationListAdapter;
 import com.petpaw.databinding.FragmentMessagesBinding;
 import com.petpaw.interfaces.OnConversationClickListener;
@@ -57,6 +59,8 @@ public class MessagesFragment extends Fragment {
     private List<Conversation> mConversationList;
 
     private List<String> mUserIdList;
+    FirebaseUser firebaseUser;
+
 
     private ConversationListAdapter mConversationListAdapter;
 
@@ -75,14 +79,22 @@ public class MessagesFragment extends Fragment {
         return fragment;
     }
 
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (firebaseUser == null) {
+            Intent intent = new Intent(getActivity(), MainActivity.class);
+            startActivity(intent);
+            requireActivity().finish();
+        }
         if (getArguments() != null) {
         }
 
-        mAuth = FirebaseAuth.getInstance();
         mDb = FirebaseFirestore.getInstance();
+
+
 
     }
 
@@ -90,14 +102,19 @@ public class MessagesFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mBinding = FragmentMessagesBinding.inflate(inflater, container, false);
+        if (firebaseUser == null) {
+
+            requireActivity().finish();
+        }
+
         return mBinding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+
         setupRvConversationList();
         getConversationsFromDb();
-
 
 //        setupFirebaseUser();
     }
@@ -122,38 +139,8 @@ public class MessagesFragment extends Fragment {
     }
 
     private void getConversationsFromDb() {
-//        mDb.collection(Conversation.CONVERSATIONS)
-//                .whereArrayContains("memberIdList", mAuth.getCurrentUser().getUid())
-//                .get()
-//                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-//                    @Override
-//                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-//                        mNumConversations = queryDocumentSnapshots.size();
-//                        Log.d("messages.java", "mNumConversations = " + mNumConversations);
-//                        mConversationList = new ArrayList<>();
-//
-//                        mUserIdList = new ArrayList<>();
-//
-//                        for (DocumentSnapshot doc: queryDocumentSnapshots) {
-//                            Conversation conversation = doc.toObject(Conversation.class);
-//                            assert conversation != null;
-//                            conversation.setUid(doc.getId());
-//
-//                            for (String userId: conversation.getMemberIdList()) {
-//                                if (!Objects.equals(userId, mAuth.getCurrentUser().getUid())) {
-//                                    mUserIdList.add(userId);
-//                                }
-//                            }
-//
-//                            getLastMessageFromDb(conversation);
-//                        }
-//
-//                        getUsersFromDb();
-//                    }
-//                });
-
         mDb.collection(Conversation.CONVERSATIONS)
-                .whereArrayContains("memberIdList", mAuth.getCurrentUser().getUid())
+                .whereArrayContains("memberIdList", firebaseUser.getUid())
                 .addSnapshotListener(MetadataChanges.INCLUDE, new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
@@ -170,7 +157,7 @@ public class MessagesFragment extends Fragment {
                             conversation.setUid(doc.getId());
 
                             for (String userId: conversation.getMemberIdList()) {
-                                if (!Objects.equals(userId, mAuth.getCurrentUser().getUid())) {
+                                if (!Objects.equals(userId, firebaseUser.getUid())) {
                                     mUserIdList.add(userId);
                                 }
                             }

@@ -70,12 +70,17 @@ public class MessageActivity extends AppCompatActivity {
     private Map<String, User> userMap;
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        auth = FirebaseAuth.getInstance();
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityMessageBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         db = FirebaseFirestore.getInstance();
-        auth = FirebaseAuth.getInstance();
 
         binding.btnVoiceCall.setIsVideoCall(true);
 
