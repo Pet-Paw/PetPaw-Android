@@ -81,7 +81,7 @@ public class MessageActivity extends AppCompatActivity {
                 if (isGranted) {
                     Toast.makeText(this, "Permission granted", Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(this, "FCM can't post notifications  without POST_NOTIFICATION permission", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, "Can't share location without permission", Toast.LENGTH_LONG).show();
                 }
             });
 
@@ -93,12 +93,10 @@ public class MessageActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
         db = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
+        client = LocationServices.getFusedLocationProviderClient(this);
         getConversation();
-        setupMapFragment();
-        setupLocationSharing();
         setupMessageRV();
-
-
+        binding.rlMap.setVisibility(View.GONE);
 
         binding.sendMessageBtn.setOnClickListener(v -> onBtnSendClick());
         binding.backBtn.setOnClickListener(v -> {
@@ -107,21 +105,30 @@ public class MessageActivity extends AppCompatActivity {
         });
         binding.shareLocationBtn.setOnClickListener(v -> {
             if (askLocationPermission()){
-                client = LocationServices.getFusedLocationProviderClient(this);
                 if (isSharing) {
                     isSharing = false;
                     binding.shareLocationBtn.setText("Share Location");
-                    binding.mapFragmentCtn.setVisibility(View.GONE);
+                    binding.rlMap.setVisibility(View.GONE);
                     stopLocationUpdates();
                 } else {
                     isSharing = true;
                     binding.shareLocationBtn.setText("Stop Sharing");
-                    binding.mapFragmentCtn.setVisibility(View.VISIBLE);
+                    binding.rlMap.setVisibility(View.VISIBLE);
                     startLocationUpdates();
                 }
             }
         });
 
+    }
+
+    public void setupLocationFeature(){
+        if(conversation.getMemberIdList().size() > 2){
+            binding.shareLocationBtn.setVisibility(View.GONE);
+        } else {
+            setupMapFragment();
+            setupLocationSharing();
+            setupLocationSharingListener();
+        }
     }
 
     protected void setupLocationSharing() {
@@ -134,15 +141,18 @@ public class MessageActivity extends AppCompatActivity {
                     return;
                 }
                 for (Location location : locationResult.getLocations()) {
-                    GeoPoint curLoc = new GeoPoint(location.getLatitude(), location.getLongitude());
-                    Map<String, Object> doc = new HashMap<>();
-                    doc.put("location", curLoc);
-                    doc.put("isSharing", true);
-                    db.collection("Conversations")
-                            .document(conversationID)
-                            .collection("locations")
-                            .document(auth.getCurrentUser().getUid())
-                            .update(doc);
+                    Log.d("Current Location", location.toString());
+                    if(isSharing){
+                        GeoPoint curLoc = new GeoPoint(location.getLatitude(), location.getLongitude());
+                        Map<String, Object> doc = new HashMap<>();
+                        doc.put("location", curLoc);
+                        doc.put("isSharing", true);
+                        db.collection("Conversations")
+                                .document(conversationID)
+                                .collection("locations")
+                                .document(auth.getCurrentUser().getUid())
+                                .update(doc);
+                    }
                 }
             }
         };
@@ -233,6 +243,7 @@ public class MessageActivity extends AppCompatActivity {
                                         @Nullable FirebaseFirestoreException error) {
                         conversation = value.toObject(Conversation.class);
                         getMessages();
+                        setupLocationFeature();
                     }
                 });
     }
@@ -275,6 +286,7 @@ public class MessageActivity extends AppCompatActivity {
                                 if (!Objects.equals(userId, auth.getCurrentUser().getUid())) {
                                     User user = userMap.get(userId);
                                     binding.tvName.setText(user.getName());
+//                                    binding.tvShareLocation.setText(user.getName() + "is sharing their location");
                                     if (user.getImageURL() == null) {
                                         binding.ivUserPic.setImageResource(R.drawable.default_avatar);
                                     } else {
@@ -346,7 +358,7 @@ public class MessageActivity extends AppCompatActivity {
             askLocationPermission();
             return;
         }
-        client.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper());
+        client.requestLocationUpdates(locationRequest, locationCallback, null);
     }
 
     private void stopLocationUpdates(){
@@ -359,7 +371,9 @@ public class MessageActivity extends AppCompatActivity {
                 .collection("locations")
                 .document(auth.getCurrentUser().getUid())
                 .update(doc);
-        client.removeLocationUpdates(locationCallback);
+        if(isSharing){
+            client.removeLocationUpdates(locationCallback);
+        }
     }
 
     private void setupMapFragment(){
@@ -370,5 +384,29 @@ public class MessageActivity extends AppCompatActivity {
                 .setReorderingAllowed(true)
                 .add(binding.mapFragmentCtn.getId(), MapsFragment.class, bundle)
                 .commit();
+    }
+
+    private void setupLocationSharingListener(){
+        db.collection("Conversations")
+                .document(conversationID)
+                .collection("locations")
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot query, @Nullable FirebaseFirestoreException error) {
+                        for (DocumentSnapshot doc: query){
+                            if(doc.getId() != auth.getCurrentUser().getUid()){
+                                if((boolean) doc.get("isSharing")){
+                                    if(binding.mapFragmentCtn.getVisibility() == View.GONE){
+                                        binding.mapFragmentCtn.setVisibility(View.VISIBLE);
+//                                        binding.tvShareLocation.setVisibility(View.VISIBLE);
+                                    } else {
+                                        binding.mapFragmentCtn.setVisibility(View.GONE);
+//                                        binding.tvShareLocation.setVisibility(View.GONE);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
     }
 }

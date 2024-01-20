@@ -94,9 +94,23 @@
             />
     </LinearLayout>
 
-    <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/mapFragmentCtn"
+    <RelativeLayout
+        android:id="@+id/rlMap"
         android:layout_width="wrap_content"
-        android:layout_height="250dp"
-        android:visibility="gone"/>
+        android:layout_height="250dp">
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/mapFragmentCtn"
+            android:layout_width="wrap_content"
+            android:layout_height="250dp"/>
+<!--        <TextView-->
+<!--            android:id="@+id/tvShareLocation"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="is sharing their location"-->
+<!--            android:gravity="center"-->
+<!--            android:layout_marginBottom="10dp"-->
+<!--            android:layout_alignParentBottom="true"/>-->
+    </RelativeLayout>
+
+
 </LinearLayout>
