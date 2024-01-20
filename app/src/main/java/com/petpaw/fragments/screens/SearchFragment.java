@@ -264,8 +264,8 @@ public class SearchFragment extends Fragment {
                         }
                     }
                     if (context != null) {
-                        binding.searchFragmentPostRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-                        binding.searchFragmentPostRecyclerView.setAdapter(new PostListAdapter(requireContext(), postList));
+                        binding.searchFragmentPostRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+                        binding.searchFragmentPostRecyclerView.setAdapter(new PostListAdapter(getContext(), postList));
                     }
                 }
             }
@@ -293,8 +293,8 @@ public class SearchFragment extends Fragment {
                         }
                     }
                     if (context != null) {
-                        binding.searchFragmentCommunityRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-                        binding.searchFragmentCommunityRecyclerView.setAdapter(new CommunityListAdapter(requireContext(), communityList, true, getFragmentManager()));
+                        binding.searchFragmentCommunityRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+                        binding.searchFragmentCommunityRecyclerView.setAdapter(new CommunityListAdapter(getContext(), communityList, true, getFragmentManager()));
                     }
                 }
             }
@@ -324,8 +324,8 @@ public class SearchFragment extends Fragment {
                         }
                     }
                     if (context != null) {
-                        binding.searchFragmentUserRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-                        binding.searchFragmentUserRecyclerView.setAdapter(new UserListAdapter(requireContext(), userList));
+                        binding.searchFragmentUserRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+                        binding.searchFragmentUserRecyclerView.setAdapter(new UserListAdapter(getContext(), userList));
                     }
                 }
             }

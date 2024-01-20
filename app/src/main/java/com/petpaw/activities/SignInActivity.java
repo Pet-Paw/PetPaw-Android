@@ -60,10 +60,11 @@ public class SignInActivity extends AppCompatActivity {
             @Override
             public void onVerificationCompleted(@NonNull PhoneAuthCredential phoneAuthCredential) {
                 Log.d(TAG, "onVerificationCompleted:" + phoneAuthCredential);
+
                 final String code = phoneAuthCredential.getSmsCode();
                 if (code != null) {
                     Log.d(TAG, "onVerificationCompleted: code: " + code);
-                    verifyCode(code);
+//                    verifyCode(code);
                 }
 //                    signInWithPhoneAuthCredential(phoneAuthCredential);
 
@@ -118,7 +119,7 @@ public class SignInActivity extends AppCompatActivity {
                     });
                 }
             } else {
-                String phone = emailOrPhone.getText().toString();
+                String phone =  "+84" + emailOrPhone.getText().toString();
                 startPhoneNumberVerification(phone);
 
 
@@ -193,12 +194,16 @@ public class SignInActivity extends AppCompatActivity {
                     startActivity(intent);
                     finish();
                 } else {
+
                     Log.w(TAG, "signInWithCredential:failure", task.getException());
                     if (task.getException() instanceof FirebaseAuthInvalidCredentialsException) {
                         // The verification code entered was invalid
                         Log.w(TAG, "signInWithCredential:failure", task.getException());
                         Toast.makeText(SignInActivity.this, "OTP message is expired", Toast.LENGTH_SHORT).show();
                     }
+
+                    // otp is expired
+
                     Toast.makeText(SignInActivity.this, "Login failed", Toast.LENGTH_SHORT).show();
                 }
             }

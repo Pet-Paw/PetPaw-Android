@@ -1,8 +1,10 @@
 package com.petpaw.fragments.screens;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.activity.OnBackPressedCallback;
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -14,16 +16,26 @@ import android.view.ViewGroup;
 import android.widget.SearchView;
 import android.widget.TextView;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.petpaw.R;
 import com.petpaw.activities.MainActivity;
+import com.petpaw.activities.MessageActivity;
 import com.petpaw.adapters.UserFollowingAdapter;
 import com.petpaw.database.FollowCollection;
 import com.petpaw.database.UserCollection;
 import com.petpaw.databinding.FragmentUserFollowersBinding;
 import com.petpaw.databinding.FragmentUserFollowingBinding;
+import com.petpaw.interfaces.OnBtnMessageClickListener;
+import com.petpaw.models.Conversation;
 import com.petpaw.models.FollowRecord;
 import com.petpaw.models.User;
 
@@ -55,6 +67,8 @@ public class UserFollowersFragment extends Fragment {
 
     private List<User> followerUsers = new ArrayList<>();
 
+    private FirebaseFirestore mDb;
+
 
 
     public UserFollowersFragment() {
@@ -74,6 +88,8 @@ public class UserFollowersFragment extends Fragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        auth = FirebaseAuth.getInstance();
+        mDb = FirebaseFirestore.getInstance();
         super.onCreate(savedInstanceState);
 
     }
@@ -122,6 +138,47 @@ public class UserFollowersFragment extends Fragment {
                             if (followerUsers.size() == 0) {
                                 msgNoFollowing.setVisibility(TextView.VISIBLE);
                             }
+
+                            userFollowingAdapter.setOnBtnMessageClick(new OnBtnMessageClickListener() {
+                                @Override
+                                public void onClick(User user) {
+                                    String currentUserId = auth.getCurrentUser().getUid();
+                                    String userId = user.getUid();
+
+                                    mDb.collection(Conversation.CONVERSATIONS)
+                                            .whereArrayContains("memberIdList", currentUserId)
+                                            .get()
+                                            .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                                                @Override
+                                                public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                                    String conversationId = null;
+
+                                                    for (DocumentSnapshot doc: queryDocumentSnapshots) {
+                                                        Conversation conversation = doc.toObject(Conversation.class);
+                                                        assert conversation != null;
+                                                        List<String> memberIdList = conversation.getMemberIdList();
+
+                                                        if (memberIdList.size() == 2
+                                                                && memberIdList.contains(currentUserId)
+                                                                && memberIdList.contains(userId)) {
+                                                            conversationId = doc.getId();
+                                                            break;
+                                                        }
+                                                    }
+
+                                                    if (conversationId != null) {
+                                                        moveToMessageActivity(conversationId);
+                                                        return;
+                                                    }
+
+                                                    List<String> memberIdList = new ArrayList<>();
+                                                    memberIdList.add(userId);
+                                                    memberIdList.add(currentUserId);
+                                                    createConversation(memberIdList);
+                                                }
+                                            });
+                                }
+                            });
                         }
                     });
                 }
@@ -182,4 +239,26 @@ public class UserFollowersFragment extends Fragment {
         }
     }
 
+    private void moveToMessageActivity(String conversationId) {
+        Intent intent = new Intent(requireActivity(), MessageActivity.class);
+        intent.putExtra("conversationID", conversationId);
+        startActivity(intent);
+    }
+
+    private void createConversation(List<String> userIdList){
+        // Create new conversation
+        Conversation conversation = new Conversation();
+        conversation.setMemberIdList(userIdList);
+        mDb.collection("Conversations")
+                .add(conversation.toDoc())
+                .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentReference> task) {
+                        if(task.isSuccessful()){
+                            moveToMessageActivity(task.getResult().getId());
+                        }
+
+                    }
+                });
+    }
 }

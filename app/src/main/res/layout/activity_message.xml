@@ -37,6 +37,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="20dp"
             android:layout_marginStart="20dp"
+            android:layout_marginRight="20dp"
             android:layout_weight="1"
             android:text="Name"
             android:textColor="@color/black"
@@ -45,12 +46,23 @@
             android:gravity="center_vertical"
             />
 
+<<<<<<< HEAD
         <Button
             android:id="@+id/shareLocationBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Share Location"/>
 
+=======
+        <com.zegocloud.uikit.prebuilt.call.invite.widget.ZegoSendCallInvitationButton
+            android:id="@+id/btnVoiceCall"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:backgroundTint="@color/white"
+            android:drawableStart="@drawable/baseline_local_phone_24"
+            android:paddingLeft="7dp"
+            app:tint="@color/primary" />
+>>>>>>> main
 
     </LinearLayout>
 

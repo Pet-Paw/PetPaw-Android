@@ -29,7 +29,7 @@ import java.util.List;
 
 public class UserFollowingAdapter extends RecyclerView.Adapter<UserFollowingAdapter.UserFollowingViewHolder>  {
     private List<User> users = new ArrayList<>();
-    private String currentUserId;
+    private final String currentUserId;
 
     private boolean isFollowing;
 
@@ -100,7 +100,6 @@ public class UserFollowingAdapter extends RecyclerView.Adapter<UserFollowingAdap
                             .replace(R.id.profileFragmentLayout, ProfileFragment.newInstance(userId, R.id.useFollowerFragment, currentUserId))
                             .commitNow();
                 }
-
 
 //
 //                ((FragmentActivity) context).findViewById(R.id.overlay_fragment_container).setVisibility(View.VISIBLE);

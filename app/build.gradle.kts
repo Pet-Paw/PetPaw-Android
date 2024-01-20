@@ -81,4 +81,7 @@ dependencies {
     // Avatar ImageView
     implementation("de.hdodenhof:circleimageview:3.1.0")
 
+    // call
+    implementation("com.github.ZEGOCLOUD:zego_uikit_prebuilt_call_android:+")
+
 }

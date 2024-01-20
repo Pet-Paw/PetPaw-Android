@@ -71,6 +71,9 @@ public class ConversationListAdapter extends RecyclerView.Adapter<ConversationLi
         if (userMap == null) {
             return;
         }
+        if (mAuth.getCurrentUser() == null){
+            return;
+        }
 
         Conversation conversation = conversationList.get(position);
         if (conversation.getMemberIdList().size() <= 2){
@@ -109,9 +112,16 @@ public class ConversationListAdapter extends RecyclerView.Adapter<ConversationLi
         } else {
             holder.mBinding.iv.setImageResource(R.drawable.group_chat_image);
             String names = "";
+            int cnt = 0;
             for (String userId: conversation.getMemberIdList()) {
                 if (!Objects.equals(userId, mAuth.getCurrentUser().getUid())) {
                     names += userMap.get(userId).getName();
+                    cnt++;
+
+                    if (cnt == 3) {
+                        break;
+                    }
+
                     if(conversation.getMemberIdList().indexOf(userMap.get(userId).getUid()) != (conversation.getMemberIdList().size() - 1)){
                         names += ", ";
                     }

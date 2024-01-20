@@ -13,6 +13,7 @@ public class Community implements FirebaseDoc {
     private String owner;
     private String imageURL;
     private List<String> members;
+    private String conversationId;
 
     public Community(String id, String name, String description, String owner, String imageURL, List<String> members) {
         this.id = id;
@@ -72,6 +73,14 @@ public class Community implements FirebaseDoc {
 
     public void setMembers(List<String> members) {
         this.members = members;
+    }
+
+    public String getConversationId() {
+        return conversationId;
+    }
+
+    public void setConversationId(String conversationId) {
+        this.conversationId = conversationId;
     }
 
     @Override
