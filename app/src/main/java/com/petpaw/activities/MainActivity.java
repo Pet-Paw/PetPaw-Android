@@ -229,6 +229,22 @@ public class MainActivity extends AppCompatActivity {
         CollectionReference usersRef = db.collection("users");
         DocumentReference docRef = usersRef.document(uid);
 
+        docRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot document = task.getResult();
+                if (document.exists()) {
+                    String banReason = (String) document.get("banReason");
+
+                    if (!(banReason == null || banReason.isEmpty())) {
+                        // banReason is null
+                        Intent intent = new Intent(MainActivity.this, BanActivity.class);
+                        startActivity(intent);
+                        //finish();
+                    }
+                }
+            }
+        });
+
         listener = docRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
