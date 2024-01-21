@@ -189,7 +189,7 @@ public class SignUpActivity extends AppCompatActivity {
 
                     createUser(auth.getCurrentUser().getUid(), username, "", phone, address, password);
 
-                    Intent intent = new Intent(SignUpActivity.this, SignInActivity.class);
+                    Intent intent = new Intent(SignUpActivity.this, MainActivity.class);
                     startActivity(intent);
                     finish();
 
@@ -237,7 +237,7 @@ public class SignUpActivity extends AppCompatActivity {
                         User newUser = new User(userId, username, emailOrPhone, phoneNumber,  address, null, physicalDeviceToken, phonePass);
                         userCollection.createUser(newUser);
 
-                        Intent intent = new Intent(SignUpActivity.this, SignInActivity.class);
+                        Intent intent = new Intent(SignUpActivity.this, MainActivity.class);
                         startActivity(intent);
                         finish();
                         Toast.makeText(SignUpActivity.this, "Register successfully", Toast.LENGTH_SHORT).show();
