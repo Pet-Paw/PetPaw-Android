@@ -5,6 +5,7 @@ import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
+import android.app.ProgressDialog;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -42,7 +43,7 @@ import com.petpaw.R;
 import com.petpaw.databinding.FragmentMapsBinding;
 import com.petpaw.models.Conversation;
 import com.petpaw.models.User;
-import com.petpaw.utils.BubbleTransformation;
+import com.petpaw.utils.CircleTransform;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
@@ -79,119 +80,9 @@ public class MapsFragment extends Fragment {
         @Override
         public void onMapReady(GoogleMap googleMap) {
             mMap = googleMap;
-            db.collection("Conversations")
-                    .document(conversationID)
-                    .get()
-                    .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                        @Override
-                        public void onSuccess(DocumentSnapshot doc) {
-                            Conversation con = doc.toObject(Conversation.class);
-                            List<String> userIdList =  con.getMemberIdList();
-                            db.collection("users")
-                                    .whereIn(FieldPath.documentId(), userIdList)
-                                    .get()
-                                    .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                                        @Override
-                                        public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                                            for (DocumentSnapshot doc : queryDocumentSnapshots){
-                                                userSet.put(doc.getId(), doc.toObject(User.class));
-                                            }
-                                            db.collection("Conversations")
-                                                    .document(conversationID)
-                                                    .collection("locations")
-                                                    .whereEqualTo("isSharing", true)
-                                                    .addSnapshotListener(new EventListener<QuerySnapshot>() {
-                                                        @Override
-                                                        public void onEvent(@Nullable QuerySnapshot query, @Nullable FirebaseFirestoreException error) {
-                                                            for (Marker marker : markerList){
-                                                                marker.remove();
-                                                            }
-                                                            markerList.clear();
-                                                            if(query != null){
-                                                                for (DocumentSnapshot doc: query){
-                                                                    User curUser = userSet.get(doc.getId());
-                                                                    if ((boolean) doc.get("isSharing")){
-                                                                        GeoPoint geo = (GeoPoint) doc.get("location");
-                                                                        if(!(geo.getLatitude() == 0 && geo.getLongitude() == 0)){
-                                                                            LatLng latLng = new LatLng(geo.getLatitude(), geo.getLongitude());
-                                                                            if(query.size() > 1){
-                                                                                if(doc.getId() != auth.getCurrentUser().getUid()){
-                                                                                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 12));
-                                                                                }
-                                                                            } else {
-                                                                                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 12));
-                                                                            }
-                                                                            String imgURL = userSet.get(doc.getId()).getImageURL();
-                                                                            if(imgURL != null){
-                                                                                Target target = new Target() {
-                                                                                    @Override
-                                                                                    public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                                                                                        MarkerOptions options = new MarkerOptions().position(latLng).title(curUser.getName())
-                                                                                                .icon(BitmapDescriptorFactory.fromBitmap(bitmap));
-                                                                                        Marker marker = mMap.addMarker(options);
-                                                                                        marker.setTitle(curUser.getUid());
-                                                                                        markerList.add(marker);
-                                                                                    }
-
-                                                                                    @Override
-                                                                                    public void onBitmapFailed(Exception e, Drawable errorDrawable) {
-
-                                                                                    }
-
-                                                                                    @Override
-                                                                                    public void onPrepareLoad(Drawable placeHolderDrawable) {
-
-                                                                                    }
-                                                                                };
-
-                                                                                Picasso.get()
-                                                                                        .load(curUser.getImageURL())
-                                                                                        .resize(120,120)
-                                                                                        .transform(new BubbleTransformation(5))
-                                                                                        .centerCrop()
-                                                                                        .into(target);
-                                                                            } else {
-                                                                                Target target = new Target() {
-                                                                                    @Override
-                                                                                    public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                                                                                        MarkerOptions options = new MarkerOptions().position(latLng).title(curUser.getName())
-                                                                                                .icon(BitmapDescriptorFactory.fromBitmap(bitmap));
-                                                                                        Marker marker = mMap.addMarker(options);
-                                                                                        marker.setTitle(curUser.getUid());
-                                                                                        markerList.add(marker);
-                                                                                    }
-
-                                                                                    @Override
-                                                                                    public void onBitmapFailed(Exception e, Drawable errorDrawable) {
-
-                                                                                    }
-
-                                                                                    @Override
-                                                                                    public void onPrepareLoad(Drawable placeHolderDrawable) {
-
-                                                                                    }
-                                                                                };
-
-                                                                                Picasso.get()
-                                                                                        .load(R.drawable.default_avatar)
-                                                                                        .resize(120,120)
-                                                                                        .transform(new BubbleTransformation(5))
-                                                                                        .centerCrop()
-                                                                                        .into(target);
-                                                                            }
-
-                                                                        }
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
-                                                    });
-                                        }
-                                    });
-
-                        }
-                    });
+            getUsers();
         }
+
     };
 
     @Nullable
@@ -203,6 +94,7 @@ public class MapsFragment extends Fragment {
         db = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
         conversationID = requireArguments().getString("conversationID").toString();
+
         return binding.getRoot();
     }
 
@@ -215,6 +107,126 @@ public class MapsFragment extends Fragment {
         if (mapFragment != null) {
             mapFragment.getMapAsync(callback);
         }
+    }
+
+    private void getUsers(){
+        db.collection("Conversations")
+                .document(conversationID)
+                .get()
+                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                    @Override
+                    public void onSuccess(DocumentSnapshot doc) {
+                        Conversation con = doc.toObject(Conversation.class);
+                        List<String> userIdList =  con.getMemberIdList();
+                        db.collection("users")
+                                .whereIn(FieldPath.documentId(), userIdList)
+                                .get()
+                                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                                    @Override
+                                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                        for (DocumentSnapshot doc : queryDocumentSnapshots){
+                                            userSet.put(doc.getId(), doc.toObject(User.class));
+                                        }
+                                        setupLocationSharing();
+                                    }
+                                });
+
+                    }
+                });
+    }
+
+    private void setupLocationSharing(){
+        db.collection("Conversations")
+                .document(conversationID)
+                .collection("locations")
+                .whereEqualTo("isSharing", true)
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot query, @Nullable FirebaseFirestoreException error) {
+                        for (Marker marker : markerList){
+                            marker.remove();
+                        }
+                        markerList.clear();
+                        if(query != null){
+                            for (DocumentSnapshot doc: query){
+                                User curUser = userSet.get(doc.getId());
+                                if ((boolean) doc.get("isSharing")){
+                                    GeoPoint geo = (GeoPoint) doc.get("location");
+                                    if(!(geo.getLatitude() == 0 && geo.getLongitude() == 0)){
+                                        LatLng latLng = new LatLng(geo.getLatitude(), geo.getLongitude());
+                                        if(query.size() > 1){
+                                            if(doc.getId() != auth.getCurrentUser().getUid()){
+                                                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 12));
+                                            }
+                                        } else {
+                                            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 12));
+                                        }
+                                        String imgURL = userSet.get(doc.getId()).getImageURL();
+                                        if(imgURL != null){
+                                            Target target = new Target() {
+                                                @Override
+                                                public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                                                    MarkerOptions options = new MarkerOptions().position(latLng).title(curUser.getName())
+                                                            .icon(BitmapDescriptorFactory.fromBitmap(bitmap));
+                                                    Marker marker = mMap.addMarker(options);
+                                                    marker.setTitle(curUser.getUid());
+                                                    markerList.add(marker);
+                                                }
+
+                                                @Override
+                                                public void onBitmapFailed(Exception e, Drawable errorDrawable) {
+
+                                                }
+
+                                                @Override
+                                                public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+                                                }
+                                            };
+
+                                            Picasso.get()
+                                                    .load(curUser.getImageURL())
+                                                    .resize(120,120)
+                                                    .transform(new CircleTransform())
+                                                    .centerCrop()
+                                                    .into(target);
+
+                                        } else {
+                                            Target target = new Target() {
+                                                @Override
+                                                public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                                                    MarkerOptions options = new MarkerOptions().position(latLng).title(curUser.getName())
+                                                            .icon(BitmapDescriptorFactory.fromBitmap(bitmap));
+                                                    Marker marker = mMap.addMarker(options);
+                                                    marker.setTitle(curUser.getUid());
+                                                    markerList.add(marker);
+                                                }
+
+                                                @Override
+                                                public void onBitmapFailed(Exception e, Drawable errorDrawable) {
+
+                                                }
+
+                                                @Override
+                                                public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+                                                }
+                                            };
+                                            Picasso.get()
+                                                    .load(R.drawable.default_avatar)
+                                                    .resize(120,120)
+                                                    .transform(new CircleTransform())
+                                                    .centerCrop()
+                                                    .into(target);
+                                        }
+
+                                    }
+                                }
+                            }
+                        }
+
+                    }
+                });
     }
 
 
