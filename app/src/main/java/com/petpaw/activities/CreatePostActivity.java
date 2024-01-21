@@ -254,6 +254,12 @@ public class CreatePostActivity extends AppCompatActivity {
                 boolean isValid = true;
 
                 String tempDescription = binding.createPostDescriptionEditText.getText().toString();
+                // Check if the description is empty and the image is null
+                if(tempDescription.isEmpty() && imageUri == null){
+                    isValid = false;
+                    Toast.makeText(this, "Please add an image or description", Toast.LENGTH_SHORT).show();
+                }
+
                 List<String> tags = getTags(tempDescription);
                 String description = removeTag(tempDescription, tags);
                 Log.d("CreatePostActivity", "Description: " + description);
