@@ -45,7 +45,7 @@
             android:layout_alignParentLeft="true"
             android:text="Community name: "
             android:gravity="center_vertical"
-            android:textSize="15dp"/>
+            android:textSize="18dp"/>
         <EditText
             android:id="@+id/communityNameEditText"
             android:layout_width="200dp"
@@ -68,7 +68,7 @@
             android:layout_alignParentLeft="true"
             android:text="Description: "
             android:gravity="center_vertical"
-            android:textSize="15dp"
+            android:textSize="18dp"
             />
 
         <EditText
@@ -100,7 +100,7 @@
             android:layout_alignParentLeft="true"
             android:text="Community image: "
             android:gravity="center_vertical"
-            android:textSize="15dp"/>
+            android:textSize="18dp"/>
         <LinearLayout
             android:layout_width="200dp"
             android:layout_height="match_parent"

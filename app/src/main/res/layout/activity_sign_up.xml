@@ -16,28 +16,49 @@
 
         <ImageView
             android:id="@+id/logo"
-            android:layout_width="wrap_content"
+            android:layout_width="140dp"
             android:layout_height="wrap_content"
             android:layout_gravity="left"
             android:layout_marginTop="20dp"
             android:src="@drawable/signup_banner" />
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="20dp"
+            android:fontFamily="@font/poppins_bold"
+            android:text="Welcome to PetPaw!"
+            android:textAlignment="center"
+            android:textColor="@color/black"
+            android:textSize="32dp" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:fontFamily="@font/poppins_medium"
+            android:lineHeight="30sp"
+            android:text="Create your account"
+            android:textColor="#010101"
+            android:textFontWeight="500"
+            android:textSize="20sp" />
+
         <EditText
-            style="@style/Widget.Material3.TextInputEditText.OutlinedBox"
             android:id="@+id/username"
+            style="@style/Widget.Material3.TextInputEditText.OutlinedBox"
             android:layout_width="324dp"
             android:layout_height="55dp"
             android:layout_gravity="center"
-            android:layout_marginTop="50dp"
+            android:layout_marginTop="30dp"
             android:background="@drawable/edit_text_border"
             android:drawableBottom="@color/black"
-            android:hint="Username"
+            android:hint="Name"
             android:inputType="textEmailAddress"
             android:textSize="20dp" />
 
         <EditText
-            style="@style/Widget.Material3.TextInputEditText.OutlinedBox"
             android:id="@+id/emailOrPhone"
+            style="@style/Widget.Material3.TextInputEditText.OutlinedBox"
             android:layout_width="324dp"
             android:layout_height="55dp"
             android:layout_gravity="center"
@@ -51,8 +72,8 @@
 
 
         <EditText
-            style="@style/Widget.Material3.TextInputEditText.OutlinedBox"
             android:id="@+id/address"
+            style="@style/Widget.Material3.TextInputEditText.OutlinedBox"
             android:layout_width="324dp"
             android:layout_height="55dp"
             android:layout_gravity="center"
@@ -64,8 +85,8 @@
             android:textSize="20dp" />
 
         <EditText
-            style="@style/Widget.Material3.TextInputEditText.OutlinedBox"
             android:id="@+id/password"
+            style="@style/Widget.Material3.TextInputEditText.OutlinedBox"
             android:layout_width="324dp"
             android:layout_height="55dp"
             android:layout_gravity="center"

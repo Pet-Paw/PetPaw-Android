@@ -36,7 +36,7 @@
                 android:layout_alignParentStart="true"
                 android:layout_alignParentEnd="true"
                 android:layout_weight="1"
-                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
                 android:layout_marginHorizontal="10dp"
                 android:background="@drawable/bg_search_view"
                 android:elevation="5dp"
@@ -55,6 +55,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
+            android:layout_marginBottom="5dp"
             android:orientation="horizontal">
 
             <TextView

@@ -42,9 +42,6 @@
         <activity
             android:name=".activities.EmptyActivity"
             android:exported="false" />
-        <activity
-            android:name=".activities.Empty"
-            android:exported="false" />
 
         <service
             android:name=".models.NotificationChannelService"

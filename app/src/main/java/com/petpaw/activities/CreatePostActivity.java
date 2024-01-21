@@ -91,6 +91,7 @@ public class CreatePostActivity extends AppCompatActivity {
 
 // ---------------------------------------- Edit post ------------------------------------------------
         if(postId != null) {
+            binding.createPostTitle.setText("Edit Post");
             progressDialog = new ProgressDialog(this);
             progressDialog.setTitle("Fetching Post Detail....");
             progressDialog.show();
@@ -237,7 +238,7 @@ public class CreatePostActivity extends AppCompatActivity {
 
         }
         else { // ------------------------------ CREATE a new post -----------------------------------
-
+            binding.createPostTitle.setText("Create Post");
 //            ---------- ListView to select pet -----------
             renderPetListView(false);
 

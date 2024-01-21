@@ -17,7 +17,7 @@
 
         <ImageView
             android:id="@+id/logo"
-            android:layout_width="wrap_content"
+            android:layout_width="140dp"
             android:layout_height="wrap_content"
             android:layout_gravity="left"
             android:layout_marginTop="20dp"
@@ -27,7 +27,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginTop="64dp"
+            android:layout_marginTop="60dp"
             android:fontFamily="@font/poppins_bold"
             android:text="Hello Again!"
             android:textColor="@color/black"
@@ -41,7 +41,6 @@
             android:lineHeight="30sp"
             android:text="Sign in to your account"
             android:textColor="#010101"
-
             android:textFontWeight="500"
             android:textSize="20sp" />
 

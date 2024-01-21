@@ -58,7 +58,7 @@
                 android:layout_height="200dp"
                 android:layout_marginBottom="10dp"
                 android:background="@drawable/edit_text_border"
-                android:src="@drawable/default_pet_avatar"/>
+                android:src="@drawable/app_icon"/>
             <Button
                 android:id="@+id/selectImageBtn"
                 android:layout_width="wrap_content"

@@ -135,6 +135,15 @@ public class CommunityFragment extends Fragment {
                 binding.communityFragmentJoinedRecyclerView.setVisibility(View.VISIBLE);
             }
         });
+
+        binding.comBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(requireContext(), CreateCommunityActivity.class);
+                startActivity(intent);
+            }
+        });
+
         return binding.getRoot();
     }
 

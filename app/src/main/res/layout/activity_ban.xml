@@ -20,8 +20,8 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="You have been banned!!"
-            android:textSize="30sp"
+            android:text="You have been banned due to"
+            android:textSize="28sp"
             android:textColor="@color/black"
             android:textStyle="bold"
             android:layout_gravity="center"
@@ -38,33 +38,52 @@
             android:layout_marginBottom="20dp"
             android:textAlignment="center"/>
 
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Please contact the admin for more information at"
+            android:text="Please contact the admin for more"
             android:textSize="20sp"
             android:textColor="@color/black"
             android:layout_gravity="center"
-            android:layout_marginBottom="20dp"
             android:textAlignment="center"/>
 
-        <TextView
-            android:id="@+id/admin_email"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginBottom="20dp"
-            android:text="petpaw@gmail.com"
-            android:textAlignment="center"
-            android:textColor="@color/primary"
-            android:textSize="20sp" />
+            android:orientation="horizontal"
+            android:gravity="center"
+            >
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="information at "
+                android:textSize="20sp"
+                android:textColor="@color/black"
+                android:layout_gravity="center"
+                android:textAlignment="center"/>
+            <TextView
+                android:id="@+id/admin_email"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="petpaw@gmail.com"
+                android:textAlignment="center"
+                android:textColor="@color/primary"
+                android:textSize="20sp" />
+        </LinearLayout>
+
+
             <Button
                 android:id="@+id/ban_log_out"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Log Out"
                 android:textColor="@color/white"
-                android:background="@color/primary"
-                android:layout_marginRight="10dp"/>
+                app:cornerRadius="20dp"
+                android:textSize="20dp"
+                android:paddingVertical="10dp"
+                android:layout_marginTop="20dp"
+                />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

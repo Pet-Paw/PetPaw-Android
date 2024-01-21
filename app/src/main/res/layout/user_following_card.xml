@@ -16,13 +16,14 @@
         android:gravity="center"
 
         android:orientation="vertical">
-        <com.google.android.material.imageview.ShapeableImageView
+        <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/profilePic"
             android:layout_margin="1dp"
             android:layout_width="64dp"
             android:layout_height="64dp"
             android:src="@drawable/default_avatar"
-            app:shapeAppearanceOverlay="@style/Circular" />
+            app:civ_border_width="1dp"
+            app:civ_border_color="@color/primary"/>
 
         <TextView
             android:id="@+id/username"

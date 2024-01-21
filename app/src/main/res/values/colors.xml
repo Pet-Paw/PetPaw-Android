@@ -4,11 +4,11 @@
     <color name="white">#FFFFFFFF</color>
     <color name="darkGray">#5A5A5A</color>
     <color name="gray">#EFF1F3</color>
-    <color name="primary">#2FA6A7</color>
+    <color name="primary">#F1538B</color>
     <color name="text">#FF010101</color>
     <color name="on_surface_variant">#3F4948</color>
     <color name="surface">#F4FBFA</color>
-    <color name="secondary_container">#CCE8E7</color>
+    <color name="secondary_container">#FDF6F6</color>
     <color name="yellow">#F8D966</color>
     <color name="red">#CB3F3F</color>
 </resources>

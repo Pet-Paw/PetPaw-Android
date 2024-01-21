@@ -95,7 +95,7 @@ public class HomeFragment extends Fragment {
         FirebaseAuth auth = FirebaseAuth.getInstance();
         uid = auth.getCurrentUser().getUid();
         ImageView createPostBtn = view.findViewById(R.id.homeCreatePostImageView);
-        Button comBtn = view.findViewById(R.id.comBtn);
+//        Button comBtn = view.findViewById(R.id.comBtn);
         createPostBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -104,7 +104,7 @@ public class HomeFragment extends Fragment {
                 startActivity(intent);
             }
         });
-
+/*
         comBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -112,6 +112,8 @@ public class HomeFragment extends Fragment {
                 startActivity(intent);
             }
         });
+
+ */
 
         return view;
     }

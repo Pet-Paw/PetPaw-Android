@@ -29,11 +29,7 @@
                 android:gravity="center"
                 android:textStyle="bold"
                 android:layout_weight="1"/>
-            <Button
-                android:id="@+id/comBtn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Community"/>
+
 
            <ImageView
                android:id="@+id/homeCreatePostImageView"
@@ -48,6 +44,21 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp" />
+        <View
+            android:id="@+id/postDividerView"
+            android:layout_width="match_parent"
+            android:layout_marginHorizontal="50dp"
+            android:layout_height="2dp"
+            android:layout_marginTop="15dp"
+            android:background="@color/darkGray"/>
+        <TextView
+            android:id="@+id/postDividerTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="10dp"
+            android:textAlignment="center"
+            android:text="Posts from other users"
+            android:textSize="18dp"/>
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/homePostRandomRecyclerView"
             android:layout_width="match_parent"
