@@ -185,8 +185,8 @@ public class PetProfileFragment extends Fragment {
                     // Navigate back to profile fragment
                     if (isAdded() && getActivity() != null) {
                         getActivity().findViewById(R.id.overlay_pet_fragment).setVisibility(View.GONE);
-                        getActivity().findViewById(R.id.profileLayout).setVisibility(View.VISIBLE);
-                        Intent intent = new Intent(requireContext(), EmptyActivity.class);
+                        getActivity().findViewById(R.id.profileFragmentLayout).setVisibility(View.VISIBLE);
+                        Intent intent = new Intent(getContext(), EmptyActivity.class);
                         startActivity(intent);
                     }
                 })

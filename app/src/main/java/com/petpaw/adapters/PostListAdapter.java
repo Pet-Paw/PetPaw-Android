@@ -224,6 +224,9 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.PostVi
         }
 
 //        ----------------- report post ------------------------
+        if(currentUserId.equals(postList.get(position).getAuthorId())){
+            holder.postCardViewReportImageView.setVisibility(View.GONE);
+        }else{
         holder.postCardViewReportImageView.setOnClickListener(view -> {
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
             builder.setTitle("Report this post?");
@@ -257,6 +260,7 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.PostVi
             dialog.show();
 
         });
+        }
 
 
 //        --------------- add onClick like button -----------

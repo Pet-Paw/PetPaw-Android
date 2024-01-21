@@ -401,6 +401,7 @@ public class MessageActivity extends AppCompatActivity {
                                 }
                             }
                         } else {
+                            binding.btnVoiceCall.setVisibility(View.GONE);
                             binding.mapBtn.setVisibility(View.GONE);
                             binding.ivUserPic.setImageResource(R.drawable.group_chat_image);
                             StringBuilder names = new StringBuilder();

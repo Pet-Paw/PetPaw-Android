@@ -80,7 +80,7 @@ public class PostCommentActivity extends AppCompatActivity {
         Intent intent = getIntent();
         if (intent.hasExtra("postID")){
             postId = intent.getExtras().getString("postID").toString();
-            Toast.makeText(this, postId, Toast.LENGTH_SHORT).show();
+            //Toast.makeText(this, postId, Toast.LENGTH_SHORT).show();
             getComments();
             binding.createCommentBtn.setOnClickListener(v -> {
                 if (binding.createCommentEditText.getText().toString().length() != 0){
