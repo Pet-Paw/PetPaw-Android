@@ -119,7 +119,7 @@ public class MessageActivity extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
 
-        client = LocationServices.getFusedLocationProviderClient(this);
+        client = LocationServices.getFusedLocationProviderClient(MessageActivity.this);
         getConversation();
         setupMessageRV();
         binding.rlMap.setVisibility(View.GONE);
@@ -139,17 +139,22 @@ public class MessageActivity extends AppCompatActivity {
             stopLocationUpdates();
             finish();
         });
+        binding.mapBtn.setOnClickListener(v -> {
+            if(binding.rlMap.getVisibility() == View.GONE){
+                binding.rlMap.setVisibility(View.VISIBLE);
+            } else {
+                binding.rlMap.setVisibility(View.GONE);
+            }
+        });
         binding.shareLocationBtn.setOnClickListener(v -> {
             if (askLocationPermission()){
                 if (isSharing) {
                     isSharing = false;
                     binding.shareLocationBtn.setText("Share Location");
-                    binding.rlMap.setVisibility(View.GONE);
                     stopLocationUpdates();
                 } else {
                     isSharing = true;
                     binding.shareLocationBtn.setText("Stop Sharing");
-                    binding.rlMap.setVisibility(View.VISIBLE);
                     startLocationUpdates();
                 }
             }
@@ -345,6 +350,7 @@ public class MessageActivity extends AppCompatActivity {
                                 }
                             }
                         } else {
+                            binding.mapBtn.setVisibility(View.GONE);
                             binding.ivUserPic.setImageResource(R.drawable.group_chat_image);
                             StringBuilder names = new StringBuilder();
                             int cnt = 0;
@@ -446,15 +452,13 @@ public class MessageActivity extends AppCompatActivity {
                     public void onEvent(@Nullable QuerySnapshot query, @Nullable FirebaseFirestoreException error) {
                         for (DocumentSnapshot doc: query){
                             if(doc.getId() != auth.getCurrentUser().getUid()){
-                                if((boolean) doc.get("isSharing")){
-                                    if(binding.mapFragmentCtn.getVisibility() == View.GONE){
-                                        binding.mapFragmentCtn.setVisibility(View.VISIBLE);
-//                                        binding.tvShareLocation.setVisibility(View.VISIBLE);
-                                    } else {
-                                        binding.mapFragmentCtn.setVisibility(View.GONE);
-//                                        binding.tvShareLocation.setVisibility(View.GONE);
+                                if((boolean) doc.get("isSharing")) {
+                                    if(binding.rlMap.getVisibility() == View.GONE){
+                                        Toast.makeText(getBaseContext(), "Location sharing is active. Press Map Icon to view", Toast.LENGTH_SHORT).show();
                                     }
+//                                  binding.tvShareLocation.setVisibility(View.VISIBLE);
                                 }
+
                             }
                         }
                     }

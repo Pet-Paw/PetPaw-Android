@@ -46,7 +46,7 @@ public class BubbleTransformation implements Transformation {
         Canvas canvas = new Canvas(output);
 
         Paint paintBorder = new Paint();
-        paintBorder.setColor(0x3E7EFF);
+        paintBorder.setColor(0x2FA6A7);
         paintBorder.setStrokeWidth(margin);
         canvas.drawRoundRect(new RectF(outerMargin, outerMargin, source.getWidth() - outerMargin, source.getHeight() - outerMargin), 0, 0, paintBorder);
 

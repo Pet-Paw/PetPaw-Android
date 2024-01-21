@@ -47,11 +47,11 @@
             />
 
 
-        <Button
-            android:id="@+id/shareLocationBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Share Location"/>
+        <ImageView
+            android:id="@+id/mapBtn"
+            android:src="@drawable/baseline_map_24"
+            android:layout_width="36dp"
+            android:layout_height="36dp"/>
 
 
         <com.zegocloud.uikit.prebuilt.call.invite.widget.ZegoSendCallInvitationButton
@@ -113,14 +113,14 @@
             android:id="@+id/mapFragmentCtn"
             android:layout_width="wrap_content"
             android:layout_height="250dp"/>
-<!--        <TextView-->
-<!--            android:id="@+id/tvShareLocation"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:text="is sharing their location"-->
-<!--            android:gravity="center"-->
-<!--            android:layout_marginBottom="10dp"-->
-<!--            android:layout_alignParentBottom="true"/>-->
+        <Button
+            android:id="@+id/shareLocationBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Share Location"
+            android:layout_alignParentBottom="true"
+            android:layout_marginLeft="135dp"
+            android:layout_marginBottom="10dp"/>
     </RelativeLayout>
 
 
