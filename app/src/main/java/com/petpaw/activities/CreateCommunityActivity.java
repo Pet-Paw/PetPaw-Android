@@ -71,7 +71,7 @@ public class CreateCommunityActivity extends AppCompatActivity {
         binding.createCommunityBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(binding.communityNameEditText.getText().length() != 0){
+                if(binding.communityNameEditText.getText().length() != 0 && binding.descriptionEditText.getText().length() != 0){
                     Community com = new Community("", binding.communityNameEditText.getText().toString(), binding.descriptionEditText.getText().toString(), auth.getCurrentUser().getUid(), "https://firebasestorage.googleapis.com/v0/b/petpaw-1d5a6.appspot.com/o/communityImages%2Fdefault_community_picture.jpg?alt=media&token=02941e55-1875-4eb3-8e9e-35d11ef657df", new ArrayList<>());
                     db.collection("Communities")
                             .add(com.toDoc())
@@ -102,6 +102,8 @@ public class CreateCommunityActivity extends AppCompatActivity {
                             .addOnFailureListener(e -> {
                                 Toast.makeText(getBaseContext(), "Error Creating Community", Toast.LENGTH_SHORT).show();
                             });
+                } else {
+                    Toast.makeText(CreateCommunityActivity.this, "Please fill in all information fields", Toast.LENGTH_SHORT).show();
                 }
             }
         });
