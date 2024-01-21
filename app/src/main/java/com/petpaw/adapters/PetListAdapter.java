@@ -1,10 +1,6 @@
 package com.petpaw.adapters;
 
-import static androidx.core.content.ContentProviderCompat.requireContext;
-
 import android.content.Context;
-import android.content.Intent;
-import android.graphics.PorterDuff;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,34 +9,23 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.petpaw.R;
-import com.petpaw.activities.PetProfileActivity;
 import com.petpaw.fragments.screens.PetProfileFragment;
-import com.petpaw.fragments.screens.ProfileFragment;
 import com.petpaw.models.Pet;
-import com.petpaw.models.Post;
-import com.petpaw.models.User;
 import com.squareup.picasso.Picasso;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 
 public class PetListAdapter extends RecyclerView.Adapter<PetListAdapter.PetViewHolder> {
 

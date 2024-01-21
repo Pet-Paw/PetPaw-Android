@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
-        android:gravity="center_horizontal"
+        android:gravity="center_vertical"
         android:orientation="horizontal"
         android:padding="10dp">
 
@@ -29,15 +29,14 @@
             app:civ_border_width="1dp"
             app:civ_border_color="@color/primary"
             tools:ignore="MissingClass"
-            android:layout_marginLeft="20dp"/>
+            android:layout_marginLeft="10dp"/>
 
         <TextView
             android:id="@+id/tvName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="20dp"
-            android:layout_marginStart="20dp"
-            android:layout_marginRight="20dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginStart="10dp"
             android:layout_weight="1"
             android:text="Name"
             android:textColor="@color/black"

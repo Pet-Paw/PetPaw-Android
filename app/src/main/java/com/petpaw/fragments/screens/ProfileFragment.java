@@ -2,9 +2,11 @@ package com.petpaw.fragments.screens;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.net.Uri;
@@ -202,22 +204,37 @@ public class ProfileFragment extends Fragment {
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         binding.reportBtn.setOnClickListener(view -> {
-            DocumentReference postRef = db.collection("Admin").document("nolD8tefH4w9mwE9efzM");
-            postRef.get().addOnCompleteListener(task -> {
-                if (task.isSuccessful() && task.getResult() != null) {
-                    DocumentSnapshot documentSnapshot = task.getResult();
-                    if (documentSnapshot.exists()) {
-                        //add to the "notifications" list a text "post reported"
-                        if(documentSnapshot.get("notifications") != null){
-                            List<String> notifications = (List<String>) documentSnapshot.get("notifications");
-                            notifications.add("USER REPORT: User " + currentUser.getUid() + " has reported user " + uid);
-                            documentSnapshot.getReference().update("notifications", notifications);
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+            builder.setTitle("Report this user?");
+            builder.setMessage("Report notification will be sent to PetPaw admin.");
+            builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    DocumentReference ref = db.collection("Admin").document("nolD8tefH4w9mwE9efzM");
+                    ref.get().addOnCompleteListener(task -> {
+                        if (task.isSuccessful() && task.getResult() != null) {
+                            DocumentSnapshot documentSnapshot = task.getResult();
+                            if (documentSnapshot.exists()) {
+                                //add to the "notifications" list a text "post reported"
+                                if(documentSnapshot.get("notifications") != null){
+                                    List<String> notifications = (List<String>) documentSnapshot.get("notifications");
+                                    notifications.add("USER REPORT: User " + currentUser.getUid() + " has reported user " + uid);
+                                    documentSnapshot.getReference().update("notifications", notifications);
+                                }
+                            }
+                        } else {
+                            Log.e("PostListAdapter", "Error fetching admin data", task.getException());
                         }
-                    }
-                } else {
-                    Log.e("PostListAdapter", "Error fetching admin data", task.getException());
+                    });
                 }
             });
+            builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    dialog.dismiss();
+                }
+            });
+            AlertDialog dialog = builder.create();
+            dialog.show();
+
         });
 
         binding.displayPosts.setOnClickListener(new View.OnClickListener() {

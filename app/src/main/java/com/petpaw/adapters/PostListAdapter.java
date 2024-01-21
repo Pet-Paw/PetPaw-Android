@@ -1,6 +1,8 @@
 package com.petpaw.adapters;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
@@ -12,11 +14,14 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
@@ -220,22 +225,37 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.PostVi
 
 //        ----------------- report post ------------------------
         holder.postCardViewReportImageView.setOnClickListener(view -> {
-            DocumentReference postRef = db.collection("Admin").document("nolD8tefH4w9mwE9efzM");
-            postRef.get().addOnCompleteListener(task -> {
-                if (task.isSuccessful() && task.getResult() != null) {
-                    DocumentSnapshot documentSnapshot = task.getResult();
-                    if (documentSnapshot.exists()) {
-                        //add to the "notifications" list a text "post reported"
-                        if(documentSnapshot.get("notifications") != null){
-                            List<String> notifications = (List<String>) documentSnapshot.get("notifications");
-                            notifications.add("POST REPORT: User " + currentUserId + " has reported post " + postId);
-                            documentSnapshot.getReference().update("notifications", notifications);
+            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+            builder.setTitle("Report this post?");
+            builder.setMessage("Report notification will be sent to PetPaw admin.");
+            builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    DocumentReference postRef = db.collection("Admin").document("nolD8tefH4w9mwE9efzM");
+                    postRef.get().addOnCompleteListener(task -> {
+                        if (task.isSuccessful() && task.getResult() != null) {
+                            DocumentSnapshot documentSnapshot = task.getResult();
+                            if (documentSnapshot.exists()) {
+                                //add to the "notifications" list a text "post reported"
+                                if(documentSnapshot.get("notifications") != null){
+                                    List<String> notifications = (List<String>) documentSnapshot.get("notifications");
+                                    notifications.add("POST REPORT: User " + currentUserId + " has reported post " + postId);
+                                    documentSnapshot.getReference().update("notifications", notifications);
+                                }
+                            }
+                        } else {
+                            Log.e("PostListAdapter", "Error fetching admin data", task.getException());
                         }
-                    }
-                } else {
-                    Log.e("PostListAdapter", "Error fetching admin data", task.getException());
+                    });
                 }
             });
+            builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    dialog.dismiss();
+                }
+            });
+            AlertDialog dialog = builder.create();
+            dialog.show();
+
         });
 
 

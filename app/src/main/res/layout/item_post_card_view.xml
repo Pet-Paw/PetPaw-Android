@@ -62,7 +62,6 @@
                             android:id="@+id/postCardViewUserNameTextView"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:text="Le Duy Quang"
                             android:textSize="16sp"
                             android:textStyle="bold" />
 

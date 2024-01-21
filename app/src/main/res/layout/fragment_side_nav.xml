@@ -15,20 +15,25 @@
         android:layout_width="match_parent"
         android:orientation="vertical"
         android:layout_height="match_parent">
-        <androidx.appcompat.widget.Toolbar
+
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/toolbar"
-            android:elevation="4dp"
-            />
+            android:layout_height="wrap_content"
+            android:background="@color/primary">
+            <androidx.appcompat.widget.Toolbar
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/toolbar"
+                android:theme="@style/ToolbarTheme"
+                android:elevation="4dp"
+                />
+        </LinearLayout>
 
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:id="@+id/fragment_container"
             />
-
-
 
     </LinearLayout>
 
@@ -39,6 +44,8 @@
         android:layout_gravity="start"
         app:headerLayout="@layout/side_nav_header"
         app:menu="@menu/side_nav"
+        app:itemIconTint="@color/primary"
+        app:itemTextColor="@color/black"
         />
 
 </androidx.drawerlayout.widget.DrawerLayout>
