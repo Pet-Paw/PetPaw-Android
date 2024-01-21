@@ -21,6 +21,7 @@ import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
+import android.os.StrictMode;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -53,6 +54,8 @@ import com.permissionx.guolindev.request.ExplainScope;
 import com.petpaw.R;
 import com.petpaw.adapters.ConversationListAdapter;
 import com.petpaw.adapters.MessageListAdapter;
+import com.petpaw.clients.NotiSender;
+import com.petpaw.database.UserCollection;
 import com.petpaw.databinding.ActivityMessageBinding;
 import com.petpaw.fragments.screens.MapsFragment;
 import com.petpaw.interfaces.OnConversationClickListener;
@@ -67,6 +70,7 @@ import com.zegocloud.uikit.prebuilt.call.invite.ZegoUIKitPrebuiltCallInvitationS
 import com.zegocloud.uikit.prebuilt.call.invite.widget.ZegoSendCallInvitationButton;
 import com.zegocloud.uikit.service.defines.ZegoUIKitUser;
 
+import java.io.IOException;
 import java.security.Permission;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -114,6 +118,10 @@ public class MessageActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
+                .permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+
         binding = ActivityMessageBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         db = FirebaseFirestore.getInstance();
@@ -205,6 +213,38 @@ public class MessageActivity extends AppCompatActivity {
             message.setContent(binding.etSendMessage.getText().toString());
             message.setSenderId(auth.getCurrentUser().getUid());
             message.setSentAt(new Date());
+
+            String currentUserId = auth.getCurrentUser().getUid();
+            UserCollection userCollection = UserCollection.newInstance();
+            userCollection.getUser(currentUserId, new UserCollection.Callback() {
+                @Override
+                public void onCallback(List<User> users) {
+
+                }
+
+                @Override
+                public void onCallBack(User currentUser) {
+                    String title = currentUser.getName();
+                    NotiSender notiSender = new NotiSender(currentUserId);
+                    List<String> memberIdLists =  conversation.getMemberIdList();
+                    for (String memberId: memberIdLists) {
+                        if (!memberId.equals(currentUserId)) {
+                            notiSender.sendNotificationToDifferentAccount(memberId, title, message.getContent());
+                        }
+                    }
+
+                    try {
+                        notiSender.sendNotificationOnCurrentAccount("You message " + message.getContent());
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+
+                }
+            });
+
+
+
+
 
             db.collection(Conversation.CONVERSATIONS)
                     .document(conversationID)
