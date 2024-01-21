@@ -16,17 +16,17 @@ public class User implements FirebaseDoc {
     private String address;
     private String imageURL;
     private String physicalDeviceToken;
-    private LatLng location;
+    private String location;
     private String phonePass;
 
     private String country;
     private String banReason;
 
-    public LatLng getLocation() {
+    public String getLocation() {
         return location;
     }
 
-    public void setLocation(LatLng location) {
+    public void setLocation(String location) {
         this.location = location;
     }
 

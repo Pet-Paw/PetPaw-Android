@@ -234,7 +234,7 @@ public class SignUpActivity extends AppCompatActivity {
                             Toast.makeText(SignUpActivity.this, "Fetching FCM registration token failed", Toast.LENGTH_SHORT).show();
                         }
                         String physicalDeviceToken = task.getResult();
-                        User newUser = new User(userId, username, emailOrPhone, phoneNumber,  address, "", physicalDeviceToken, phonePass);
+                        User newUser = new User(userId, username, emailOrPhone, phoneNumber,  address, null, physicalDeviceToken, phonePass);
                         userCollection.createUser(newUser);
 
                         Intent intent = new Intent(SignUpActivity.this, SignInActivity.class);

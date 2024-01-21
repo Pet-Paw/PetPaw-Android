@@ -58,7 +58,7 @@ public class MessagesFragment extends Fragment {
     private int mNumConversations;
     private List<Conversation> mConversationList = new ArrayList<>();;
 
-    private List<String> mUserIdList = new ArrayList<>();;
+    private List<String> mUserIdList = new ArrayList<>();
 
 
 
@@ -102,21 +102,23 @@ public class MessagesFragment extends Fragment {
         return mBinding.getRoot();
     }
 
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-
-        setupRvConversationList();
-        if(mAuth.getCurrentUser() != null){
-            getConversationsFromDb();
-        }
-
-//        setupFirebaseUser();
-    }
+//    @Override
+//    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+//        setupRvConversationList();
+//        if(mAuth.getCurrentUser() != null){
+//            getConversationsFromDb();
+//        }
+//
+////        setupFirebaseUser();
+//    }
 
     @Override
     public void onResume() {
+        Log.d("ON RESUME", "ON RESUME CALLED");
+        setupRvConversationList();
         if(mAuth.getCurrentUser() != null){
-            mConversationListAdapter.setConversationList(mConversationList);
+            getConversationsFromDb();
+//            mConversationListAdapter.setConversationList(mConversationList);
         }
         super.onResume();
     }
@@ -141,18 +143,44 @@ public class MessagesFragment extends Fragment {
 
     private void getConversationsFromDb() {
         mDb.collection(Conversation.CONVERSATIONS)
-                .whereArrayContains("memberIdList", mAuth.getCurrentUser().getUid())
-                .addSnapshotListener(MetadataChanges.INCLUDE, new EventListener<QuerySnapshot>() {
+//                .whereArrayContains("memberIdList", mAuth.getCurrentUser().getUid())
+//                .addSnapshotListener(MetadataChanges.INCLUDE, new EventListener<QuerySnapshot>() {
+//                    @Override
+//                    public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+//                        assert value != null;
+//                        mNumConversations = value.size();
+//                        Log.d("messages.java", "mNumConversations = " + mNumConversations);
+//                        mConversationList.clear();
+//                        mUserIdList.clear();
+//
+//                        for (DocumentSnapshot doc: value) {
+//                            Conversation conversation = doc.toObject(Conversation.class);
+//                            assert conversation != null;
+//                            conversation.setUid(doc.getId());
+//
+//                            for (String userId: conversation.getMemberIdList()) {
+//                                if(mAuth.getCurrentUser() != null){
+//                                    if (!Objects.equals(userId, mAuth.getCurrentUser().getUid())) {
+//                                        mUserIdList.add(userId);
+//                                    }
+//                                }
+//                            }
+//                            getLastMessageFromDb(conversation);
+//                        }
+//                        getUsersFromDb();
+//                    }
+//                });
+                .get()
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
-                    public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
-                        assert value != null;
-                        mNumConversations = value.size();
+                    public void onSuccess(QuerySnapshot snapshots) {
+                        assert snapshots != null;
+                        mNumConversations = snapshots.size();
                         Log.d("messages.java", "mNumConversations = " + mNumConversations);
                         mConversationList.clear();
-
                         mUserIdList.clear();
 
-                        for (DocumentSnapshot doc: value) {
+                        for (DocumentSnapshot doc: snapshots) {
                             Conversation conversation = doc.toObject(Conversation.class);
                             assert conversation != null;
                             conversation.setUid(doc.getId());
@@ -164,19 +192,11 @@ public class MessagesFragment extends Fragment {
                                     }
                                 }
                             }
-
                             getLastMessageFromDb(conversation);
                         }
-
                         getUsersFromDb();
                     }
                 });
-//                .get()
-//                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-//                    @Override
-//                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-//                    }
-//                });
     }
 
     private void getLastMessageFromDb(Conversation conversation) {
@@ -193,18 +213,22 @@ public class MessagesFragment extends Fragment {
                         for (DocumentSnapshot doc: queryDocumentSnapshots) {
                             Message message = doc.toObject(Message.class);
                             assert message != null;
-
+                            Log.d("MESSAGE", message.getContent());
                             message.setUid(doc.getId());
                             conversation.setLastMessage(message);
+                            Log.d("ADD", "ADDED");
                             mConversationList.add(conversation);
                         }
-
                         Log.d("messages.java", "Conversation list sz: " + mConversationList.size());
+                        mConversationListAdapter.setConversationList(mConversationList);
 
-                        if (mConversationList.size() == mNumConversations) {
-                            Log.d("messages.java", "setup conversation list");
-                            mConversationListAdapter.setConversationList(mConversationList);
-                        }
+//                        if (mConversationList.size() == mNumConversations) {
+//                            Log.d("messages.java", "setup conversation list");
+//                            for (Conversation con : mConversationList){
+//                                Log.d("CONVERSATION LIST", con.getUid());
+//                            }
+//                        }
+
                     }
                 });
     }
@@ -227,7 +251,6 @@ public class MessagesFragment extends Fragment {
                         }
                         Log.d("TAG", "User Map: " + userMap);
                         mConversationListAdapter.setUserMap(userMap);
-
                     }
                 });
     }

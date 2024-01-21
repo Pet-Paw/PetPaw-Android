@@ -53,7 +53,7 @@ public class StartActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
-        FirebaseAuth.getInstance().signOut();
+//        FirebaseAuth.getInstance().signOut();
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
 
@@ -101,7 +101,12 @@ public class StartActivity extends AppCompatActivity {
             } else {
                 // Directly ask for the permission
                 requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
+
             }
         }
     }
+
+
+
+
 }

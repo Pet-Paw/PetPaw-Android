@@ -201,7 +201,7 @@ public class HomeFragment extends Fragment {
                                         randomPostList.add(postTemp);
                                     }
                                     if (context != null) {
-                                        recyclerViewRandom.setLayoutManager(new LinearLayoutManager(requireContext()));
+                                        recyclerViewRandom.setLayoutManager(new LinearLayoutManager(getContext()));
                                         recyclerViewRandom.setAdapter(new PostListAdapter(getContext(), randomPostList));
                                     }
                                     Log.d("randomPostList", "randomPostList: " + randomPostList);
