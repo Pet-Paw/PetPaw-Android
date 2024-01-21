@@ -153,7 +153,7 @@ public class SignUpActivity extends AppCompatActivity {
                 if (task.isSuccessful()) {
                     FirebaseUser firebaseUser = auth.getCurrentUser();
                     String userId = firebaseUser.getUid();
-                    createUser(userId, username, emailOrPhone, "", address);
+                    createUser(userId, username, emailOrPhone, "", address, password);
                 } else {
                     Toast.makeText(SignUpActivity.this, "Email is already existed", Toast.LENGTH_SHORT).show();
                 }
@@ -181,7 +181,13 @@ public class SignUpActivity extends AppCompatActivity {
                     Log.d(TAG, "signInWithCredential:success");
                     Toast.makeText(SignUpActivity.this, "Signup successfully", Toast.LENGTH_SHORT).show();
 
-                    createUser(auth.getCurrentUser().getUid(), usernameInSignUpByPhone, "", phoneInSignUpByPhone, "");
+                    String username = signUpBinding.username.getText().toString();
+                    String phone =  "+84" +  signUpBinding.emailOrPhone.getText().toString();
+                    String address = signUpBinding.address.getText().toString();
+                    String password = signUpBinding.password.getText().toString();
+
+
+                    createUser(auth.getCurrentUser().getUid(), username, "", phone, address, password);
 
                     Intent intent = new Intent(SignUpActivity.this, SignInActivity.class);
                     startActivity(intent);
@@ -193,6 +199,7 @@ public class SignUpActivity extends AppCompatActivity {
                         // The verification code entered was invalid
                         Log.w(TAG, "signInWithCredential:failure", task.getException());
                     }
+                    Toast.makeText(SignUpActivity.this, "OTP invalid", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -203,7 +210,7 @@ public class SignUpActivity extends AppCompatActivity {
         PhoneAuthOptions options =
                 PhoneAuthOptions.newBuilder(auth)
                         .setPhoneNumber(phoneNumber)       // Phone number to verify
-                        .setTimeout(60L, TimeUnit.SECONDS) // Timeout and unit
+                        .setTimeout(120L, TimeUnit.SECONDS) // Timeout and unit
                         .setActivity(this)                 // (optional) Activity for callback binding
                         // If no activity is passed, reCAPTCHA verification can not be used.
                         .setCallbacks(mCallbacks)          // OnVerificationStateChangedCallbacks
@@ -217,7 +224,7 @@ public class SignUpActivity extends AppCompatActivity {
         signInWithPhoneAuthCredential(credential);
     }
 
-    private void createUser(String userId, String username, String emailOrPhone, String phoneNumber, String address) {
+    private void createUser(String userId, String username, String emailOrPhone, String phoneNumber, String address, String phonePass) {
         FirebaseMessaging.getInstance().getToken()
                 .addOnCompleteListener(new OnCompleteListener<String>() {
                     @Override
@@ -227,7 +234,7 @@ public class SignUpActivity extends AppCompatActivity {
                             Toast.makeText(SignUpActivity.this, "Fetching FCM registration token failed", Toast.LENGTH_SHORT).show();
                         }
                         String physicalDeviceToken = task.getResult();
-                        User newUser = new User(userId, username, emailOrPhone, "",  address, physicalDeviceToken);
+                        User newUser = new User(userId, username, emailOrPhone, phoneNumber,  address, null, physicalDeviceToken, phonePass);
                         userCollection.createUser(newUser);
 
                         Intent intent = new Intent(SignUpActivity.this, SignInActivity.class);

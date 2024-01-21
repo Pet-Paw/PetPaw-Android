@@ -25,8 +25,11 @@ import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthOptions;
 import com.google.firebase.auth.PhoneAuthProvider;
 import com.petpaw.R;
+import com.petpaw.database.UserCollection;
 import com.petpaw.databinding.ActivitySignInBinding;
+import com.petpaw.models.User;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class SignInActivity extends AppCompatActivity {
@@ -38,6 +41,7 @@ public class SignInActivity extends AppCompatActivity {
     private PhoneAuthProvider.ForceResendingToken mResendToken;
     private String mVerificationId;
     private String otp;
+    private String code;
     boolean isLoginByPhone = false;
 
     @Override
@@ -61,10 +65,11 @@ public class SignInActivity extends AppCompatActivity {
             public void onVerificationCompleted(@NonNull PhoneAuthCredential phoneAuthCredential) {
                 Log.d(TAG, "onVerificationCompleted:" + phoneAuthCredential);
 
-                final String code = phoneAuthCredential.getSmsCode();
-                if (code != null) {
+                final String codeSent = phoneAuthCredential.getSmsCode();
+                if (codeSent != null) {
                     Log.d(TAG, "onVerificationCompleted: code: " + code);
-//                    verifyCode(code);
+                    code = codeSent;
+
                 }
 //                    signInWithPhoneAuthCredential(phoneAuthCredential);
 
@@ -89,6 +94,7 @@ public class SignInActivity extends AppCompatActivity {
                 // now need to ask the user to enter the code and then construct a credential
                 // by combining the code with a verification ID.
                 Log.d(TAG, "onCodeSent:" + verificationId);
+
 
                 // Save verification ID and resending token so we can use them later
                 mVerificationId = verificationId;
@@ -169,7 +175,7 @@ public class SignInActivity extends AppCompatActivity {
         PhoneAuthOptions options =
                 PhoneAuthOptions.newBuilder(auth)
                         .setPhoneNumber(phoneNumber)       // Phone number to verify
-                        .setTimeout(60L, TimeUnit.SECONDS) // Timeout and unit
+                        .setTimeout(120L, TimeUnit.SECONDS) // Timeout and unit
                         .setActivity(this)                 // (optional) Activity for callback binding
                         // If no activity is passed, reCAPTCHA verification can not be used.
                         .setCallbacks(mCallbacks)          // OnVerificationStateChangedCallbacks
@@ -210,4 +216,25 @@ public class SignInActivity extends AppCompatActivity {
         });
     }
 
+    private void signInPhoneWithFireStore(String phone, String password) {
+        UserCollection userCollection = UserCollection.newInstance();
+        userCollection.authUserPhone(phone, password, new UserCollection.Callback() {
+            @Override
+            public void onCallback(List<User> users) {
+
+            }
+
+            @Override
+            public void onCallBack(User user) {
+                if (user != null) {
+                    Toast.makeText(SignInActivity.this, "Login successfully", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(SignInActivity.this, MainActivity.class);
+                    startActivity(intent);
+                    finish();
+                } else {
+                    Toast.makeText(SignInActivity.this, "Login failed", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
 }

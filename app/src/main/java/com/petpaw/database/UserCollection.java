@@ -61,4 +61,20 @@ public class UserCollection {
     public void updateDeviceToken(String uid, String token) {
         usersCollectionReference.document(uid).update("physicalDeviceToken", token);
     }
+
+    public void authUserPhone(String phone, String password, Callback callback) {
+        usersCollectionReference.whereEqualTo("phone", phone).whereEqualTo("phonePass", password).get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                List<User> users = task.getResult().toObjects(User.class);
+                if (users.size() > 0) {
+                    callback.onCallBack(users.get(0));
+                } else {
+                    callback.onCallBack(null);
+                }
+            } else {
+                System.out.println("Error getting documents: " + task.getException());
+                throw new RuntimeException(task.getException());
+            }
+        });
+    }
 }
