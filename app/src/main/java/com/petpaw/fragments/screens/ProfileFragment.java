@@ -191,13 +191,11 @@ public class ProfileFragment extends Fragment {
             binding.reportBtn.setVisibility(View.INVISIBLE);
             binding.backBtn.setVisibility(View.INVISIBLE);
             binding.followBtn.setVisibility(View.GONE);
-            binding.messageBtn.setVisibility(View.GONE);
         } else {
             // Another user's profile
             binding.editBtn.setVisibility(View.GONE);
             binding.addPetBtn.setVisibility(View.GONE);
             binding.followBtn.setVisibility(View.VISIBLE);
-            binding.messageBtn.setVisibility(View.VISIBLE);
             binding.backBtn.setVisibility(View.VISIBLE);
             binding.reportBtn.setVisibility(View.VISIBLE);
         }
@@ -298,7 +296,7 @@ public class ProfileFragment extends Fragment {
                 Log.d("ProfileFragment", "previousFragment = " + previousFragment);
                 String owner_uid = getArguments().getString(OWNER_UID);
                 if (previousFragment == R.id.userFollowingFragment) {
-                    Toast.makeText(getContext(), "previousFragment = " + previousFragment, Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(getContext(), "previousFragment = " + previousFragment, Toast.LENGTH_SHORT).show();
                     fragmentTransaction.replace(R.id.profileFragmentLayout, UserFollowingFragment.newInstance(owner_uid)).commitNow();
                 } else if (previousFragment == R.id.useFollowerFragment) {
                     fragmentTransaction.replace(R.id.profileFragmentLayout, UserFollowersFragment.newInstance(owner_uid)).commitNow();
