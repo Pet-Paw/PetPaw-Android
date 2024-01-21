@@ -153,8 +153,12 @@ public class MessageActivity extends AppCompatActivity {
         });
         binding.mapBtn.setOnClickListener(v -> {
             if(binding.rlMap.getVisibility() == View.GONE){
+                binding.mapBtn.setImageTintList(getColorStateList(R.color.white));
+                binding.mapBtn.setBackgroundColor(getColor(R.color.primary));
                 binding.rlMap.setVisibility(View.VISIBLE);
             } else {
+                binding.mapBtn.setImageTintList(getColorStateList(R.color.primary));
+                binding.mapBtn.setBackgroundColor(0x00000000);
                 binding.rlMap.setVisibility(View.GONE);
             }
         });
