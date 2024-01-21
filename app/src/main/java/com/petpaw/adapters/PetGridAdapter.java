@@ -35,7 +35,7 @@ public class PetGridAdapter extends BaseAdapter {
 
     @Override
     public long getItemId(int position) {
-        return images.size();
+        return position;
     }
 
     @Override

@@ -134,7 +134,7 @@
                     android:visibility="gone"
                     android:text="Message"
                     android:textAllCaps="false"
-                    android:textColor="@color/black"
+                    android:textColor="@color/white"
                     app:cornerRadius="20dp" />
 
             </RelativeLayout>

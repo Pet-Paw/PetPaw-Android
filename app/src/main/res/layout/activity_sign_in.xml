@@ -55,8 +55,7 @@
             android:drawableBottom="@color/black"
             android:hint="Email Address"
             android:inputType="textEmailAddress"
-            android:textSize="20dp"
-            android:text="tester@gmail.com"/>
+            android:textSize="20dp"/>
 
         <EditText
             style="@style/Widget.Material3.TextInputEditText.OutlinedBox"
@@ -66,10 +65,9 @@
             android:layout_gravity="center"
             android:layout_marginTop="15dp"
             android:background="@drawable/edit_text_border"
-            android:hint="Enter Your Password"
+            android:hint="Password"
             android:inputType="textPassword"
-            android:textSize="20dp"
-            android:text="123456789"/>
+            android:textSize="20dp"/>
 
 
 
