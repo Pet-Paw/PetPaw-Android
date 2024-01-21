@@ -1,19 +1,37 @@
 package com.petpaw.activities;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.Manifest;
+
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -24,6 +42,7 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.MetadataChanges;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -35,6 +54,7 @@ import com.petpaw.R;
 import com.petpaw.adapters.ConversationListAdapter;
 import com.petpaw.adapters.MessageListAdapter;
 import com.petpaw.databinding.ActivityMessageBinding;
+import com.petpaw.fragments.screens.MapsFragment;
 import com.petpaw.interfaces.OnConversationClickListener;
 import com.petpaw.models.Conversation;
 import com.petpaw.models.Message;
@@ -67,7 +87,23 @@ public class MessageActivity extends AppCompatActivity {
     private Conversation conversation;
     private List<Message> messageList = new ArrayList<>();
     private MessageListAdapter messageListAdapter;
+
+    private FusedLocationProviderClient client;
+    private LocationCallback locationCallback;
+    private LocationRequest locationRequest;
+    private Boolean isSharing = false;
+
+    private final ActivityResultLauncher<String> requestPermissionLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+                if (isGranted) {
+                    Toast.makeText(this, "Permission granted", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(this, "Can't share location without permission", Toast.LENGTH_LONG).show();
+                }
+            });
+
     private Map<String, User> userMap;
+
 
 //    @Override
 //    protected void onStart() {
@@ -83,6 +119,12 @@ public class MessageActivity extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
 
+        client = LocationServices.getFusedLocationProviderClient(MessageActivity.this);
+        getConversation();
+        setupMessageRV();
+        binding.rlMap.setVisibility(View.GONE);
+
+
 
         binding.btnVoiceCall.setIsVideoCall(true);
 
@@ -91,12 +133,74 @@ public class MessageActivity extends AppCompatActivity {
 
         requestCallPermissions();
 
+
         binding.sendMessageBtn.setOnClickListener(v -> onBtnSendClick());
-        binding.backBtn.setOnClickListener(v -> finish());
+        binding.backBtn.setOnClickListener(v -> {
+            stopLocationUpdates();
+            finish();
+        });
+        binding.mapBtn.setOnClickListener(v -> {
+            if(binding.rlMap.getVisibility() == View.GONE){
+                binding.rlMap.setVisibility(View.VISIBLE);
+            } else {
+                binding.rlMap.setVisibility(View.GONE);
+            }
+        });
+        binding.shareLocationBtn.setOnClickListener(v -> {
+            if (askLocationPermission()){
+                if (isSharing) {
+                    isSharing = false;
+                    binding.shareLocationBtn.setText("Share Location");
+                    stopLocationUpdates();
+                } else {
+                    isSharing = true;
+                    binding.shareLocationBtn.setText("Stop Sharing");
+                    startLocationUpdates();
+                }
+            }
+        });
+
+    }
+
+    public void setupLocationFeature(){
+        if(conversation.getMemberIdList().size() > 2){
+            binding.shareLocationBtn.setVisibility(View.GONE);
+        } else {
+            setupMapFragment();
+            setupLocationSharing();
+            setupLocationSharingListener();
+        }
+    }
+
+    protected void setupLocationSharing() {
+        locationRequest = new LocationRequest.Builder(1000)
+                .build();
+        locationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                if (locationResult == null) {
+                    return;
+                }
+                for (Location location : locationResult.getLocations()) {
+                    Log.d("Current Location", location.toString());
+                    if(isSharing){
+                        GeoPoint curLoc = new GeoPoint(location.getLatitude(), location.getLongitude());
+                        Map<String, Object> doc = new HashMap<>();
+                        doc.put("location", curLoc);
+                        doc.put("isSharing", true);
+                        db.collection("Conversations")
+                                .document(conversationID)
+                                .collection("locations")
+                                .document(auth.getCurrentUser().getUid())
+                                .update(doc);
+                    }
+                }
+            }
+        };
     }
 
     private void onBtnSendClick() {
-        if(binding.etSendMessage.getText().length() != 0){
+        if (binding.etSendMessage.getText().length() != 0) {
             Message message = new Message();
             message.setContent(binding.etSendMessage.getText().toString());
             message.setSenderId(auth.getCurrentUser().getUid());
@@ -135,7 +239,7 @@ public class MessageActivity extends AppCompatActivity {
         Intent intent = getIntent();
         conversationID = intent.getStringExtra("conversationID");
 
-        if(!intent.hasExtra("conversationID")) {
+        if (!intent.hasExtra("conversationID")) {
             return;
         }
 
@@ -180,11 +284,12 @@ public class MessageActivity extends AppCompatActivity {
                                         @Nullable FirebaseFirestoreException error) {
                         conversation = value.toObject(Conversation.class);
                         getMessages();
+                        setupLocationFeature();
                     }
                 });
     }
 
-    private void getMessages(){
+    private void getMessages() {
         db.collection(Conversation.CONVERSATIONS)
                 .document(conversationID)
                 .collection(Message.MESSAGES)
@@ -202,7 +307,8 @@ public class MessageActivity extends AppCompatActivity {
                     }
                 });
     }
-    private void getUsers(){
+
+    private void getUsers() {
         db.collection(User.USERS)
                 .whereIn(FieldPath.documentId(), conversation.getMemberIdList())
                 .get()
@@ -211,18 +317,19 @@ public class MessageActivity extends AppCompatActivity {
                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                         userMap = new HashMap<>();
 
-                        for (DocumentSnapshot doc: queryDocumentSnapshots) {
+                        for (DocumentSnapshot doc : queryDocumentSnapshots) {
                             User user = doc.toObject(User.class);
                             userMap.put(user.getUid(), user);
                         }
 
                         Log.d("TAG", "User Map: " + userMap);
-                        if(conversation.getMemberIdList().size() <= 2){
-                            for (String userId: conversation.getMemberIdList()) {
+                        if (conversation.getMemberIdList().size() <= 2) {
+                            for (String userId : conversation.getMemberIdList()) {
                                 if (!Objects.equals(userId, auth.getCurrentUser().getUid())) {
                                     User user = userMap.get(userId);
                                     binding.tvName.setText(user.getName());
-                                    if(user.getImageURL() == null){
+//                                    binding.tvShareLocation.setText(user.getName() + "is sharing their location");
+                                    if (user.getImageURL() == null) {
                                         binding.ivUserPic.setImageResource(R.drawable.default_avatar);
                                     } else {
                                         Picasso.get()
@@ -243,6 +350,7 @@ public class MessageActivity extends AppCompatActivity {
                                 }
                             }
                         } else {
+                            binding.mapBtn.setVisibility(View.GONE);
                             binding.ivUserPic.setImageResource(R.drawable.group_chat_image);
                             StringBuilder names = new StringBuilder();
                             int cnt = 0;
@@ -257,6 +365,7 @@ public class MessageActivity extends AppCompatActivity {
 
                                     if(conversation.getMemberIdList().indexOf(userMap.get(userId).getUid()) != (conversation.getMemberIdList().size() - 1)){
                                         names.append(", ");
+
                                     }
                                 }
                             }
@@ -275,13 +384,85 @@ public class MessageActivity extends AppCompatActivity {
     }
 
 
-    private void setupMessageRV(){
+    private void setupMessageRV() {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getBaseContext(), LinearLayoutManager.VERTICAL, false);
         linearLayoutManager.setReverseLayout(true);
         binding.rvMessageList.setLayoutManager(linearLayoutManager);
         messageListAdapter = new MessageListAdapter(getBaseContext());
         binding.rvMessageList.setAdapter(messageListAdapter);
+    }
 
+
+    private boolean askLocationPermission() {
+        // This is only necessary for API Level > 33 (TIRAMISU)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if ((ContextCompat.checkSelfPermission(MessageActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) ==
+                    PackageManager.PERMISSION_GRANTED) && (ContextCompat.checkSelfPermission(MessageActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) ==
+                    PackageManager.PERMISSION_GRANTED)) {
+                return true;
+            } else {
+                // Directly ask for the permission
+                requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION);
+                requestPermissionLauncher.launch(Manifest.permission.ACCESS_COARSE_LOCATION);
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private void startLocationUpdates() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            askLocationPermission();
+            return;
+        }
+        client.requestLocationUpdates(locationRequest, locationCallback, null);
+    }
+
+    private void stopLocationUpdates(){
+        GeoPoint loc = new GeoPoint(0, 0);
+        Map<String, Object> doc = new HashMap<>();
+        doc.put("location", loc);
+        doc.put("isSharing", false);
+        db.collection("Conversations")
+                .document(conversationID)
+                .collection("locations")
+                .document(auth.getCurrentUser().getUid())
+                .update(doc);
+        if(isSharing){
+            client.removeLocationUpdates(locationCallback);
+        }
+    }
+
+    private void setupMapFragment(){
+        Bundle bundle = new Bundle();
+        bundle.putString("conversationID", conversationID);
+
+        getSupportFragmentManager().beginTransaction()
+                .setReorderingAllowed(true)
+                .add(binding.mapFragmentCtn.getId(), MapsFragment.class, bundle)
+                .commit();
+    }
+
+    private void setupLocationSharingListener(){
+        db.collection("Conversations")
+                .document(conversationID)
+                .collection("locations")
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot query, @Nullable FirebaseFirestoreException error) {
+                        for (DocumentSnapshot doc: query){
+                            if(doc.getId() != auth.getCurrentUser().getUid()){
+                                if((boolean) doc.get("isSharing")) {
+                                    if(binding.rlMap.getVisibility() == View.GONE){
+                                        Toast.makeText(getBaseContext(), "Location sharing is active. Press Map Icon to view", Toast.LENGTH_SHORT).show();
+                                    }
+//                                  binding.tvShareLocation.setVisibility(View.VISIBLE);
+                                }
+
+                            }
+                        }
+                    }
+                });
     }
 
     private void onBtnCallClick() {

@@ -110,7 +110,6 @@ public class ConversationListAdapter extends RecyclerView.Adapter<ConversationLi
             }
 
         } else {
-            // TODO: handle group chat image + name + last message
             holder.mBinding.iv.setImageResource(R.drawable.group_chat_image);
             String names = "";
             int cnt = 0;
