@@ -133,9 +133,10 @@ public class MessageActivity extends AppCompatActivity {
         client = LocationServices.getFusedLocationProviderClient(MessageActivity.this);
         getConversation();
         setupMessageRV();
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE){
+            binding.mapBtn.setVisibility(View.GONE);
+        }
         binding.rlMap.setVisibility(View.GONE);
-
-
 
         binding.btnVoiceCall.setIsVideoCall(true);
 
