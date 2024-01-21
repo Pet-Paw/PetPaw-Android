@@ -99,7 +99,7 @@ public class HomeFragment extends Fragment {
         createPostBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(requireContext(), CreatePostActivity.class);
+                Intent intent = new Intent(getContext(), CreatePostActivity.class);
 //                intent.putExtra("communityId", "RWNRXeWkMpRlb20yV7z8");
                 startActivity(intent);
             }
@@ -108,7 +108,7 @@ public class HomeFragment extends Fragment {
         comBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(requireContext(), CreateCommunityActivity.class);
+                Intent intent = new Intent(getContext(), CreateCommunityActivity.class);
                 startActivity(intent);
             }
         });
@@ -155,8 +155,8 @@ public class HomeFragment extends Fragment {
                                         postList.add(postTemp);
                                     }
                                     if (context != null) {
-                                        recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-                                        recyclerView.setAdapter(new PostListAdapter(requireContext(), postList));
+                                        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+                                        recyclerView.setAdapter(new PostListAdapter(getContext(), postList));
                                     }
                                     Log.d("TAG", "onComplete: " + postList);
                                 }else{
@@ -178,8 +178,8 @@ public class HomeFragment extends Fragment {
                                         postList.add(postTemp);
                                     }
                                     if (context != null) {
-                                        recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-                                        recyclerView.setAdapter(new PostListAdapter(requireContext(), postList));
+                                        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+                                        recyclerView.setAdapter(new PostListAdapter(getContext(), postList));
                                     }
                                     Log.d("TAG", "postList: " + postList);
                                 }else{
@@ -202,7 +202,7 @@ public class HomeFragment extends Fragment {
                                     }
                                     if (context != null) {
                                         recyclerViewRandom.setLayoutManager(new LinearLayoutManager(requireContext()));
-                                        recyclerViewRandom.setAdapter(new PostListAdapter(requireContext(), randomPostList));
+                                        recyclerViewRandom.setAdapter(new PostListAdapter(getContext(), randomPostList));
                                     }
                                     Log.d("randomPostList", "randomPostList: " + randomPostList);
                                 }else{
