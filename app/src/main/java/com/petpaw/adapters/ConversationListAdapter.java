@@ -19,6 +19,8 @@ import com.petpaw.models.User;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -161,6 +163,12 @@ public class ConversationListAdapter extends RecyclerView.Adapter<ConversationLi
     }
 
     private void sortConversationList() {
+        conversationList.sort(new Comparator<Conversation>() {
+            @Override
+            public int compare(Conversation o1, Conversation o2) {
+                return o2.getLastMessage().getSentAt().compareTo(o1.getLastMessage().getSentAt());
+            }
+        });
 
     }
 }
