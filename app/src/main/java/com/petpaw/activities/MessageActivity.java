@@ -7,6 +7,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -43,6 +44,7 @@ import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.GeoPoint;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.MetadataChanges;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -92,6 +94,7 @@ public class MessageActivity extends AppCompatActivity {
     private LocationCallback locationCallback;
     private LocationRequest locationRequest;
     private Boolean isSharing = false;
+    FragmentManager fragmentManager;
 
     private final ActivityResultLauncher<String> requestPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
@@ -118,7 +121,7 @@ public class MessageActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
         db = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
-
+        fragmentManager = getSupportFragmentManager();
         client = LocationServices.getFusedLocationProviderClient(MessageActivity.this);
         getConversation();
         setupMessageRV();
@@ -137,6 +140,7 @@ public class MessageActivity extends AppCompatActivity {
         binding.sendMessageBtn.setOnClickListener(v -> onBtnSendClick());
         binding.backBtn.setOnClickListener(v -> {
             stopLocationUpdates();
+            fragmentManager = null;
             finish();
         });
         binding.mapBtn.setOnClickListener(v -> {
@@ -325,27 +329,29 @@ public class MessageActivity extends AppCompatActivity {
                         Log.d("TAG", "User Map: " + userMap);
                         if (conversation.getMemberIdList().size() <= 2) {
                             for (String userId : conversation.getMemberIdList()) {
-                                if (!Objects.equals(userId, auth.getCurrentUser().getUid())) {
-                                    User user = userMap.get(userId);
-                                    binding.tvName.setText(user.getName());
+                                if(auth.getCurrentUser() != null){
+                                    if (!Objects.equals(userId, auth.getCurrentUser().getUid())) {
+                                        User user = userMap.get(userId);
+                                        binding.tvName.setText(user.getName());
 //                                    binding.tvShareLocation.setText(user.getName() + "is sharing their location");
-                                    if (user.getImageURL() == null) {
-                                        binding.ivUserPic.setImageResource(R.drawable.default_avatar);
-                                    } else {
-                                        Picasso.get()
-                                                .load(user.getImageURL())
-                                                .tag(System.currentTimeMillis())
-                                                .into(binding.ivUserPic, new com.squareup.picasso.Callback() {
-                                                    @Override
-                                                    public void onSuccess() {
-                                                        Log.d("TAG", "Load image successfully");
-                                                    }
+                                        if (user.getImageURL() == null) {
+                                            binding.ivUserPic.setImageResource(R.drawable.default_avatar);
+                                        } else {
+                                            Picasso.get()
+                                                    .load(user.getImageURL())
+                                                    .tag(System.currentTimeMillis())
+                                                    .into(binding.ivUserPic, new com.squareup.picasso.Callback() {
+                                                        @Override
+                                                        public void onSuccess() {
+                                                            Log.d("TAG", "Load image successfully");
+                                                        }
 
-                                                    @Override
-                                                    public void onError(Exception e) {
-                                                        Log.e("TAG", "Load image failed");
-                                                    }
-                                                });
+                                                        @Override
+                                                        public void onError(Exception e) {
+                                                            Log.e("TAG", "Load image failed");
+                                                        }
+                                                    });
+                                        }
                                     }
                                 }
                             }
@@ -355,17 +361,19 @@ public class MessageActivity extends AppCompatActivity {
                             StringBuilder names = new StringBuilder();
                             int cnt = 0;
                             for (String userId: conversation.getMemberIdList()) {
-                                if (!Objects.equals(userId, auth.getCurrentUser().getUid())) {
-                                    names.append(userMap.get(userId).getName());
-                                    cnt++;
+                                if(auth.getCurrentUser() != null){
+                                    if (!Objects.equals(userId, auth.getCurrentUser().getUid())) {
+                                        names.append(userMap.get(userId).getName());
+                                        cnt++;
 
-                                    if (cnt == 3) {
-                                        break;
-                                    }
+                                        if (cnt == 3) {
+                                            break;
+                                        }
 
-                                    if(conversation.getMemberIdList().indexOf(userMap.get(userId).getUid()) != (conversation.getMemberIdList().size() - 1)){
-                                        names.append(", ");
+                                        if(conversation.getMemberIdList().indexOf(userMap.get(userId).getUid()) != (conversation.getMemberIdList().size() - 1)){
+                                            names.append(", ");
 
+                                        }
                                     }
                                 }
                             }
@@ -434,13 +442,14 @@ public class MessageActivity extends AppCompatActivity {
     }
 
     private void setupMapFragment(){
-        Bundle bundle = new Bundle();
-        bundle.putString("conversationID", conversationID);
-
-        getSupportFragmentManager().beginTransaction()
-                .setReorderingAllowed(true)
-                .add(binding.mapFragmentCtn.getId(), MapsFragment.class, bundle)
-                .commit();
+        if(fragmentManager != null) {
+            Bundle bundle = new Bundle();
+            bundle.putString("conversationID", conversationID);
+            fragmentManager.beginTransaction()
+                    .setReorderingAllowed(true)
+                    .add(binding.mapFragmentCtn.getId(), MapsFragment.class, bundle)
+                    .commit();
+        }
     }
 
     private void setupLocationSharingListener(){
@@ -451,14 +460,16 @@ public class MessageActivity extends AppCompatActivity {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot query, @Nullable FirebaseFirestoreException error) {
                         for (DocumentSnapshot doc: query){
-                            if(doc.getId() != auth.getCurrentUser().getUid()){
-                                if((boolean) doc.get("isSharing")) {
-                                    if(binding.rlMap.getVisibility() == View.GONE){
-                                        Toast.makeText(getBaseContext(), "Location sharing is active. Press Map Icon to view", Toast.LENGTH_SHORT).show();
-                                    }
+                            if(auth.getCurrentUser() != null){
+                                if(doc.getId() != auth.getCurrentUser().getUid()){
+                                    if((boolean) doc.get("isSharing")) {
+                                        if(binding.rlMap.getVisibility() == View.GONE){
+                                            Toast.makeText(getBaseContext(), "Location sharing is active. Press Map Icon to view", Toast.LENGTH_SHORT).show();
+                                        }
 //                                  binding.tvShareLocation.setVisibility(View.VISIBLE);
-                                }
+                                    }
 
+                                }
                             }
                         }
                     }
@@ -532,6 +543,9 @@ public class MessageActivity extends AppCompatActivity {
 //    }
 
     private void setupVoiceCallBtn() {
+        if(auth.getCurrentUser() == null){
+            return;
+        }
         String currentUserId = auth.getCurrentUser().getUid();
         String targetUserId = null;
 
@@ -552,6 +566,9 @@ public class MessageActivity extends AppCompatActivity {
     }
 
     private void setupVideoCallBtn() {
+        if(auth.getCurrentUser() == null){
+            return;
+        }
         String currentUserId = auth.getCurrentUser().getUid();
         String targetUserId = null;
 
