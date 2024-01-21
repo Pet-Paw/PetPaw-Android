@@ -5,63 +5,73 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".activities.BanActivity">
+
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
+        android:id="@+id/linearLayout2"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@color/white"
         android:gravity="center"
-        android:background="@color/white">
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
         <ImageView
             android:layout_width="100dp"
             android:layout_height="100dp"
-            android:src="@drawable/ban"
             android:layout_gravity="center"
-            android:layout_marginBottom="20dp"/>
+            android:layout_marginBottom="20dp"
+            android:src="@drawable/ban"
+            app:tint="@color/red" />
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="You have been banned due to"
-            android:textSize="28sp"
-            android:textColor="@color/black"
-            android:textStyle="bold"
             android:layout_gravity="center"
-            android:layout_marginBottom="20dp"/>
+            android:layout_marginBottom="10dp"
+            android:text="You have been banned due to"
+            android:textColor="@color/red"
+            android:textSize="28sp"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/ban_reason"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Bad behaviour"
-            android:textSize="40sp"
-            android:textColor="@color/red"
             android:layout_gravity="center"
             android:layout_marginBottom="20dp"
-            android:textAlignment="center"/>
+            android:text="Bad behaviour"
+            android:textAlignment="center"
+            android:textColor="@color/red"
+            android:textSize="40sp" />
 
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Please contact the admin for more"
-            android:textSize="20sp"
-            android:textColor="@color/black"
             android:layout_gravity="center"
-            android:textAlignment="center"/>
+            android:text="Please contact PetPaw admin for more"
+            android:textAlignment="center"
+            android:textColor="@color/black"
+            android:textSize="20sp" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
             android:gravity="center"
-            >
+            android:orientation="horizontal">
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="information at "
-                android:textSize="20sp"
-                android:textColor="@color/black"
                 android:layout_gravity="center"
-                android:textAlignment="center"/>
+                android:text="information at "
+                android:textAlignment="center"
+                android:textColor="@color/black"
+                android:textSize="20sp" />
+
             <TextView
                 android:id="@+id/admin_email"
                 android:layout_width="wrap_content"
@@ -74,16 +84,15 @@
         </LinearLayout>
 
 
-            <Button
-                android:id="@+id/ban_log_out"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Log Out"
-                android:textColor="@color/white"
-                app:cornerRadius="20dp"
-                android:textSize="20dp"
-                android:paddingVertical="10dp"
-                android:layout_marginTop="20dp"
-                />
+        <Button
+            android:id="@+id/ban_log_out"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:paddingVertical="10dp"
+            android:text="Log Out"
+            android:textColor="@color/white"
+            android:textSize="20dp"
+            app:cornerRadius="20dp" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

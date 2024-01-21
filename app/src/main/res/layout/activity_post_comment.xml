@@ -10,15 +10,17 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="8dp"
         android:gravity="center_horizontal"
         android:orientation="horizontal"
-        android:padding="10dp">
+        android:background="@color/primary"
+        android:padding="15dp"
+        android:layout_marginBottom="10dp">
 
         <ImageView
             android:id="@+id/backBtn"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            app:tint="@color/white"
             android:src="@drawable/baseline_arrow_back_ios_24"
             android:clickable="true"/>
 
@@ -27,9 +29,9 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="20dp"
             android:layout_weight="1"
-            android:text="Post Comment"
+            android:text="Comments"
             android:textAlignment="center"
-            android:textColor="@color/black"
+            android:textColor="@color/white"
             android:textStyle="bold"
             android:textSize="22dp" />
 

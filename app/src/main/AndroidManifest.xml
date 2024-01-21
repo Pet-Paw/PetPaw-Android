@@ -69,9 +69,6 @@
             android:name=".activities.EditPetProfileActivity"
             android:exported="false" />
         <activity
-            android:name=".activities.PetProfileActivity"
-            android:exported="false" />
-        <activity
             android:name=".activities.EditProfileActivity"
             android:exported="false" /> <!-- <intent-filter> -->
         <!-- <action android:name="android.intent.action.MAIN" /> -->

@@ -20,7 +20,6 @@ import com.google.firebase.storage.StorageReference;
 import com.petpaw.R;
 import com.petpaw.database.NotificationCollection;
 import com.petpaw.databinding.ActivityEditPetProfileBinding;
-import com.petpaw.databinding.ActivityPetProfileBinding;
 import com.petpaw.models.NotificationPetPaw;
 import com.squareup.picasso.Picasso;
 
